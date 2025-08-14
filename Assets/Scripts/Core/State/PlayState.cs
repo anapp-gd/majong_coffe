@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayState : State
 {
     [SerializeField] private Board board;
-    private Tile selectedTile;
+    private Board _board;
 
     protected override void Awake()
     {
@@ -12,10 +12,11 @@ public class PlayState : State
 
     protected override void Start()
     {
-
+        _board = Instantiate(board);
+        _board.Init();
     }
 
-    public void OnTileClicked(Tile tile)
+    /*public void OnTileClicked(Tile tile)
     {
         if (!tile.IsFree) return;
 
@@ -43,5 +44,5 @@ public class PlayState : State
                 tile.Select();
             }
         }
-    }
+    }*/
 }
