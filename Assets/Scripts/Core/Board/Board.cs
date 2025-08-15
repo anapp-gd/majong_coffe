@@ -27,17 +27,17 @@ public class Board : MonoBehaviour
         float offsetX = -(maxX * tileSize) / 2f;
         float offsetY = -(maxY * tileSize) / 2f;
 
-        foreach (var t in tiles)
+        foreach (var data in tiles)
         {
             Vector3 worldPos = new Vector3(
-                t.position.x * tileSize + offsetX,
-                t.position.y * tileSize + offsetY,
+                data.position.x * tileSize + offsetX,
+                data.position.y * tileSize + offsetY,
                 0f // Z всегда 0, всё контролируем через sortingOrder
             );
 
             var tile = Instantiate(tileView, worldPos, Quaternion.identity, transform); 
-            tile.GridPos = t.position;
-            tile.LayerIndex = t.layer; // Запоминаем слой
+            tile.GridPos = data.position;
+            tile.LayerIndex = data.layer; // Запоминаем слой
             tile.Init(state);
 
             var spriteRenderer = tile.GetComponent<SpriteRenderer>();
@@ -45,10 +45,10 @@ public class Board : MonoBehaviour
             if (spriteRenderer != null)
             {
                 // Чем меньше индекс слоя (верхние слои), тем больше порядок
-                spriteRenderer.sortingOrder = layersCount - t.layer;// (layersCount - t.position.z) * orderPerLayer + (int)(-t.position.y);
+                spriteRenderer.sortingOrder = layersCount - data.layer;// (layersCount - t.position.z) * orderPerLayer + (int)(-t.position.y);
 
                 // Красим для теста
-                spriteRenderer.color = Color.HSVToRGB((t.type % 12) / 12f, 0.8f, 1f);
+                spriteRenderer.color = Color.HSVToRGB((data.type % 12) / 12f, 0.8f, 1f);
 
                 // Затемняем нижние слои
                 if (spriteRenderer.sortingOrder < currentLayer)
