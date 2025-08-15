@@ -4,35 +4,63 @@ using UnityEngine;
 public class TileView : MonoBehaviour
 {
     public Vector2Int GridPos { get; set; }
-    public int LayerIndex { get; set; } // <--- новый параметр
-    public int TypeId { get; private set; }
+    public int LayerIndex => _layer;
+    public Enums.TileType TileType => _tileType;
 
-    [SerializeField] SpriteRenderer face;
+    [SerializeField, ReadOnlyInspector] private Enums.TileType _tileType;
+    [SerializeField, ReadOnlyInspector] private int _layer;
+    SpriteRenderer _view;
     private PlayState _state;
-
-    public void Init(PlayState state)
+    private BoxCollider2D _collider;
+    public void Init(PlayState state, Enums.TileType type, int layer)
     {
         _state = state;
-        gameObject.AddComponent<BoxCollider2D>().isTrigger = true;
+        _tileType = type;
+        _layer = layer;
+        _view = GetComponent<SpriteRenderer>();
+
+        _collider = gameObject.AddComponent<BoxCollider2D>();
+        _collider.isTrigger = true;
     }
 
-    public void SetType(int typeId, Sprite sprite)
+    public void Disable()
     {
-        TypeId = typeId;
-        if (face) face.sprite = sprite;
+        _collider.enabled = false;
     }
 
-    public bool TrySelect()
+    public void Enable()
     {
-        Debug.Log($"Select me! Layer: {LayerIndex}");
+        _collider.enabled = true;
+    }
+
+    public bool CompareType(Enums.TileType type)
+    {
+        return type == _tileType;
+    }
+
+    public bool IsAvailable(TileView[,] layerTiles, int currentLayer)
+    {
+        if (LayerIndex != currentLayer)
+            return false;
+
+        bool freeLeft = GridPos.x - 1 < 0 || layerTiles[GridPos.x - 1, GridPos.y] == null;
+        bool freeRight = GridPos.x + 1 >= layerTiles.GetLength(0) || layerTiles[GridPos.x + 1, GridPos.y] == null;
+
+        return freeLeft || freeRight;
+    }
+
+    public void SetColor(Color color)
+    { 
+        _view.color = color;
+    }
+     
+    public void Select()
+    {
         transform.DOScale(1.08f, 0.15f).SetLoops(2, LoopType.Yoyo);
-        return true;
     }
 
-    public void Select() { }
     public void Deselect()
     {
-        Debug.Log($"Deselect me! Layer: {LayerIndex}");
         transform.DOScale(1f, 0.1f);
     }
 

@@ -1,0 +1,123 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef32745e024e4c348b1975ce666c6054, type: 3}
+  m_Name: TextureConfig
+  m_EditorClassIdentifier: 
+  TextureData:
+  - TileType: 0
+    Name: Eggs
+    Texture: {fileID: 0}
+  - TileType: 1
+    Name: CoffeeBeans
+    Texture: {fileID: 0}
+  - TileType: 2
+    Name: Bread
+    Texture: {fileID: 0}
+  - TileType: 3
+    Name: Potato
+    Texture: {fileID: 0}
+  - TileType: 4
+    Name: Milk
+    Texture: {fileID: 0}
+  - TileType: 5
+    Name: Dough
+    Texture: {fileID: 0}
+  - TileType: 6
+    Name: Pita
+    Texture: {fileID: 0}
+  - TileType: 7
+    Name: BurgerBuns
+    Texture: {fileID: 0}
+  - TileType: 8
+    Name: Salmon
+    Texture: {fileID: 0}
+  - TileType: 9
+    Name: Chiken
+    Texture: {fileID: 0}
+  - TileType: 10
+    Name: Limon
+    Texture: {fileID: 0}
+  - TileType: 11
+    Name: Cheese
+    Texture: {fileID: 0}
+  - TileType: 12
+    Name: Blueberries
+    Texture: {fileID: 0}
+  - TileType: 13
+    Name: TeaLeaves
+    Texture: {fileID: 0}
+  - TileType: 14
+    Name: Tomato
+    Texture: {fileID: 0}
+  - TileType: 15
+    Name: Cream
+    Texture: {fileID: 0}
+  - TileType: 16
+    Name: Pasta
+    Texture: {fileID: 0}
+  - TileType: 17
+    Name: Onion
+    Texture: {fileID: 0}
+  - TileType: 18
+    Name: Olive
+    Texture: {fileID: 0}
+  - TileType: 19
+    Name: Sausages
+    Texture: {fileID: 0}
+  - TileType: 20
+    Name: Beef
+    Texture: {fileID: 0}
+  - TileType: 21
+    Name: Apple
+    Texture: {fileID: 0}
+  - TileType: 22
+    Name: Kvass
+    Texture: {fileID: 0}
+  - TileType: 23
+    Name: Pumpkin
+    Texture: {fileID: 0}
+  - TileType: 24
+    Name: Beet
+    Texture: {fileID: 0}
+  - TileType: 25
+    Name: MincedMeat
+    Texture: {fileID: 0}
+  - TileType: 26
+    Name: Cabbage
+    Texture: {fileID: 0}
+  - TileType: 27
+    Name: Cucumbers
+    Texture: {fileID: 0}
+  - TileType: 28
+    Name: Jam
+    Texture: {fileID: 0}
+  - TileType: 29
+    Name: Mushrooms
+    Texture: {fileID: 0}
+  - TileType: 30
+    Name: Rice
+    Texture: {fileID: 0}
+  - TileType: 31
+    Name: Caviar
+    Texture: {fileID: 0}
+  - TileType: 32
+    Name: CottageCheese
+    Texture: {fileID: 0}
+  - TileType: 33
+    Name: Garlic
+    Texture: {fileID: 0}
+  - TileType: 34
+    Name: Shrimp
+    Texture: {fileID: 0}
+  - TileType: 35
+    Name: LettuceLeaf
+    Texture: {fileID: 0}

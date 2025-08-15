@@ -1,4 +1,4 @@
-using UnityEngine;
+п»їusing UnityEngine;
 
 public class PlayState : State
 {
@@ -37,7 +37,10 @@ public class PlayState : State
 
     private void HandleTileClick(TileView clickedTile)
     {
-        // Если первая плитка не выбрана
+        // РљР»РёРєР°С‚СЊ РјРѕР¶РЅРѕ С‚РѕР»СЊРєРѕ РґРѕСЃС‚СѓРїРЅС‹Рµ С‚Р°Р№Р»С‹
+        if (!clickedTile.IsAvailable(_board.GetTilesOnLayer(_board.CurrentLayer), _board.CurrentLayer))
+            return;
+
         if (_firstTile == null)
         {
             _firstTile = clickedTile;
@@ -45,7 +48,6 @@ public class PlayState : State
             return;
         }
 
-        // Если нажали на ту же плитку — снимаем выбор
         if (_firstTile == clickedTile)
         {
             _firstTile.Deselect();
@@ -53,22 +55,17 @@ public class PlayState : State
             return;
         }
 
-        // Проверяем совпадение типа
-        if (_firstTile.TypeId == clickedTile.TypeId)
+        if (_firstTile.CompareType(clickedTile.TileType))
         {
-            Vector3 joinPoint = (_firstTile.transform.position + clickedTile.transform.position) / 2f;
-
-            _firstTile.RemoveWithJoin(joinPoint);
-            clickedTile.RemoveWithJoin(joinPoint);
-
+            _board.RemoveTiles(_firstTile, clickedTile);
             _firstTile = null;
         }
         else
         {
-            // Типы не совпали — снимаем выбор
             _firstTile.Deselect();
             _firstTile = clickedTile;
             _firstTile.Select();
         }
     }
+
 }

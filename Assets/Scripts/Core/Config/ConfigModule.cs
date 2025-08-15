@@ -45,7 +45,7 @@ public class ConfigModule
     {
         Debug.Log("Starting config initialization...");
         // Загружаем все Config из папки "Configs"
-        var configs = Resources.LoadAll<Config>("Configs");
+        var configs = Resources.LoadAll<Config>("Config");
 
         string loadedInfo = $"Загрузка {configs.Length} настроек";
 

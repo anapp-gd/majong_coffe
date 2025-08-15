@@ -5,17 +5,15 @@ public static class MadjongGenerator
 {
     public struct TileData
     {
-        public Vector2Int position; // x, y, z(слой)
-        public int type;
-        public Enums.TileType Tyle;
+        public Vector2Int position;
+        public Enums.TileType TileType;
         public int layer;
 
-        public TileData(Vector2Int pos, int type, int layer, Enums.TileType tyleType)
+        public TileData(Vector2Int pos, int layer, Enums.TileType tyleType)
         {
-            this.position = pos;
-            this.type = type;
+            this.position = pos; 
             this.layer = layer;
-            this.Tyle = tyleType;
+            this.TileType = tyleType;
         }
     }
 
@@ -45,8 +43,8 @@ public static class MadjongGenerator
                 grid[layer, pos1.y, pos1.x] = true;
                 grid[layer, pos2.y, pos2.x] = true;
 
-                result.Add(new TileData(new Vector2Int(pos1.x, pos1.y), type, layer, Enums.TileType.Eggs));
-                result.Add(new TileData(new Vector2Int(pos2.x, pos2.y), type, layer, Enums.TileType.Eggs));
+                result.Add(new TileData(new Vector2Int(pos1.x, pos1.y), layer, (Enums.TileType)type));
+                result.Add(new TileData(new Vector2Int(pos2.x, pos2.y), layer, (Enums.TileType)type));
 
                 pairsCount--;
             }
