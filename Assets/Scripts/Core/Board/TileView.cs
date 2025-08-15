@@ -1,17 +1,19 @@
-using UnityEngine;
-using UnityEngine.EventSystems;
 using DG.Tweening;
+using UnityEngine;
 
-public class TileView : MonoBehaviour, IPointerClickHandler
+public class TileView : MonoBehaviour
 {
-    public Vector3Int GridPos { get; set; }
+    public Vector2Int GridPos { get; set; }
+    public int LayerIndex { get; set; } // <--- новый параметр
     public int TypeId { get; private set; }
 
     [SerializeField] SpriteRenderer face;
+    private PlayState _state;
 
-    public void Init()
+    public void Init(PlayState state)
     {
-
+        _state = state;
+        gameObject.AddComponent<BoxCollider2D>().isTrigger = true;
     }
 
     public void SetType(int typeId, Sprite sprite)
@@ -20,14 +22,19 @@ public class TileView : MonoBehaviour, IPointerClickHandler
         if (face) face.sprite = sprite;
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    public bool TrySelect()
     {
-        Debug.Log($"Ќажата плитка {TypeId} на позиции {GridPos}");
-        Select();
+        Debug.Log($"Select me! Layer: {LayerIndex}");
+        transform.DOScale(1.08f, 0.15f).SetLoops(2, LoopType.Yoyo);
+        return true;
     }
 
-    public void Select() => transform.DOScale(1.06f, 0.15f).SetLoops(2, LoopType.Yoyo);
-    public void Deselect() => transform.DOScale(1f, 0.1f);
+    public void Select() { }
+    public void Deselect()
+    {
+        Debug.Log($"Deselect me! Layer: {LayerIndex}");
+        transform.DOScale(1f, 0.1f);
+    }
 
     public Tween RemoveWithJoin(Vector3 to)
     {

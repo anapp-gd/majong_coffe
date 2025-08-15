@@ -43,7 +43,7 @@ public static class UIModule
     }
     public static void Inject(params object[] data) 
     {
-        Handler.Inject(data); 
+        Handler?.Inject(data); 
     }
 
     public static bool OpenCanvas<T>(out T canvas) where T : SourceCanvas

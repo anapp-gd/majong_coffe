@@ -3,78 +3,84 @@ using UnityEngine;
 
 public static class MadjongGenerator
 {
-    // Структура данных для возврата
     public struct TileData
     {
-        public Vector2Int position;
+        public Vector2Int position; // x, y, z(слой)
         public int type;
+        public int layer;
 
-        public TileData(Vector2Int pos, int type)
+        public TileData(Vector2Int pos, int type, int layer)
         {
             this.position = pos;
             this.type = type;
+            this.layer = layer;
         }
     }
 
-    // Простая маска поля
-    static int[,] mask = new int[,] {
-        {0, 1, 1, 1, 0},
-        {1, 1, 0, 1, 1},
-        {1, 0, 0, 0, 1},
-        {1, 1, 0, 1, 1},
-        {0, 1, 1, 1, 0}
-    };
-
-    public static List<TileData> Generate(int pairsCount)
+    public static List<TileData> Generate(int layersCount, int pairsCount, int tileTypesCount)
     {
-        if (!TryGetAvailablePoints(out List<Vector2Int> availablePositions))
-        {
-            Debug.LogError("Нет доступных позиций для генерации!");
-            return new List<TileData>();
-        }
-
-        // Если мест меньше, чем пар, уменьшаем количество пар
-        int maxPairs = availablePositions.Count / 2;
-        if (pairsCount > maxPairs)
-        {
-            Debug.LogWarning($"Запрошено {pairsCount} пар, но доступно только {maxPairs}. Уменьшаем до {maxPairs}.");
-            pairsCount = maxPairs;
-        }
-
         List<TileData> result = new List<TileData>();
+        bool[,,] grid = new bool[layersCount, 5, 5];
 
-        for (int i = 0; i < pairsCount; i++)
+        for (int layer = 0; layer < layersCount; layer++)
         {
-            int type = Random.Range(0, 5);
+            List<Vector2Int> available = GenerateLayerMask(layer, grid);
 
-            int index1 = Random.Range(0, availablePositions.Count);
-            Vector2Int pos1 = availablePositions[index1];
-            availablePositions.RemoveAt(index1);
+            while (available.Count >= 2 && pairsCount > 0)
+            {
+                int type = Random.Range(0, tileTypesCount);
 
-            int index2 = Random.Range(0, availablePositions.Count);
-            Vector2Int pos2 = availablePositions[index2];
-            availablePositions.RemoveAt(index2);
+                // Выбираем первую плитку
+                int idx1 = Random.Range(0, available.Count);
+                Vector2Int pos1 = available[idx1];
+                available.RemoveAt(idx1);
 
-            result.Add(new TileData(pos1, type));
-            result.Add(new TileData(pos2, type));
+                // Ищем вторую плитку, чтобы была не на той же позиции
+                int idx2 = Random.Range(0, available.Count);
+                Vector2Int pos2 = available[idx2];
+                available.RemoveAt(idx2);
+
+                grid[layer, pos1.y, pos1.x] = true;
+                grid[layer, pos2.y, pos2.x] = true;
+
+                result.Add(new TileData(new Vector2Int(pos1.x, pos1.y), type, layer));
+                result.Add(new TileData(new Vector2Int(pos2.x, pos2.y), type, layer));
+
+                pairsCount--;
+            }
         }
 
         return result;
     }
 
-    private static bool TryGetAvailablePoints(out List<Vector2Int> availablePositions)
+    private static List<Vector2Int> GenerateLayerMask(int z, bool[,,] grid)
     {
-        availablePositions = new List<Vector2Int>();
+        List<Vector2Int> positions = new List<Vector2Int>();
 
-        for (int y = 0; y < mask.GetLength(0); y++)
+        for (int y = 0; y < 5; y++)
         {
-            for (int x = 0; x < mask.GetLength(1); x++)
+            for (int x = 0; x < 5; x++)
             {
-                if (mask[y, x] == 1)
-                    availablePositions.Add(new Vector2Int(x, y));
+                // Проверка опоры снизу
+                if (z > 0 && !grid[z - 1, y, x])
+                    continue;
+
+                // Проверка свободной стороны (слева или справа)
+                bool freeLeft = (x - 1 < 0) || !grid[z, y, x - 1];
+                bool freeRight = (x + 1 >= 5) || !grid[z, y, x + 1];
+                if (!freeLeft && !freeRight)
+                    continue;
+
+                // Проверка, что сверху нет плитки
+                if (z + 1 < grid.GetLength(0) && grid[z + 1, y, x])
+                    continue;
+
+                // Вероятность, что здесь будет слот
+                if (Random.value > 0.3f)
+                    positions.Add(new Vector2Int(x, y));
             }
         }
 
-        return availablePositions.Count > 0;
+        return positions;
     }
 }
