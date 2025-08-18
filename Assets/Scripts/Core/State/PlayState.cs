@@ -5,6 +5,7 @@ public class PlayState : State
     [SerializeField] private Board board;
 
     private Board _board;
+    private ServingWindow _window;
     private Camera _camera;
 
     private TileView _firstTile;
@@ -13,6 +14,9 @@ public class PlayState : State
     {
         _board = Instantiate(board);
         _board.Init(this);
+
+        _board.OnWin += Win;
+        _board.OnLose += Lose;
 
         UIModule.Inject(this, _board);
     }
@@ -39,7 +43,30 @@ public class PlayState : State
                 HandleTileClick(tile);
             }
         }
-    } 
+    }
+
+    private void OnDestroy()
+    {
+        _board.OnLose -= Lose;
+        _board.OnWin -= Win;
+    }
+
+    public void Win()
+    {
+        if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
+        {
+            playCanvas.OpenPanel<WinPanel>();
+        }
+    }
+
+    public void Lose()
+    {
+        if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
+        {
+            playCanvas.OpenPanel<LosePanel>();
+        }
+    }
+
     private void HandleTileClick(TileView clickedTile)
     {
         // Кликать можно только доступные тайлы
@@ -62,6 +89,22 @@ public class PlayState : State
 
         if (_firstTile.CompareType(clickedTile.TileType))
         {
+            if (DishMapping.TryGetDish(clickedTile.TileType, out Enums.DishType type))
+            {
+                var textureConfig = ConfigModule.GetConfig<TextureConfig>();
+
+                if ()
+                {
+
+                }
+            }
+
+
+
+            var dish = new Dish(clickedTile.TileType, clickedTile);
+
+            _window.AddDish();
+
             _board.RemoveTiles(_firstTile, clickedTile);
             _firstTile = null;
         }

@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Board : MonoBehaviour
-{
-    // Событие: нет ходов
-    public event Action OnNoMoves;
-    // (Опционально) событие: вся доска очищена (победа)
-    public event Action OnBoardCleared;
+{ 
+    public event Action OnLose; 
+    public event Action OnWin;
 
     [SerializeField] TileView tileView;
     [SerializeField] int layersCount = 3;          // Кол-во слоёв
@@ -21,9 +19,8 @@ public class Board : MonoBehaviour
     public int CurrentLayer { get; private set; }
 
     // Храним все тайлы по слоям
-    private Dictionary<int, TileView[,]> _layers = new Dictionary<int, TileView[,]>();
-
-    private PlayState _state;
+    private Dictionary<int, TileView[,]> _layers = new Dictionary<int, TileView[,]>(); 
+    private PlayState _state; 
 
     public void Init(PlayState state)
     {
@@ -84,9 +81,7 @@ public class Board : MonoBehaviour
                 }
             }
         }
-    }
-
-
+    } 
     public void RemoveTiles(TileView a, TileView b)
     {
         Vector3 joinPoint = (a.transform.position + b.transform.position) / 2f;
@@ -98,8 +93,7 @@ public class Board : MonoBehaviour
         b.RemoveWithJoin(joinPoint);
 
         StartCoroutine(WaitAndCheckLayer(a.LayerIndex));
-    }
-
+    } 
     private IEnumerator WaitAndCheckLayer(int layer)
     {
         yield return new WaitForSeconds(0.3f); // ждём завершения анимации
@@ -120,19 +114,17 @@ public class Board : MonoBehaviour
                 if (!HasAvailableMoves(CurrentLayer))
                 {
                     Debug.Log("Нет доступных ходов — GAME OVER");
-                    OnNoMoves?.Invoke();
+                    OnLose?.Invoke();
                 }
             }
             else
             {
                 // Все слои очищены — игрок победил
                 Debug.Log("Все слои очищены — WIN");
-                OnBoardCleared?.Invoke();
+                OnWin?.Invoke();
             }
         }
-    }
-
-
+    } 
     private bool IsLayerCleared(int layer)
     {
         var layerTiles = GetTilesOnLayer(layer);
@@ -151,8 +143,7 @@ public class Board : MonoBehaviour
     public TileView[,] GetTilesOnLayer(int layer)
     {
         return _layers.ContainsKey(layer) ? _layers[layer] : null;
-    }
-
+    } 
     // Проверяет: есть ли на слое хотя бы одна пара плиток, которые можно выбрать (оба кликабельны и одного типа)
     public bool HasAvailableMoves(int layer)
     {
@@ -186,8 +177,7 @@ public class Board : MonoBehaviour
         }
 
         return false;
-    }
-
+    } 
     // Восстанавливаем "нормальный" цвет для слоя (ту же формулу, что использовалась при создании)
     private void ApplyNormalColorToLayer(int layer)
     {

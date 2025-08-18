@@ -6,55 +6,81 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TextureConfig", menuName = "Config/TextureConfig")]
 public class TextureConfig : Config, ISerializationCallbackReceiver
 {
-    public List<TextureData> TextureData;
-    private Dictionary<Enums.TileType, TextureData> _dictionary; 
+    [Header("Ингредиенты (TileType)")]
+    public List<TileTextureData> TileTextures;
+
+    [Header("Блюда (DishType)")]
+    public List<DishTextureData> DishTextures;
+
+    private Dictionary<Enums.TileType, TileTextureData> _tileDictionary;
+    private Dictionary<Enums.DishType, DishTextureData> _dishDictionary;
 
     public override IEnumerator Init()
     {
-        _dictionary = new Dictionary<Enums.TileType, TextureData>();
+        _tileDictionary = new Dictionary<Enums.TileType, TileTextureData>();
+        _dishDictionary = new Dictionary<Enums.DishType, DishTextureData>();
 
-        foreach (var data in TextureData)
-        {
-            if (!_dictionary.ContainsKey(data.TileType))
-            {
-                _dictionary.Add(data.TileType, data);
-            }
-        }
+        foreach (var data in TileTextures)
+            if (!_tileDictionary.ContainsKey(data.TileType))
+                _tileDictionary.Add(data.TileType, data);
+
+        foreach (var data in DishTextures)
+            if (!_dishDictionary.ContainsKey(data.DishType))
+                _dishDictionary.Add(data.DishType, data);
 
         yield return null;
     }
 
-    public bool TryGetTextureData(Enums.TileType type, out TextureData data)
+    #region Get Data
+    public bool TryGetTextureData(Enums.TileType type, out TileTextureData data)
+        => _tileDictionary.TryGetValue(type, out data);
+
+    public bool TryGetTextureData(Enums.DishType type, out DishTextureData data)
+        => _dishDictionary.TryGetValue(type, out data);
+
+    public bool TryGetTexture(Enums.TileType type, out Sprite texture)
     {
-        data = null;
-
-        if (_dictionary.TryGetValue(type, out data))
+        texture = null;
+        if (_tileDictionary.TryGetValue(type, out var data))
         {
-            return true;
+            texture = data.TextureTile;
+            return texture != null;
         }
-
         return false;
     }
 
-    public void OnAfterDeserialize()
+    public bool TryGetTexture(Enums.DishType type, out Sprite texture)
     {
-
+        texture = null;
+        if (_dishDictionary.TryGetValue(type, out var data))
+        {
+            texture = data.TextureDish;
+            return texture != null;
+        }
+        return false;
     }
+    #endregion
+
+    #region Serialization
+    public void OnAfterDeserialize() { }
 
     public void OnBeforeSerialize()
     {
-        var enumValues = (Enums.TileType[])Enum.GetValues(typeof(Enums.TileType));
+        SyncTileList();
+        SyncDishList();
+    }
 
-        // Если список пуст или размер не совпадает — пересобираем
-        if (TextureData == null || TextureData.Count < enumValues.Length)
-            TextureData = new List<TextureData>();
+    private void SyncTileList()
+    {
+        var enumValues = (Enums.TileType[])Enum.GetValues(typeof(Enums.TileType));
+        if (TileTextures == null || TileTextures.Count < enumValues.Length)
+            TileTextures = new List<TileTextureData>();
 
         for (int i = 0; i < enumValues.Length; i++)
         {
-            // Если элемента нет — добавляем новый
-            if (i >= TextureData.Count)
+            if (i >= TileTextures.Count)
             {
-                TextureData.Add(new TextureData
+                TileTextures.Add(new TileTextureData
                 {
                     TileType = enumValues[i],
                     Name = enumValues[i].ToString()
@@ -62,38 +88,56 @@ public class TextureConfig : Config, ISerializationCallbackReceiver
             }
             else
             {
-                // Синхронизируем значение TileType в случае изменения порядка enum
-                TextureData[i].TileType = enumValues[i];
-                TextureData[i].Name = enumValues[i].ToString();
+                TileTextures[i].TileType = enumValues[i];
+                TileTextures[i].Name = enumValues[i].ToString();
             }
         }
 
-        // Если enum уменьшился — удаляем лишние элементы
-        if (TextureData.Count > enumValues.Length)
-            TextureData.RemoveRange(enumValues.Length, TextureData.Count - enumValues.Length);
+        if (TileTextures.Count > enumValues.Length)
+            TileTextures.RemoveRange(enumValues.Length, TileTextures.Count - enumValues.Length);
     }
 
-    public bool TryGetTexture(Enums.TileType type, out Sprite texture)
+    private void SyncDishList()
     {
-        texture = null;
+        var enumValues = (Enums.DishType[])Enum.GetValues(typeof(Enums.DishType));
+        if (DishTextures == null || DishTextures.Count < enumValues.Length)
+            DishTextures = new List<DishTextureData>();
 
-        foreach (var data in TextureData)
+        for (int i = 0; i < enumValues.Length; i++)
         {
-            if (data.TileType == type)
+            if (i >= DishTextures.Count)
             {
-                texture = data.Texture;
-                break;
+                DishTextures.Add(new DishTextureData
+                {
+                    DishType = enumValues[i],
+                    Name = enumValues[i].ToString()
+                });
+            }
+            else
+            {
+                DishTextures[i].DishType = enumValues[i];
+                DishTextures[i].Name = enumValues[i].ToString();
             }
         }
 
-        return texture != null;
+        if (DishTextures.Count > enumValues.Length)
+            DishTextures.RemoveRange(enumValues.Length, DishTextures.Count - enumValues.Length);
     }
+    #endregion
 }
 
 [System.Serializable]
-public class TextureData
+public class TileTextureData
 {
     public Enums.TileType TileType;
     public string Name;
-    public Sprite Texture;
+    public Sprite TextureTile;
+}
+
+[System.Serializable]
+public class DishTextureData
+{
+    public Enums.DishType DishType;
+    public string Name;
+    public Sprite TextureDish;
 }
