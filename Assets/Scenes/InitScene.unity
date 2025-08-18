@@ -389,6 +389,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: InitState
       objectReference: {fileID: 0}
+    - target: {fileID: 7365618771064245615, guid: fd98ee1c8d28f464aad91bcb00df3e38, type: 3}
+      propertyPath: TargetScene
+      value: 
+      objectReference: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
+    - target: {fileID: 7365618771064245615, guid: fd98ee1c8d28f464aad91bcb00df3e38, type: 3}
+      propertyPath: targetSceneName
+      value: MenuScene
+      objectReference: {fileID: 0}
     - target: {fileID: 8925753770097207906, guid: fd98ee1c8d28f464aad91bcb00df3e38, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

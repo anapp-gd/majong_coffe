@@ -3,6 +3,7 @@
 public class PlayState : State
 {
     [SerializeField] private Board board;
+
     private Board _board;
     private Camera _camera;
 
@@ -19,6 +20,11 @@ public class PlayState : State
     protected override void Start()
     {
         _camera = Camera.main;
+
+        if (UIModule.OpenCanvas<PlayCanvas>(out var playCanvas))
+        {
+            playCanvas.OpenPanel<PlayPanel>();
+        }
     }
 
     protected override void Update()
@@ -33,8 +39,7 @@ public class PlayState : State
                 HandleTileClick(tile);
             }
         }
-    }
-
+    } 
     private void HandleTileClick(TileView clickedTile)
     {
         // Кликать можно только доступные тайлы

@@ -17,17 +17,26 @@ public class Board : MonoBehaviour
     [SerializeField] float tileSize = 1f;          // Размер одной плитки
     [SerializeField, Range(0f, 1f)] float lowerLayerDarken = 0.5f; // Затемнение нижних слоёв
 
+    private LevelData _levelData;
     public int CurrentLayer { get; private set; }
 
     // Храним все тайлы по слоям
     private Dictionary<int, TileView[,]> _layers = new Dictionary<int, TileView[,]>();
 
+    private PlayState _state;
+
     public void Init(PlayState state)
     {
+        _state = state;
         CurrentLayer = layersCount - 1; // Начинаем с верхнего слоя
         _layers.Clear();
 
-        var tiles = MadjongGenerator.Generate(layersCount, pairsCount, tileTypesCount);
+        if (ConfigModule.GetConfig<LevelConfig>().TryGetLevelData(0, out var levelData))
+        {
+            _levelData = levelData;
+        }
+
+        var tiles = MadjongGenerator.Generate(_levelData);
 
         // Чтобы всё было по центру
         int maxX = 0, maxY = 0;

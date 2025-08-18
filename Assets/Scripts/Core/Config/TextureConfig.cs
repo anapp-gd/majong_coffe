@@ -7,10 +7,33 @@ using UnityEngine;
 public class TextureConfig : Config, ISerializationCallbackReceiver
 {
     public List<TextureData> TextureData;
+    private Dictionary<Enums.TileType, TextureData> _dictionary; 
 
     public override IEnumerator Init()
     {
+        _dictionary = new Dictionary<Enums.TileType, TextureData>();
+
+        foreach (var data in TextureData)
+        {
+            if (!_dictionary.ContainsKey(data.TileType))
+            {
+                _dictionary.Add(data.TileType, data);
+            }
+        }
+
         yield return null;
+    }
+
+    public bool TryGetTextureData(Enums.TileType type, out TextureData data)
+    {
+        data = null;
+
+        if (_dictionary.TryGetValue(type, out data))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public void OnAfterDeserialize()
