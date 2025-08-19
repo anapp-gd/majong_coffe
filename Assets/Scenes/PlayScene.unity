@@ -482,6 +482,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayState
       objectReference: {fileID: 0}
+    - target: {fileID: 7161927304236260171, guid: 0117a2bf338898e4e92e566a4d66afb9, type: 3}
+      propertyPath: client
+      value: 
+      objectReference: {fileID: 8503154709240550209, guid: ebde44104808ff849ba83aade7ff1bfc, type: 3}
+    - target: {fileID: 7161927304236260171, guid: 0117a2bf338898e4e92e566a4d66afb9, type: 3}
+      propertyPath: window
+      value: 
+      objectReference: {fileID: 2983734123477734840, guid: 21e96f5eb93540144a929a8705876aa4, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -3,9 +3,12 @@
 public class PlayState : State
 {
     [SerializeField] private Board board;
-
+    [SerializeField] private ServingWindow window;
+    [SerializeField] private ClientGenerator client;
+ 
     private Board _board;
     private ServingWindow _window;
+    private ClientGenerator _client;
     private Camera _camera;
 
     private TileView _firstTile;
@@ -14,6 +17,12 @@ public class PlayState : State
     {
         _board = Instantiate(board);
         _board.Init(this);
+
+        _window = Instantiate(window);
+        _window.Init(this);
+
+        _client = Instantiate(client);
+        _client.Init(this);
 
         _board.OnWin += Win;
         _board.OnLose += Lose;

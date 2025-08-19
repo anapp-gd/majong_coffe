@@ -88,6 +88,8 @@ public static class MadjongGenerator
             }
         }
 
+
+
         return result;
     }
 
