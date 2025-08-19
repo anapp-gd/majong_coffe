@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ClientGenerator : MonoBehaviour
+public class ClientService : MonoBehaviour
 {
     private Transform _spawnPoint;
     [SerializeField] private Client clientPrefab; 
@@ -55,6 +55,7 @@ public class ClientGenerator : MonoBehaviour
     {
         int index = Random.Range(0, _availableDishes.Count);
         int i = 0;
+
         foreach (var dish in _availableDishes)
         {
             if (i == index) return dish;

@@ -11,14 +11,15 @@ public class Client : MonoBehaviour
 
     public void Init(Enums.DishType dish, System.Action<Client> onLeave)
     {
-        WantedDish = dish;
         _timer = waitTime;
+        WantedDish = dish;
         _onLeave = onLeave;
     }
 
     private void Update()
     {
         _timer -= Time.deltaTime;
+
         if (_timer <= 0f)
         {
             Leave(false);
@@ -27,23 +28,16 @@ public class Client : MonoBehaviour
 
     public void TakeDish(Enums.DishType dish)
     {
-        if (dish == WantedDish)
-        {
-            Debug.Log($"Клиент доволен, получил {dish}!");
-            Leave(true);
-        }
-        else
-        {
-            Debug.Log($"Клиент недоволен, ожидал {WantedDish}, а получил {dish}");
-            Leave(false);
-        }
+        Leave(dish == WantedDish);
     }
 
     private void Leave(bool success)
     {
-        // Тут можно триггерить анимацию ухода, начисление очков и т.д.
+        // TODO Animation leave and score
         if (!success)
             Debug.Log("Клиент ушёл недовольным!");
+        else
+            Debug.Log("Клиент ушел довольный!");
 
         _onLeave?.Invoke(this);
         Destroy(gameObject);

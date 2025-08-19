@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+п»їusing System.Collections.Generic;
 using UnityEngine;
 
 public static class MadjongGenerator
@@ -16,9 +16,10 @@ public static class MadjongGenerator
             this.TileType = tileType;
         }
     }
+    
     /// <summary>
-    /// Генерация тайлов + список доступных блюд (DishType).
-    /// </summary>
+     /// Р“РµРЅРµСЂР°С†РёСЏ С‚Р°Р№Р»РѕРІ + СЃРїРёСЃРѕРє РґРѕСЃС‚СѓРїРЅС‹С… Р±Р»СЋРґ (DishType).
+     /// </summary>
     public static (List<TileData> tiles, HashSet<Enums.DishType> dishes) Generate(LevelData data)
     {
         List<TileData> result = new List<TileData>();
@@ -27,7 +28,7 @@ public static class MadjongGenerator
         bool[,,] grid = new bool[data.layersCount, data.height, data.width];
         int pairsLeft = data.pairsCount;
 
-        // === 0-й слой: из baseLayer ===
+        // === 0-Р№ СЃР»РѕР№: РёР· baseLayer ===
         List<Vector2Int> basePositions = new List<Vector2Int>();
         for (int y = 0; y < data.height; y++)
         {
@@ -41,11 +42,22 @@ public static class MadjongGenerator
 
         var availableTileTypesCopy = new List<Enums.TileType>(data.availableTileTypes);
 
-        while (basePositions.Count >= 2 && pairsLeft > 0 && availableTileTypesCopy.Count > 0)
+        while (basePositions.Count >= 2 && pairsLeft > 0)
         {
-            int typeIdx = Random.Range(0, availableTileTypesCopy.Count);
-            var tileType = availableTileTypesCopy[typeIdx];
-            availableTileTypesCopy.RemoveAt(typeIdx);
+            Enums.TileType tileType;
+
+            if (availableTileTypesCopy.Count >= pairsLeft)
+            {
+                // С‚РёРїРѕРІ С…РІР°С‚Р°РµС‚ в†’ РёСЃРїРѕР»СЊР·СѓРµРј СѓРЅРёРєР°Р»СЊРЅС‹Рµ
+                int typeIdx = Random.Range(0, availableTileTypesCopy.Count);
+                tileType = availableTileTypesCopy[typeIdx];
+                availableTileTypesCopy.RemoveAt(typeIdx);
+            }
+            else
+            {
+                // С‚РёРїРѕРІ РјР°Р»Рѕ в†’ СЂР°Р·СЂРµС€Р°РµРј РїРѕРІС‚РѕСЂС‹
+                tileType = data.availableTileTypes[Random.Range(0, data.availableTileTypes.Count)];
+            }
 
             if (DishMapping.TryGetDish(tileType, out var dishType))
             {
@@ -69,19 +81,29 @@ public static class MadjongGenerator
             pairsLeft--;
         }
 
-        // === остальные слои ===
+        // === РѕСЃС‚Р°Р»СЊРЅС‹Рµ СЃР»РѕРё ===
         for (int layer = 1; layer < data.layersCount; layer++)
         {
             List<Vector2Int> available = GenerateLayerMask(layer, grid);
 
-            // создаём копию типов заново для каждого слоя
             var layerTileTypesCopy = new List<Enums.TileType>(data.availableTileTypes);
 
-            while (available.Count >= 2 && pairsLeft > 0 && layerTileTypesCopy.Count > 0)
+            while (available.Count >= 2 && pairsLeft > 0)
             {
-                int typeIdx = Random.Range(0, layerTileTypesCopy.Count);
-                var tileType = layerTileTypesCopy[typeIdx];
-                layerTileTypesCopy.RemoveAt(typeIdx);
+                Enums.TileType tileType;
+
+                if (layerTileTypesCopy.Count >= pairsLeft)
+                {
+                    // С‚РёРїРѕРІ С…РІР°С‚Р°РµС‚ в†’ РёСЃРїРѕР»СЊР·СѓРµРј СѓРЅРёРєР°Р»СЊРЅС‹Рµ
+                    int typeIdx = Random.Range(0, layerTileTypesCopy.Count);
+                    tileType = layerTileTypesCopy[typeIdx];
+                    layerTileTypesCopy.RemoveAt(typeIdx);
+                }
+                else
+                {
+                    // С‚РёРїРѕРІ РјР°Р»Рѕ в†’ СЂР°Р·СЂРµС€Р°РµРј РїРѕРІС‚РѕСЂС‹
+                    tileType = data.availableTileTypes[Random.Range(0, data.availableTileTypes.Count)];
+                }
 
                 if (DishMapping.TryGetDish(tileType, out var dishType))
                 {
@@ -107,7 +129,8 @@ public static class MadjongGenerator
         }
 
         return (result, availableDishes);
-    } 
+    }
+
     private static List<Vector2Int> GenerateLayerMask(int z, bool[,,] grid)
     {
         List<Vector2Int> positions = new List<Vector2Int>();
@@ -118,7 +141,7 @@ public static class MadjongGenerator
         {
             for (int x = 0; x < width; x++)
             {
-                if (z > 0 && !grid[z - 1, y, x]) // опора снизу
+                if (z > 0 && !grid[z - 1, y, x]) // РѕРїРѕСЂР° СЃРЅРёР·Сѓ
                     continue;
 
                 bool freeLeft = (x - 1 < 0) || !grid[z, y, x - 1];
@@ -126,7 +149,7 @@ public static class MadjongGenerator
                 if (!freeLeft && !freeRight)
                     continue;
 
-                if (z + 1 < grid.GetLength(0) && grid[z + 1, y, x]) // сверху занято
+                if (z + 1 < grid.GetLength(0) && grid[z + 1, y, x]) // СЃРІРµСЂС…Сѓ Р·Р°РЅСЏС‚Рѕ
                     continue;
 
                 if (Random.value > 0.3f)

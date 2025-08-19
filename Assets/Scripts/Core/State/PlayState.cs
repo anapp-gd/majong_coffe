@@ -7,11 +7,11 @@ public class PlayState : State
 
     [SerializeField] private Board board;
     [SerializeField] private ServingWindow window;
-    [SerializeField] private ClientGenerator client;
+    [SerializeField] private ClientService client;
  
     private Board _board;
     private ServingWindow _window;
-    private ClientGenerator _client;
+    private ClientService _client;
     private Camera _camera;
 
     private TileView _firstTile;
@@ -39,7 +39,7 @@ public class PlayState : State
         _board.OnWin += Win;
         _board.OnLose += Lose;
 
-        UIModule.Inject(this, _board);
+        UIModule.Inject(this, _board, _window, _client);
     }
 
     protected override void Start()
@@ -90,9 +90,18 @@ public class PlayState : State
 
     private void HandleTileClick(TileView clickedTile)
     {
-        // Кликать можно только доступные тайлы
         if (!clickedTile.IsAvailable(_board.GetTilesOnLayer(_board.CurrentLayer), _board.CurrentLayer))
             return;
+
+        if (_window.IsFull())
+        {
+            if (_firstTile != null)
+            {
+                _firstTile.Deselect();
+                _firstTile = null;
+            } 
+            return;
+        }
 
         if (_firstTile == null)
         {
