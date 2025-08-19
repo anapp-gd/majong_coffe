@@ -93,17 +93,12 @@ public class PlayState : State
             {
                 var textureConfig = ConfigModule.GetConfig<TextureConfig>();
 
-                if ()
+                if (textureConfig.TryGetTextureData(type, out DishTextureData data))
                 {
-
+                    var dish = new Dish(type, data.TextureDish); 
+                    _window.AddDish(dish); 
                 }
             }
-
-
-
-            var dish = new Dish(clickedTile.TileType, clickedTile);
-
-            _window.AddDish();
 
             _board.RemoveTiles(_firstTile, clickedTile);
             _firstTile = null;
