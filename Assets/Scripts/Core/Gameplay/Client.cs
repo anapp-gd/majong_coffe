@@ -2,18 +2,20 @@ using UnityEngine;
 
 public class Client : MonoBehaviour
 {
-    public Enums.DishType WantedDish { get; private set; }
-
     [SerializeField] private float waitTime = 10f; // сколько ждёт клиент
 
+    private Enums.DishType _wantedDish;
+    private ServingWindow _window;
     private float _timer;
     private System.Action<Client> _onLeave;
 
-    public void Init(Enums.DishType dish, System.Action<Client> onLeave)
+    public void Init(Enums.DishType dish, ServingWindow window, System.Action<Client> onLeave)
     {
         _timer = waitTime;
-        WantedDish = dish;
+        _wantedDish = dish;
+        _window = window;
         _onLeave = onLeave;
+
     }
 
     private void Update()
@@ -22,22 +24,45 @@ public class Client : MonoBehaviour
 
         if (_timer <= 0f)
         {
-            Leave(false);
+            TakeDish();
+        }
+    }
+    void TakeDish()
+    {
+        if (_window.TryTakeDish(_wantedDish, out Dish dish))
+        {
+            if (_wantedDish == dish.Type)
+            {
+                // Клиент получил именно то, что хотел
+                Leave(dish, success: true);
+            }
+            else
+            {
+                // Клиент получил другое блюдо
+                Leave(dish, success: false);
+            }
+        }
+        else
+        {
+            // Вообще не получилось взять блюдо
+            Leave(null, success: false);
         }
     }
 
-    public void TakeDish(Enums.DishType dish)
+    void Leave(Dish dish, bool success)
     {
-        Leave(dish == WantedDish);
-    }
-
-    private void Leave(bool success)
-    {
-        // TODO Animation leave and score
+        // TODO: анимация ухода + подсчет очков
         if (!success)
-            Debug.Log("Клиент ушёл недовольным!");
+        {
+            if (dish == null)
+                Debug.Log("Клиент ушёл недовольным! (не осталось блюд)");
+            else
+                Debug.Log($"Клиент ушёл недовольным! Хотел {_wantedDish}, а получил {dish.Type}");
+        }
         else
-            Debug.Log("Клиент ушел довольный!");
+        {
+            Debug.Log($"Клиент ушёл довольный! Получил {_wantedDish}");
+        }
 
         _onLeave?.Invoke(this);
         Destroy(gameObject);

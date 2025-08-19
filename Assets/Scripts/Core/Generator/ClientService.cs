@@ -42,9 +42,14 @@ public class ClientService : MonoBehaviour
     {
         var dish = GetRandomDish();
 
-        var client = Instantiate(clientPrefab, _spawnPoint.position, Quaternion.identity); 
+        Vector3 spawnPos = _spawnPoint.position;
 
-        client.Init(dish, OnClientLeft);
+        spawnPos.y += 5f;
+        spawnPos.x += Random.Range(-5, 5);
+
+        var client = Instantiate(clientPrefab, spawnPos, Quaternion.identity); 
+
+        client.Init(dish, _state.ServingWindow, OnClientLeft);
 
         _clients.Add(client);
 

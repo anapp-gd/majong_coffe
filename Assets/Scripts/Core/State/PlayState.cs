@@ -6,7 +6,15 @@ public class PlayState : State
     [SerializeField] private Vector2 offset;
 
     [SerializeField] private Board board;
+    public ServingWindow ServingWindow
+    {
+        get => _window; 
+    }
     [SerializeField] private ServingWindow window;
+    public ClientService ClientService
+    {
+        get => _client;
+    }
     [SerializeField] private ClientService client;
  
     private Board _board;
