@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class ClientGenerator : MonoBehaviour
 {
-    [SerializeField] private GameObject clientPrefab;
-    [SerializeField] private Transform spawnPoint;
+    private Transform _spawnPoint;
+    [SerializeField] private Client clientPrefab; 
     [SerializeField] private float spawnInterval = 5f;
     [SerializeField] private int maxClients = 5;
 
@@ -18,6 +18,7 @@ public class ClientGenerator : MonoBehaviour
     {
         _state = state;
         _availableDishes = availableDishes;
+        _spawnPoint = GameObject.FindWithTag("SpawnPoint").transform;
     }
 
     private void Update()
@@ -41,10 +42,7 @@ public class ClientGenerator : MonoBehaviour
     {
         var dish = GetRandomDish();
 
-        var go = Instantiate(clientPrefab, spawnPoint.position, Quaternion.identity);
-        var client = go.GetComponent<Client>();
-        if (client == null)
-            client = go.AddComponent<Client>();
+        var client = Instantiate(clientPrefab, _spawnPoint.position, Quaternion.identity); 
 
         client.Init(dish, OnClientLeft);
 

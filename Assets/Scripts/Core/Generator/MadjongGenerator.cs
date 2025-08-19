@@ -21,8 +21,6 @@ public static class MadjongGenerator
     /// </summary>
     public static (List<TileData> tiles, HashSet<Enums.DishType> dishes) Generate(LevelData data)
     {
-        var textureConfig = ConfigModule.GetConfig<TextureConfig>();
-
         List<TileData> result = new List<TileData>();
         HashSet<Enums.DishType> availableDishes = new HashSet<Enums.DishType>();
 
@@ -31,7 +29,6 @@ public static class MadjongGenerator
 
         // === 0-й слой: из baseLayer ===
         List<Vector2Int> basePositions = new List<Vector2Int>();
-
         for (int y = 0; y < data.height; y++)
         {
             for (int x = 0; x < data.width; x++)
@@ -42,23 +39,23 @@ public static class MadjongGenerator
             }
         }
 
-        while (basePositions.Count >= 2 && pairsLeft > 0)
-        {
-            // выбираем случайный TileType из доступных
-            var tileType = data.availableTileTypes[Random.Range(0, data.availableTileTypes.Count)];
+        var availableTileTypesCopy = new List<Enums.TileType>(data.availableTileTypes);
 
-            // получаем блюдо по тайлу
+        while (basePositions.Count >= 2 && pairsLeft > 0 && availableTileTypesCopy.Count > 0)
+        {
+            int typeIdx = Random.Range(0, availableTileTypesCopy.Count);
+            var tileType = availableTileTypesCopy[typeIdx];
+            availableTileTypesCopy.RemoveAt(typeIdx);
+
             if (DishMapping.TryGetDish(tileType, out var dishType))
             {
                 availableDishes.Add(dishType);
             }
 
-            // первая
             int idx1 = Random.Range(0, basePositions.Count);
             Vector2Int pos1 = basePositions[idx1];
             basePositions.RemoveAt(idx1);
 
-            // вторая
             int idx2 = Random.Range(0, basePositions.Count);
             Vector2Int pos2 = basePositions[idx2];
             basePositions.RemoveAt(idx2);
@@ -77,9 +74,14 @@ public static class MadjongGenerator
         {
             List<Vector2Int> available = GenerateLayerMask(layer, grid);
 
-            while (available.Count >= 2 && pairsLeft > 0)
+            // создаём копию типов заново для каждого слоя
+            var layerTileTypesCopy = new List<Enums.TileType>(data.availableTileTypes);
+
+            while (available.Count >= 2 && pairsLeft > 0 && layerTileTypesCopy.Count > 0)
             {
-                var tileType = data.availableTileTypes[Random.Range(0, data.availableTileTypes.Count)];
+                int typeIdx = Random.Range(0, layerTileTypesCopy.Count);
+                var tileType = layerTileTypesCopy[typeIdx];
+                layerTileTypesCopy.RemoveAt(typeIdx);
 
                 if (DishMapping.TryGetDish(tileType, out var dishType))
                 {
@@ -105,9 +107,7 @@ public static class MadjongGenerator
         }
 
         return (result, availableDishes);
-    }
-
-
+    } 
     private static List<Vector2Int> GenerateLayerMask(int z, bool[,,] grid)
     {
         List<Vector2Int> positions = new List<Vector2Int>();
