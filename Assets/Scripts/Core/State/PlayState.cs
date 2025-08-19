@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class PlayState : State
 {
+    [SerializeField] private Vector2 offset;
+
     [SerializeField] private Board board;
     [SerializeField] private ServingWindow window;
     [SerializeField] private ClientGenerator client;
@@ -26,7 +28,7 @@ public class PlayState : State
     protected override void Awake()
     {
         _board = Instantiate(board);
-        _board.Init(this);
+        _board.Init(this, offset);
 
         _window = Instantiate(window);
         _window.Init(this);

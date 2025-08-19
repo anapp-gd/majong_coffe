@@ -20,12 +20,12 @@ public class Board : MonoBehaviour
 
     // Храним все тайлы по слоям
     private Dictionary<int, TileView[,]> _layers = new Dictionary<int, TileView[,]>(); 
-    private PlayState _state; 
+    private PlayState _state;
 
-    public void Init(PlayState state)
+    public void Init(PlayState state, Vector2 customOffset)
     {
         _state = state;
-        CurrentLayer = layersCount - 1; // Начинаем с верхнего слоя
+        CurrentLayer = layersCount - 1;
         _layers.Clear();
 
         if (ConfigModule.GetConfig<LevelConfig>().TryGetLevelData(0, out var levelData))
@@ -37,7 +37,7 @@ public class Board : MonoBehaviour
 
         _state.SetHashDishes = data.dishes;
 
-        // Чтобы всё было по центру
+        // Вычисляем центр
         int maxX = 0, maxY = 0;
         foreach (var t in data.tiles)
         {
@@ -45,8 +45,8 @@ public class Board : MonoBehaviour
             if (t.position.y > maxY) maxY = t.position.y;
         }
 
-        float offsetX = -(maxX * tileSize) / 2f;
-        float offsetY = -(maxY * tileSize) / 2f;
+        float offsetX = -(maxX * tileSize) / 2f + customOffset.x;
+        float offsetY = -(maxY * tileSize) / 2f + customOffset.y;
 
         // Создаём массивы для каждого слоя
         for (int l = 0; l < layersCount; l++)
@@ -73,7 +73,6 @@ public class Board : MonoBehaviour
             if (spriteRenderer != null)
             {
                 spriteRenderer.sortingOrder = tileData.layer;
-
                 spriteRenderer.color = Color.HSVToRGB(((int)tile.TileType % 12) / 12f, 0.8f, 1f);
 
                 if (tileData.layer < CurrentLayer)
@@ -83,7 +82,7 @@ public class Board : MonoBehaviour
                 }
             }
         }
-    } 
+    }
     public void RemoveTiles(TileView a, TileView b)
     {
         Vector3 joinPoint = (a.transform.position + b.transform.position) / 2f;
