@@ -11,7 +11,9 @@ public class LevelData : ScriptableObject
     [Header("Параметры генерации")]
     public int layersCount = 3;
     public int pairsCount = 10;
-    public int tileTypesCount = 4;
+
+    [Header("Доступные тайлы на уровне")]
+    [HideInInspector] public List<Enums.TileType> availableTileTypes = new List<Enums.TileType>();
 
     [Header("Базовый слой (ручная настройка)")]
     [HideInInspector] public List<int> baseLayer = new List<int>();
@@ -23,5 +25,6 @@ public class LevelData : ScriptableObject
             baseLayer.Add(0);
         while (baseLayer.Count > targetSize)
             baseLayer.RemoveAt(baseLayer.Count - 1);
+        
     }
 } 

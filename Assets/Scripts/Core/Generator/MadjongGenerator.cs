@@ -9,19 +9,24 @@ public static class MadjongGenerator
         public Enums.TileType TileType;
         public int layer;
 
-        public TileData(Vector2Int pos, int layer, Enums.TileType tyleType)
+        public TileData(Vector2Int pos, int layer, Enums.TileType tileType)
         {
-            this.position = pos; 
+            this.position = pos;
             this.layer = layer;
-            this.TileType = tyleType;
+            this.TileType = tileType;
         }
     }
-
-    public static List<TileData> Generate(LevelData data)
+    /// <summary>
+    /// √енераци€ тайлов + список доступных блюд (DishType).
+    /// </summary>
+    public static (List<TileData> tiles, HashSet<Enums.DishType> dishes) Generate(LevelData data)
     {
-        List<TileData> result = new List<TileData>();
-        bool[,,] grid = new bool[data.layersCount, data.height, data.width];
+        var textureConfig = ConfigModule.GetConfig<TextureConfig>();
 
+        List<TileData> result = new List<TileData>();
+        HashSet<Enums.DishType> availableDishes = new HashSet<Enums.DishType>();
+
+        bool[,,] grid = new bool[data.layersCount, data.height, data.width];
         int pairsLeft = data.pairsCount;
 
         // === 0-й слой: из baseLayer ===
@@ -37,10 +42,16 @@ public static class MadjongGenerator
             }
         }
 
-        // гарантируем пары на базовом слое
         while (basePositions.Count >= 2 && pairsLeft > 0)
         {
-            int type = Random.Range(0, data.tileTypesCount);
+            // выбираем случайный TileType из доступных
+            var tileType = data.availableTileTypes[Random.Range(0, data.availableTileTypes.Count)];
+
+            // получаем блюдо по тайлу
+            if (DishMapping.TryGetDish(tileType, out var dishType))
+            {
+                availableDishes.Add(dishType);
+            }
 
             // перва€
             int idx1 = Random.Range(0, basePositions.Count);
@@ -55,8 +66,8 @@ public static class MadjongGenerator
             grid[0, pos1.y, pos1.x] = true;
             grid[0, pos2.y, pos2.x] = true;
 
-            result.Add(new TileData(pos1, 0, (Enums.TileType)type));
-            result.Add(new TileData(pos2, 0, (Enums.TileType)type));
+            result.Add(new TileData(pos1, 0, tileType));
+            result.Add(new TileData(pos2, 0, tileType));
 
             pairsLeft--;
         }
@@ -68,7 +79,12 @@ public static class MadjongGenerator
 
             while (available.Count >= 2 && pairsLeft > 0)
             {
-                int type = Random.Range(0, data.tileTypesCount);
+                var tileType = data.availableTileTypes[Random.Range(0, data.availableTileTypes.Count)];
+
+                if (DishMapping.TryGetDish(tileType, out var dishType))
+                {
+                    availableDishes.Add(dishType);
+                }
 
                 int idx1 = Random.Range(0, available.Count);
                 Vector2Int pos1 = available[idx1];
@@ -81,16 +97,14 @@ public static class MadjongGenerator
                 grid[layer, pos1.y, pos1.x] = true;
                 grid[layer, pos2.y, pos2.x] = true;
 
-                result.Add(new TileData(pos1, layer, (Enums.TileType)type));
-                result.Add(new TileData(pos2, layer, (Enums.TileType)type));
+                result.Add(new TileData(pos1, layer, tileType));
+                result.Add(new TileData(pos2, layer, tileType));
 
                 pairsLeft--;
             }
         }
 
-
-
-        return result;
+        return (result, availableDishes);
     }
 
 

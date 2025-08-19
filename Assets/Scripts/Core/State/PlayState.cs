@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class PlayState : State
 {
@@ -13,6 +14,15 @@ public class PlayState : State
 
     private TileView _firstTile;
 
+    private HashSet<Enums.DishType> _haseDish;
+    public HashSet<Enums.DishType> SetHashDishes 
+    { 
+        set
+        {
+            _haseDish = value;
+        }
+    }
+
     protected override void Awake()
     {
         _board = Instantiate(board);
@@ -22,7 +32,7 @@ public class PlayState : State
         _window.Init(this);
 
         _client = Instantiate(client);
-        _client.Init(this);
+        _client.Init(this, _haseDish);
 
         _board.OnWin += Win;
         _board.OnLose += Lose;

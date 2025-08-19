@@ -33,11 +33,13 @@ public class Board : MonoBehaviour
             _levelData = levelData;
         }
 
-        var tiles = MadjongGenerator.Generate(_levelData);
+        var data = MadjongGenerator.Generate(_levelData);
+
+        _state.SetHashDishes = data.dishes;
 
         // Чтобы всё было по центру
         int maxX = 0, maxY = 0;
-        foreach (var t in tiles)
+        foreach (var t in data.tiles)
         {
             if (t.position.x > maxX) maxX = t.position.x;
             if (t.position.y > maxY) maxY = t.position.y;
@@ -53,28 +55,28 @@ public class Board : MonoBehaviour
         }
 
         // Создаём тайлы
-        foreach (var data in tiles)
+        foreach (var tileData in data.tiles)
         {
             Vector3 worldPos = new Vector3(
-                data.position.x * tileSize + offsetX,
-                data.position.y * tileSize + offsetY,
+                tileData.position.x * tileSize + offsetX,
+                tileData.position.y * tileSize + offsetY,
                 0f
             );
 
             var tile = Instantiate(tileView, worldPos, Quaternion.identity, transform);
-            tile.GridPos = data.position;
-            tile.Init(state, data.TileType, data.layer);
+            tile.GridPos = tileData.position;
+            tile.Init(state, tileData.TileType, tileData.layer);
 
-            _layers[data.layer][data.position.x, data.position.y] = tile;
+            _layers[tileData.layer][tileData.position.x, tileData.position.y] = tile;
 
             var spriteRenderer = tile.GetComponent<SpriteRenderer>();
             if (spriteRenderer != null)
             {
-                spriteRenderer.sortingOrder = data.layer;
+                spriteRenderer.sortingOrder = tileData.layer;
 
-                spriteRenderer.color = Color.HSVToRGB(((int)data.TileType % 12) / 12f, 0.8f, 1f);
+                spriteRenderer.color = Color.HSVToRGB(((int)tile.TileType % 12) / 12f, 0.8f, 1f);
 
-                if (data.layer < CurrentLayer)
+                if (tileData.layer < CurrentLayer)
                 {
                     spriteRenderer.color *= lowerLayerDarken;
                     tile.Disable();
