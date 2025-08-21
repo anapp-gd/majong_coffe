@@ -82,6 +82,8 @@ public class PlayState : State
 
     public void Win()
     {
+        PlayerEntity.Instance.SetNextLevel();
+
         if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
         {
             playCanvas.OpenPanel<WinPanel>();

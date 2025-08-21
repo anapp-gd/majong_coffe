@@ -111,15 +111,15 @@ public abstract class SourcePanel : MonoBehaviour
     {
         SourceLayout returnedLayout = null;
 
-        foreach (var sourceWindow in _layouts)
+        foreach (var sourceLayout in _layouts)
         {
-            if (sourceWindow is T panel)
+            if (sourceLayout is T panel)
             {
                 returnedLayout = panel;
             }
             else
             {
-                sourceWindow.OnClose();
+                sourceLayout.OnClose();
             }
         }
 

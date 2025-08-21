@@ -26,7 +26,7 @@ public abstract class SourceSlot : MonoBehaviour
         _btnClick.onClick.AddListener(OnClick);
 
         _icon = transform.GetChild(0).GetComponent<Image>();
-        _icon.enabled = false;
+        if(_icon) _icon.enabled = false;
 
         _loading = GetComponentInChildren<Animation>();
 

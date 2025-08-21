@@ -8,10 +8,8 @@ public class Board : MonoBehaviour
     public event Action OnLose; 
     public event Action OnWin;
 
-    [SerializeField] TileView tileView;
-    [SerializeField] int layersCount = 3;          // Кол-во слоёв
-    [SerializeField] int pairsCount = 10;          // Кол-во пар плиток
-    [SerializeField] int tileTypesCount = 5;       // Кол-во типов плиток
+    [SerializeField] TileView tileView; 
+    int layersCount = 3;          // Кол-во слоёв 
     [SerializeField] float tileSize = 1f;          // Размер одной плитки
     [SerializeField, Range(0f, 1f)] float lowerLayerDarken = 0.5f; // Затемнение нижних слоёв
 
@@ -25,12 +23,15 @@ public class Board : MonoBehaviour
     public void Init(PlayState state, Vector2 customOffset)
     {
         _state = state;
-        CurrentLayer = layersCount - 1;
         _layers.Clear();
 
-        if (ConfigModule.GetConfig<LevelConfig>().TryGetLevelData(0, out var levelData))
+        int currentLevel = PlayerEntity.Instance.GetCurrentLevel;
+
+        if (ConfigModule.GetConfig<LevelConfig>().TryGetLevelData(currentLevel , out var levelData))
         {
             _levelData = levelData;
+            layersCount = levelData.layersCount;
+            CurrentLayer = layersCount - 1;
         }
 
         var data = MadjongGenerator.Generate(_levelData);

@@ -21,6 +21,8 @@ public class InitState : State
 
     protected override void Start()
     { 
+        EntityModule.Initialize();
+
         UIModule.Initialize();
 
         ConfigModule.Initialize(this, onConfigLoaded);

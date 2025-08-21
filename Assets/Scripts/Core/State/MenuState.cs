@@ -1,5 +1,3 @@
-
-
 using UnityEngine.SceneManagement;
 
 public class MenuState : State

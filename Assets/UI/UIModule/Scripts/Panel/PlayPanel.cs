@@ -6,6 +6,6 @@ public class PlayPanel : SourcePanel
     {
         base.OnOpen(onComplete);
 
-        OpenLayout<ServingLayout>();
+        OpenLayout<ServingLayout>(); 
     }
 }

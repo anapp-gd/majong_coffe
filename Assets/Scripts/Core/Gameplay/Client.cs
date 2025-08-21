@@ -57,11 +57,19 @@ public class Client : MonoBehaviour
             if (dish == null)
                 Debug.Log("Клиент ушёл недовольным! (не осталось блюд)");
             else
-                Debug.Log($"Клиент ушёл недовольным! Хотел {_wantedDish}, а получил {dish.Type}");
+            {
+                if (PlayerEntity.Instance.TryAddResourceValue(5))
+                { 
+                    Debug.Log($"Клиент ушёл недовольным! Хотел {_wantedDish}, а получил {dish.Type}");
+                }
+            }
         }
         else
         {
-            Debug.Log($"Клиент ушёл довольный! Получил {_wantedDish}");
+            if (PlayerEntity.Instance.TryAddResourceValue(10))
+            {
+                Debug.Log($"Клиент ушёл довольный! Получил {_wantedDish}"); 
+            }
         }
 
         _onLeave?.Invoke(this);
