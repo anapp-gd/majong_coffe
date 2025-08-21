@@ -5,37 +5,31 @@ public static class MadjongGenerator
 {
     public struct TileData
     {
-        public Vector2Int position;
+        public Vector2 WorldPos;
+        public Vector2Int GridPos;
         public Enums.TileType TileType;
-        public int layer;
+        public int Layer;
 
-        public TileData(Vector2Int pos, int layer, Enums.TileType tileType)
+        public TileData(Vector2 worldPos, Vector2Int gridPos, int layer, Enums.TileType tileType)
         {
-            position = pos;
-            this.layer = layer;
+            WorldPos = worldPos;
+            GridPos = gridPos;
+            Layer = layer;
             TileType = tileType;
         }
     }
-
-    /// <summary>
-    /// Генерация тайлов + список доступных блюд (DishType).
-    /// Условия:
-    /// 1) Пустые слои не создаём (если нет позиций для хотя бы одной пары — выходим).
-    /// 2) Каждый следующий слой формируется "в шахматном порядке": 
-    ///    - нечётные слои (1,3,5,...) — над горизонтальными парами снизу (x и x+1);
-    ///    - чётные слои (>0: 2,4,6,...) — над вертикальными парами снизу (y и y+1).
-    ///    На позицию слоя допускаем тайл только если под ним есть две опоры снизу.
-    /// </summary>
-    public static (List<TileData> tiles, HashSet<Enums.DishType> dishes) Generate(LevelData data)
+    public static (List<TileData> tiles, HashSet<Enums.DishType> dishes, int layersCount) Generate(LevelData data)
     {
-        List<TileData> result = new List<TileData>();
-        HashSet<Enums.DishType> availableDishes = new HashSet<Enums.DishType>();
+        var result = new List<TileData>();
+        var availableDishes = new HashSet<Enums.DishType>();
 
         bool[,,] grid = new bool[data.layersCount, data.height, data.width];
         int pairsLeft = data.pairsCount;
 
-        // === 0-й слой: берём только клетки, отмеченные в baseLayer ===
-        List<Vector2Int> basePositions = new List<Vector2Int>();
+        int actualLayers = 0;
+
+        // === 0-й слой: baseLayer ===
+        var basePositions = new List<Vector2Int>();
         for (int y = 0; y < data.height; y++)
         {
             for (int x = 0; x < data.width; x++)
@@ -46,47 +40,42 @@ public static class MadjongGenerator
             }
         }
 
-        PlacePairsOnPositions(basePositions, 0, data, grid, result, availableDishes, ref pairsLeft);
+        PlacePairsOnLayer(basePositions, 0, data, grid, result, availableDishes, ref pairsLeft);
+        actualLayers++; // base layer сгенерирован
 
-        // === верхние слои: строгая поддержка "двумя опорами" и запрет пустых слоёв ===
-        for (int layer = 1; layer < data.layersCount && pairsLeft > 0; layer++)
+        // === остальные слои ===
+        for (int layer = 1; layer < data.layersCount; layer++)
         {
-            var available = GenerateLayerMaskWithSupport(layer, grid);
 
-            // если нельзя поставить хотя бы одну пару — дальше слои невозможны, выходим
-            if (available.Count < 2)
-                break;
-
-            PlacePairsOnPositions(available, layer, data, grid, result, availableDishes, ref pairsLeft);
+            var positions = GeneratePyramidLayerMask(layer, grid);
+            if (positions.Count == 0) break;
+            PlacePairsOnLayer(positions, layer, data, grid, result, availableDishes, ref pairsLeft); 
+            actualLayers++;
         }
 
-        return (result, availableDishes);
+        return (result, availableDishes, actualLayers);
     }
 
-    /// <summary>
-    /// Размещает пары тайлов на доступных позициях (positions) текущего слоя.
-    /// </summary>
-    private static void PlacePairsOnPositions(
-        List<Vector2Int> positions,
+    private static void PlacePairsOnLayer<T>(
+        List<T> positions,
         int layer,
         LevelData data,
         bool[,,] grid,
         List<TileData> result,
         HashSet<Enums.DishType> availableDishes,
-        ref int pairsLeft)
+        ref int pairsLeft) where T : struct
     {
-        // копия типов — если хочешь избегать повторов, можно использовать её;
-        // если типов меньше, чем пар — разрешим повторы.
-        var uniquePool = new List<Enums.TileType>(data.availableTileTypes);
+        var availableTileTypesCopy = new List<Enums.TileType>(data.availableTileTypes);
 
         while (positions.Count >= 2 && pairsLeft > 0)
         {
+            // Выбираем тип плитки
             Enums.TileType tileType;
-            if (uniquePool.Count >= 1 && uniquePool.Count >= pairsLeft)
+            if (availableTileTypesCopy.Count >= pairsLeft)
             {
-                int typeIdx = Random.Range(0, uniquePool.Count);
-                tileType = uniquePool[typeIdx];
-                uniquePool.RemoveAt(typeIdx);
+                int typeIdx = Random.Range(0, availableTileTypesCopy.Count);
+                tileType = availableTileTypesCopy[typeIdx];
+                availableTileTypesCopy.RemoveAt(typeIdx);
             }
             else
             {
@@ -96,107 +85,94 @@ public static class MadjongGenerator
             if (DishMapping.TryGetDish(tileType, out var dishType))
                 availableDishes.Add(dishType);
 
-            // берём 2 любые позиции под пару
+            // Выбираем две позиции для пары
             int idx1 = Random.Range(0, positions.Count);
-            Vector2Int pos1 = positions[idx1];
+            T pos1 = positions[idx1];
             positions.RemoveAt(idx1);
 
             int idx2 = Random.Range(0, positions.Count);
-            Vector2Int pos2 = positions[idx2];
+            T pos2 = positions[idx2];
             positions.RemoveAt(idx2);
 
-            grid[layer, pos1.y, pos1.x] = true;
-            grid[layer, pos2.y, pos2.x] = true;
+            Vector2Int gridPos1, gridPos2;
+            Vector2 worldPos1, worldPos2;
 
-            result.Add(new TileData(pos1, layer, tileType));
-            result.Add(new TileData(pos2, layer, tileType));
+            if (typeof(T) == typeof(Vector2Int))
+            {
+                gridPos1 = (Vector2Int)(object)pos1;
+                gridPos2 = (Vector2Int)(object)pos2;
+                worldPos1 = gridPos1;
+                worldPos2 = gridPos2;
+            }
+            else // Vector2
+            {
+                worldPos1 = (Vector2)(object)pos1;
+                worldPos2 = (Vector2)(object)pos2;
+                gridPos1 = new Vector2Int(Mathf.RoundToInt(worldPos1.x), Mathf.RoundToInt(worldPos1.y));
+                gridPos2 = new Vector2Int(Mathf.RoundToInt(worldPos2.x), Mathf.RoundToInt(worldPos2.y));
+            }
+
+            // отмечаем в grid
+            grid[layer, gridPos1.y, gridPos1.x] = true;
+            grid[layer, gridPos2.y, gridPos2.x] = true;
+
+            // добавляем в результат
+            result.Add(new TileData(worldPos1, gridPos1, layer, tileType));
+            result.Add(new TileData(worldPos2, gridPos2, layer, tileType));
 
             pairsLeft--;
         }
     }
 
-    /// <summary>
-    /// "Шахматная" маска для слоя:
-    ///  - Нечётный слой (1,3,5,...) — допускаем клетку (x,y), если снизу стоят две по горизонтали: (x,y) и (x+1,y).
-    ///  - Чётный слой (>0: 2,4,6,...) — допускаем клетку (x,y), если снизу стоят две по вертикали: (x,y) и (x,y+1).
-    /// Никаких одинарных опор — только чёткие пары. Это предотвращает “просто поверх”.
-    /// </summary>
-    private static List<Vector2Int> GenerateLayerMaskChess(int z, bool[,,] grid)
+    private static List<Vector2> GenerateLayerMaskWithSupport(int layer, bool[,,] grid)
     {
-        List<Vector2Int> positions = new List<Vector2Int>();
+        var positions = new List<Vector2>();
         int height = grid.GetLength(1);
         int width = grid.GetLength(2);
 
-        // для z==0 маска не нужна — мы используем baseLayer
-        if (z <= 0) return positions;
-
-        bool horizontal = (z % 2 == 1); // 1-й, 3-й, ... — горизонтальные мостики; 2-й, 4-й, ... — вертикальные
-
-        if (horizontal)
-        {
-            // Требуем две опоры: (x,y) и (x+1,y) на слое z-1
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width - 1; x++)
-                {
-                    if (grid[z - 1, y, x] && grid[z - 1, y, x + 1])
-                    {
-                        positions.Add(new Vector2Int(x, y));
-                    }
-                }
-            }
-        }
-        else
-        {
-            // Требуем две опоры: (x,y) и (x,y+1) на слое z-1
-            for (int y = 0; y < height - 1; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    if (grid[z - 1, y, x] && grid[z - 1, y + 1, x])
-                    {
-                        positions.Add(new Vector2Int(x, y));
-                    }
-                }
-            }
-        }
-
-        return positions;
-    }
-
-    /// <summary>
-    /// Генерация маски слоя: плитки ставятся в шахматном порядке относительно нижнего слоя.
-    /// Плитка считается допустимой, если у неё есть хотя бы две диагональные опоры снизу.
-    /// </summary>
-    private static List<Vector2Int> GenerateLayerMaskWithSupport(int z, bool[,,] grid)
-    {
-        List<Vector2Int> positions = new List<Vector2Int>();
-        int height = grid.GetLength(1);
-        int width = grid.GetLength(2);
-
-        if (z == 0) return positions;
-
-        for (int y = 0; y < height - 1; y++) // минус 1, чтобы проверка не выходила за границы
+        for (int y = 0; y < height - 1; y++)
         {
             for (int x = 0; x < width - 1; x++)
             {
-                // Проверяем "диагональный квадрат" 2x2 снизу
-                int support = 0;
-                if (grid[z - 1, y, x]) support++;
-                if (grid[z - 1, y, x + 1]) support++;
-                if (grid[z - 1, y + 1, x]) support++;
-                if (grid[z - 1, y + 1, x + 1]) support++;
+                int supportCount = 0;
+                if (grid[layer - 1, y, x]) supportCount++;
+                if (grid[layer - 1, y, x + 1]) supportCount++;
+                if (grid[layer - 1, y + 1, x]) supportCount++;
+                if (grid[layer - 1, y + 1, x + 1]) supportCount++;
 
-                // Если хотя бы две опоры, можно поставить плитку "в шахматку"
-                if (support >= 2)
+                if (supportCount >= 2)
                 {
-                    // Сместим координаты: ставим плитку в "центр квадрата" => визуально шахматный порядок
-                    positions.Add(new Vector2Int(x, y));
+                    float offset = supportCount == 4 ? 0.5f : 0f;
+                    positions.Add(new Vector2(x + offset, y + offset));
                 }
             }
         }
 
         return positions;
     }
+    private static List<Vector2> GeneratePyramidLayerMask(int layer, bool[,,] grid)
+    {
+        var positions = new List<Vector2>();
+        int height = grid.GetLength(1);
+        int width = grid.GetLength(2);
 
+        // проверяем все квадраты 2x2 на нижнем слое
+        for (int y = 0; y < height - 1; y++)
+        {
+            for (int x = 0; x < width - 1; x++)
+            {
+                // если есть все 4 опоры на предыдущем слое
+                if (grid[layer - 1, y, x] &&
+                    grid[layer - 1, y, x + 1] &&
+                    grid[layer - 1, y + 1, x] &&
+                    grid[layer - 1, y + 1, x + 1])
+                {
+                    // позиция следующего слоя — центр квадрата
+                    positions.Add(new Vector2(x + 0.5f, y + 0.5f));
+                }
+            }
+        }
+
+        return positions;
+    }
 }

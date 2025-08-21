@@ -44,6 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abd173834eccb7b4680a0082ea9fcbd2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileView: {fileID: 4882771979855935371, guid: f5cb1e2d20bbb4c4f92ed6b6f02a0019, type: 3}
+  tileViewPrefab: {fileID: 4882771979855935371, guid: f5cb1e2d20bbb4c4f92ed6b6f02a0019, type: 3}
   tileSize: 1.1
   lowerLayerDarken: 0.5

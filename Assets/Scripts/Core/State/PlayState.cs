@@ -44,8 +44,9 @@ public class PlayState : State
         _client = Instantiate(client);
         _client.Init(this, _haseDish);
 
-        _board.OnWin += Win;
         _board.OnLose += Lose;
+
+        _window.OnServingUpdate += OnServingWindowUpdate;
 
         UIModule.Inject(this, _board, _window, _client);
     }
@@ -80,6 +81,17 @@ public class PlayState : State
         _board.OnWin -= Win;
     }
 
+    void OnServingWindowUpdate(List<Dish> currentDishes)
+    {
+        if (currentDishes.Count == 0)
+        {
+            if (_board.IsBoardClear())
+            {
+                Win();
+            }
+        }
+    }
+
     public void Win()
     {
         PlayerEntity.Instance.SetNextLevel();
@@ -100,7 +112,7 @@ public class PlayState : State
 
     private void HandleTileClick(TileView clickedTile)
     {
-        if (!clickedTile.IsAvailable(_board.GetTilesOnLayer(_board.CurrentLayer), _board.CurrentLayer))
+        if (!clickedTile.IsAvailable(_board.CurrentLayer))
             return;
 
         if (_window.IsFull())
