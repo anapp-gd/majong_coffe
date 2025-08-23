@@ -37,19 +37,7 @@ public class TileView : MonoBehaviour
     public bool CompareType(Enums.TileType type)
     {
         return type == _tileType;
-    }
-
-    /*public bool IsAvailable(TileView[,] layerTiles, int currentLayer)
-    {
-        if (LayerIndex != currentLayer)
-            return false;
-
-        bool freeLeft = GridPos.x - 1 < 0 || layerTiles[GridPos.x - 1, GridPos.y] == null;
-        bool freeRight = GridPos.x + 1 >= layerTiles.GetLength(0) || layerTiles[GridPos.x + 1, GridPos.y] == null;
-
-        return freeLeft || freeRight;
-    }*/
-
+    } 
     public bool IsAvailable(int currentLayer)
     {
         if (LayerIndex != currentLayer)
@@ -76,63 +64,7 @@ public class TileView : MonoBehaviour
 
         return freeLeft || freeRight;
     }
-
-/*
-    public bool IsAvailable(int currentLayer)
-    {
-        if (LayerIndex != currentLayer)
-            return false;
-
-        float checkDistance = 1.2f; // расстояние для проверки
-        int layerMask = 1 << gameObject.layer; // тот же Physics2D слой, что и у плиток
-
-        // Влево
-        RaycastHit2D hitLeft = Physics2D.Raycast(WorldPos, Vector2.left, checkDistance, layerMask);
-        bool freeLeft = hitLeft.collider == null;
-
-        // Вправо
-        RaycastHit2D hitRight = Physics2D.Raycast(WorldPos, Vector2.right, checkDistance, layerMask);
-        bool freeRight = hitRight.collider == null;
-
-        return freeLeft || freeRight;
-    }
-*/    
-    /*
-    public bool IsAvailable(TileView[,] layerTiles, int currentLayer)
-    {
-        if (LayerIndex != currentLayer)
-            return false;
-
-        float checkDistance = 1.2f; // максимально допустимое расстояние для соседей
-        bool freeLeft = true;
-        bool freeRight = true;
-
-        int width = layerTiles.GetLength(0);
-        int height = layerTiles.GetLength(1);
-
-        // проверяем все плитки на том же слое
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                TileView tile = layerTiles[x, y];
-                if (tile == null || tile == this || tile.LayerIndex != currentLayer)
-                    continue;
-
-                float dx = tile.WorldPos.x - WorldPos.x;
-
-                if (dx > 0 && dx < checkDistance)
-                    freeRight = false;
-
-                if (dx < 0 && Mathf.Abs(dx) < checkDistance)
-                    freeLeft = false;
-            }
-        }
-
-        return freeLeft || freeRight;
-    }
-*/
-
+     
     public void SetColor(Color color)
     { 
         _view.color = color;
@@ -147,12 +79,11 @@ public class TileView : MonoBehaviour
     {
         transform.DOScale(1f, 0.1f);
     }
-
     public Tween RemoveWithJoin(Vector3 to)
     {
-        return transform.DOMove(to, 0.25f).OnComplete(() =>
-        {
-            transform.DOScale(0f, 0.2f).OnComplete(() => Destroy(gameObject));
-        });
+        Sequence seq = DOTween.Sequence();
+        seq.Append(transform.DOMove(to, 0.25f));
+        seq.Append(transform.DOScale(0f, 0.2f).OnComplete(() => Destroy(gameObject)));
+        return seq;
     }
 }

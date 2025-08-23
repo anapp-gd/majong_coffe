@@ -1,10 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayState : State
 {
-    [SerializeField] private Vector2 offset;
+    public event Action<PlayStatus> PlayStatusChanged;
+    private PlayStatus _status;
 
+    public static new PlayState Instance
+    {
+        get
+        {
+            return (PlayState)State.Instance;
+        }
+    } 
+
+    [SerializeField] private Vector2 offset; 
     [SerializeField] private Board board;
     public ServingWindow ServingWindow
     {
@@ -16,7 +27,7 @@ public class PlayState : State
         get => _client;
     }
     [SerializeField] private ClientService client;
- 
+    
     private Board _board;
     private ServingWindow _window;
     private ClientService _client;
@@ -32,6 +43,9 @@ public class PlayState : State
             _haseDish = value;
         }
     }
+
+    public int GetResaultValue => _resultValue;
+    private int _resultValue;
 
     protected override void Awake()
     {
@@ -51,6 +65,11 @@ public class PlayState : State
         UIModule.Inject(this, _board, _window, _client);
     }
 
+    public void AddValue(int value)
+    {
+        _resultValue += value;
+    }
+
     protected override void Start()
     {
         _camera = Camera.main;
@@ -59,6 +78,10 @@ public class PlayState : State
         {
             playCanvas.OpenPanel<PlayPanel>();
         }
+
+        PlayStatusChanged?.Invoke(PlayStatus.play);
+
+        _status = PlayStatus.play;
     }
 
     protected override void Update()
@@ -98,20 +121,28 @@ public class PlayState : State
 
         if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
         {
-            playCanvas.OpenPanel<WinPanel>();
+            playCanvas.OpenPanel<WinPanel>().OpenWindow<WinWindow>();
         }
+
+        PlayStatusChanged?.Invoke(PlayStatus.win);
+        _status = PlayStatus.win;
     }
 
     public void Lose()
     {
         if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
         {
-            playCanvas.OpenPanel<LosePanel>();
+            playCanvas.OpenPanel<LosePanel>().OpenWindow<LoseWindow>();
         }
+         
+        PlayStatusChanged?.Invoke(PlayStatus.lose);
+        _status = PlayStatus.lose;
     }
 
     private void HandleTileClick(TileView clickedTile)
     {
+        if (_status != PlayStatus.play) return;
+
         if (!clickedTile.IsAvailable(_board.CurrentLayer))
             return;
 
@@ -163,4 +194,5 @@ public class PlayState : State
         }
     }
 
+    public enum PlayStatus { play, pause, win, lose}
 }

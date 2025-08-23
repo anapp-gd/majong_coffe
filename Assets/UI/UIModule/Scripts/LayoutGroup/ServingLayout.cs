@@ -19,14 +19,29 @@ public class ServingLayout : SourceLayout
         }
 
         return this;
-    }
+    } 
 
     public override void OnInject()
     {
         base.OnInject();
 
         _servingWindow.OnServingUpdate += UpdateLayout;
+
+        ClearLayout();
     }
+
+    void ClearLayout()
+    { 
+        for (int i = 0; i < _slots.Length; i++)
+        {
+            if (_slots[i] is OrderSlot orderSlot)
+            {
+                orderSlot.Data = null;
+                orderSlot.UpdateView();
+            }
+        }
+    }
+
     void UpdateLayout(List<Dish> dishes)
     {
         if (dishes == null || _slots == null)
@@ -41,8 +56,7 @@ public class ServingLayout : SourceLayout
                 orderSlot.Data = dishes[i];
                 orderSlot.UpdateView();
             }
-        }
-
+        } 
 
         for (int i = count; i < _slots.Length; i++)
         {

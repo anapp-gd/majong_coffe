@@ -7,14 +7,23 @@ public class ServingWindow : MonoBehaviour
     private PlayState _state;
     public event Action<List<Dish>> OnServingUpdate;
     private List<Dish> _readyDishes = new();
+    private PlayState.PlayStatus _status;
 
     public void Init(PlayState state)
     {
         _state = state;
+        _state.PlayStatusChanged += OnPlayStatusChange;
+    }
+
+    void OnPlayStatusChange(PlayState.PlayStatus playStatus)
+    {
+        _status = playStatus;
     }
 
     public void AddDish(Dish dish)
     {
+        if (_status != PlayState.PlayStatus.play) return;
+
         _readyDishes.Add(dish);
         Debug.Log($"{dish.Type} добавлено в окно выдачи");
         OnServingUpdate?.Invoke(_readyDishes);
@@ -23,6 +32,8 @@ public class ServingWindow : MonoBehaviour
     public bool TryTakeDish(Enums.DishType dishType, out Dish dish)
     {
         dish = null;
+
+        if (_status != PlayState.PlayStatus.play) return false;
 
         if (_readyDishes == null || _readyDishes.Count == 0)
             return false; // нет блюд вообще

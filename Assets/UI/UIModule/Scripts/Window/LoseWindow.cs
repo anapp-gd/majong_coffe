@@ -1,16 +1,27 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
-public class LoseWindow : MonoBehaviour
+public class LoseWindow : SourceWindow
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] Button _btnRestart;
+
+    public override SourceWindow Init(SourcePanel panel)
     {
-        
+        base.Init(panel);
+
+        _btnRestart.onClick.AddListener(OnRestart);
+         
+        return this;
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnRestart()
     {
-        
+        SceneManager.LoadScene(2);
+    }
+
+    public override void Dispose()
+    {
+        _btnRestart.onClick.RemoveAllListeners();
     }
 }

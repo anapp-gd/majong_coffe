@@ -52,6 +52,9 @@ public class Client : MonoBehaviour
     void Leave(Dish dish, bool success)
     {
         // TODO: анимация ухода + подсчет очков
+
+        int value = 0;
+
         if (!success)
         {
             if (dish == null)
@@ -60,6 +63,7 @@ public class Client : MonoBehaviour
             {
                 if (PlayerEntity.Instance.TryAddResourceValue(5))
                 { 
+                    value = 5;
                     Debug.Log($"Клиент ушёл недовольным! Хотел {_wantedDish}, а получил {dish.Type}");
                 }
             }
@@ -68,10 +72,12 @@ public class Client : MonoBehaviour
         {
             if (PlayerEntity.Instance.TryAddResourceValue(10))
             {
+                value = 10;
                 Debug.Log($"Клиент ушёл довольный! Получил {_wantedDish}"); 
             }
         }
 
+        PlayState.Instance.AddValue(value);
         _onLeave?.Invoke(this);
         Destroy(gameObject);
     }

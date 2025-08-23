@@ -11,18 +11,26 @@ public class ClientService : MonoBehaviour
     private PlayState _state;
     private float _timer;
     private List<Client> _clients = new List<Client>();
-
+    private PlayState.PlayStatus _status;
     private HashSet<Enums.DishType> _availableDishes;
 
     public void Init(PlayState state, HashSet<Enums.DishType> availableDishes)
     {
         _state = state;
+        _state.PlayStatusChanged += OnPlayStatusChange;
         _availableDishes = availableDishes;
         _spawnPoint = GameObject.FindWithTag("SpawnPoint").transform;
     }
 
+    void OnPlayStatusChange(PlayState.PlayStatus status)
+    {
+        _status = status;
+    }
+
     private void Update()
     {
+        if (_status != PlayState.PlayStatus.play) return;
+
         if (_availableDishes == null || _availableDishes.Count == 0)
             return;
 

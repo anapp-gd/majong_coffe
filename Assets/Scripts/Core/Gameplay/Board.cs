@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,11 +20,14 @@ public class Board : MonoBehaviour
     private readonly List<TileView> _allTiles = new List<TileView>();
     public int CurrentLayer { get; private set; }
     private int _layersCount = 3;
+    private PlayState.PlayStatus _status;
 
     public void Init(PlayState state, Vector2 customOffset)
     {
         _state = state;
         _allTiles.Clear();
+
+        _state.PlayStatusChanged += OnStatusChange;
 
         int currentLevel = PlayerEntity.Instance.GetCurrentLevel;
 
@@ -37,8 +41,7 @@ public class Board : MonoBehaviour
         _layersCount = data.layersCount;
         CurrentLayer = _layersCount - 1;
         _state.SetHashDishes = data.dishes;
-
-        // Вычисляем центр
+         
         int maxX = 0, maxY = 0;
         foreach (var t in data.tiles)
         {
@@ -49,7 +52,6 @@ public class Board : MonoBehaviour
         float offsetX = -(maxX * tileSize) / 2f + customOffset.x;
         float offsetY = -(maxY * tileSize) / 2f + customOffset.y;
 
-        // Создаём тайлы
         foreach (var tileData in data.tiles)
         {
             Vector3 worldPos = new Vector3(
@@ -78,24 +80,34 @@ public class Board : MonoBehaviour
                 }
             }
         }
-    }
+    } 
 
+    void OnStatusChange(PlayState.PlayStatus playStatus)
+    {
+        _status = playStatus;
+    }
     public void RemoveTiles(TileView a, TileView b)
     {
+        if (_status != PlayState.PlayStatus.play) return;
+
         Vector3 joinPoint = (a.transform.position + b.transform.position) / 2f;
 
         _allTiles.Remove(a);
         _allTiles.Remove(b);
 
-        a.RemoveWithJoin(joinPoint);
-        b.RemoveWithJoin(joinPoint);
+        Sequence seq = DOTween.Sequence();
 
-        StartCoroutine(WaitAndCheckLayer(a.LayerIndex));
-    } 
-    private IEnumerator WaitAndCheckLayer(int layer)
+        seq.Join(a.RemoveWithJoin(joinPoint));
+        seq.Join(b.RemoveWithJoin(joinPoint));
+
+        // Когда обе анимации завершены
+        seq.OnComplete(() =>
+        {
+            CheckLayerAfterRemove(a.LayerIndex);
+        });
+    }
+    private void CheckLayerAfterRemove(int layer)
     {
-        yield return new WaitForSeconds(0.1f); // маленькая задержка, чтобы всё успело обновиться
-
         if (IsLayerCleared(layer))
         {
             int nextLayer = layer - 1;
@@ -120,7 +132,7 @@ public class Board : MonoBehaviour
             }
         }
         else
-        { 
+        {
             if (!HasAvailableMoves(layer))
             {
                 Debug.Log("Нет доступных ходов — GAME OVER");
@@ -128,6 +140,7 @@ public class Board : MonoBehaviour
             }
         }
     }
+
     public bool IsBoardClear()
     {
         return _allTiles.Count == 0;
@@ -136,7 +149,6 @@ public class Board : MonoBehaviour
     {
         return !_allTiles.Any(t => t.LayerIndex == layer);
     }
-
     public bool HasAvailableMoves(int layer)
     {
         var clickable = GetTilesOnLayer(layer)
@@ -159,21 +171,7 @@ public class Board : MonoBehaviour
     public IEnumerable<TileView> GetTilesOnLayer(int layer)
     {
         return _allTiles.Where(t => t.LayerIndex == layer);
-    }
-
-    /*
-    public bool HasAvailableMoves(int layer)
-    {
-        var clickable = GetTilesOnLayer(layer)
-            .Where(t => t.IsAvailable(CurrentLayer))
-            .ToList();
-
-        return clickable
-            .GroupBy(t => t.TileType)
-            .Any(g => g.Count() >= 2);
-    }
-    */
-
+    } 
     private void ApplyNormalColorToLayer(int layer)
     {
         foreach (var tile in GetTilesOnLayer(layer))

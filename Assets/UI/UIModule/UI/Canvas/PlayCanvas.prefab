@@ -2012,6 +2012,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 095a81ac43374024a9c564874a235658, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _btnRestart: {fileID: 7554705488128826797}
 --- !u!1 &5316263720788036270
 GameObject:
   m_ObjectHideFlags: 0
@@ -3712,6 +3713,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b35336eb46727e4a868481a13abe42d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _resultTitle: {fileID: 8107248133861917219}
+  _next: {fileID: 4654314945844146546}
+  _animationDuration: 1.5
 --- !u!1 &9057924667103679816
 GameObject:
   m_ObjectHideFlags: 0

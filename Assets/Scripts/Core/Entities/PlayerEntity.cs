@@ -91,8 +91,7 @@ public class PlayerEntity : SourceEntity
         }
 
         if (_metaResouceValue >= _maxBalance)
-        {
-            // уже на капе
+        { 
             Debug.Log($"[{nameof(PlayerEntity)}] Balance already at cap {_maxBalance}");
             return false;
         }
