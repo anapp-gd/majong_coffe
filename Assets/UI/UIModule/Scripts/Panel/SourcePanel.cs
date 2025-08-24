@@ -215,7 +215,7 @@ public abstract class SourcePanel : MonoBehaviour
                 isOpen = false;
             });
     }
-    public virtual void OnDipose()
+    public virtual void OnDispose()
     {
         for (int i = 0; i < _layouts.Count; i++)
         {

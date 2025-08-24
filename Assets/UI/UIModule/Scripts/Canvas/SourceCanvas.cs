@@ -52,7 +52,7 @@ public abstract class SourceCanvas : MonoBehaviour
     }
     public virtual void Dispose()
     {
-        _panels.ForEach(panel => panel.OnDipose()); 
+        _panels.ForEach(panel => panel.OnDispose()); 
     }
 
     public virtual T ClosePanel<T>() where T : SourcePanel

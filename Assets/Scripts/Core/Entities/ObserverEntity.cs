@@ -4,6 +4,7 @@ public class ObserverEntity : SourceEntity
 {
     public static ObserverEntity Instance;
     public event Action<int> PlayerMetaResourceChanged; 
+    public event Action<float, int, int> UpgradeProgreesChanged; 
 
     public ObserverEntity()
     {
