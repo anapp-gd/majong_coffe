@@ -33,7 +33,7 @@ public class MenuState : State
     {
         //todo upgrade 
         if (PlayerEntity.Instance.TrySubResourceValue(5))
-        {
+        { 
 
         }
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -25,11 +26,17 @@ public class MainMenuPanel : SourcePanel
         _btnPlay.onClick.AddListener(OnPlay);
         _btnBuild.onClick.AddListener(OnUpgrade);
 
-        _titlePlay.text = $"Start ({PlayerEntity.Instance.GetCurrentLevel + 1})"; 
-
         ObserverEntity.Instance.UpgradeProgreesChanged += OnProgressUpdate;
     }
-     
+
+    public override void OnOpen(params Action[] onComplete)
+    {
+        base.OnOpen(onComplete);
+
+        _titlePlay.text = $"Start ({PlayerEntity.Instance.GetCurrentLevel + 1})";
+        _titleBuild.text = $"Build ({10})";
+    }
+
     void OnProgressUpdate(float targetFill, int startValue, int targetValue)
     {
         if (_animateCoroutine != null)
