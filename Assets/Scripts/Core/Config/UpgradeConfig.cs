@@ -12,3 +12,9 @@ public class UpgradeConfig : Config
         yield return null;
     }
 }
+
+
+public class LevelInfo
+{
+
+}
