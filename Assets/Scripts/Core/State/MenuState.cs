@@ -31,8 +31,10 @@ public class MenuState : State
 
     public void Upgrade()
     {
-        //todo upgrade
+        //todo upgrade 
+        if (PlayerEntity.Instance.TrySubResourceValue(5))
+        {
 
-
+        }
     }
 }

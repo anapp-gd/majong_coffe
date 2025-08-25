@@ -1173,6 +1173,8 @@ MonoBehaviour:
   isOpen: 0
   _btnPlay: {fileID: 4000233470541925185}
   _btnBuild: {fileID: 6160144963215606293}
+  _titlePlay: {fileID: 3085198690705025917}
+  _titleBuild: {fileID: 0}
   _progressTitle: {fileID: 77247747685974618}
   _progressFill: {fileID: 753293824906096968}
   _duration: 1.5

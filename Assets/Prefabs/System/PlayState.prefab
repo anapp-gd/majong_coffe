@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f2f24b37ba0de94da7e03f405f24958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offset: {x: 0, y: -5}
+  offset: {x: 0, y: -2}
   board: {fileID: 8249881955901418612, guid: 6d61e17bddc10514ebc258120a197a00, type: 3}
   window: {fileID: 2983734123477734840, guid: 21e96f5eb93540144a929a8705876aa4, type: 3}
   client: {fileID: 8974939872978371098, guid: ebde44104808ff849ba83aade7ff1bfc, type: 3}

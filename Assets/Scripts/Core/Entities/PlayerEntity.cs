@@ -49,6 +49,11 @@ public class PlayerEntity : SourceEntity
         }
     }
 
+    public void Upgrade()
+    {
+
+    }
+
     public void SetNextLevel()
     {
         int nextLevel = _currentLevel + 1;

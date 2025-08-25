@@ -20,4 +20,9 @@ public class ObserverEntity : SourceEntity
     {
         PlayerMetaResourceChanged?.Invoke(value);
     } 
+
+    public void UpdateUpgradeProcessChanged(float value, int currentLevel, int targetLevel)
+    {
+        UpgradeProgreesChanged?.Invoke(value, currentLevel, targetLevel);
+    }
 } 

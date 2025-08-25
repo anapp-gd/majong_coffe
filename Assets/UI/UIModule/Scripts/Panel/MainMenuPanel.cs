@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,6 +7,9 @@ public class MainMenuPanel : SourcePanel
 {
     [SerializeField] Button _btnPlay;
     [SerializeField] Button _btnBuild;
+
+    [SerializeField] TextMeshProUGUI _titlePlay;
+    [SerializeField] TextMeshProUGUI _titleBuild;
 
     [SerializeField] Text _progressTitle;
     [SerializeField] Image _progressFill;
@@ -20,6 +24,8 @@ public class MainMenuPanel : SourcePanel
 
         _btnPlay.onClick.AddListener(OnPlay);
         _btnBuild.onClick.AddListener(OnUpgrade);
+
+        _titlePlay.text = $"Start ({PlayerEntity.Instance.GetCurrentLevel + 1})"; 
 
         ObserverEntity.Instance.UpgradeProgreesChanged += OnProgressUpdate;
     }
