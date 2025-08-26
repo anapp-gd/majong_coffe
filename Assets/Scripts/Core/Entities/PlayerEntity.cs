@@ -20,6 +20,15 @@ public class PlayerEntity : SourceEntity
         }
     }
     private int _currentLevel;
+
+    public int GetCurrentUpgrade
+    {
+        get
+        {
+            return _currentUpgrade;
+        }
+    }
+
     private int _currentUpgrade;
 
     private const int _maxBalance = 100000; 

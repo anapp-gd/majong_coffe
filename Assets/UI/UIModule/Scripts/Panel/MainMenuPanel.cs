@@ -39,7 +39,7 @@ public class MainMenuPanel : SourcePanel
 
         int max = upgradeConfig.GetMaxLevelUpgrade();
 
-        if (upgradeConfig.TryGetUpgrade(PlayerEntity.Instance.GetCurrentLevel, out LevelInfo levelInfo))
+        if (upgradeConfig.TryGetUpgrade(PlayerEntity.Instance.GetCurrentUpgrade, out LevelInfo levelInfo))
         {
             _titleBuild.text = $"Build ({levelInfo.Cost})";
             _progressTitle.text = $"{levelInfo.Level}/{max}";
@@ -65,7 +65,7 @@ public class MainMenuPanel : SourcePanel
 
         var upgradeConfig = ConfigModule.GetConfig<UpgradeConfig>();
 
-        if (upgradeConfig.TryGetUpgrade(PlayerEntity.Instance.GetCurrentLevel, out LevelInfo levelInfo))
+        if (upgradeConfig.TryGetUpgrade(PlayerEntity.Instance.GetCurrentUpgrade, out LevelInfo levelInfo))
         {
             int max = upgradeConfig.GetMaxLevelUpgrade();
             _progressTitle.text = $"{levelInfo.Level}/{max}";
