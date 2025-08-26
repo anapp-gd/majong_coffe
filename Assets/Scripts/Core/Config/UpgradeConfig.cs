@@ -23,6 +23,11 @@ public class UpgradeConfig : Config
     {
         levelInfo = null;
 
+        if (level < 0)
+        {
+            return false;
+        }
+
         if (level < Items.Count)
         {
             levelInfo = Items[level];

@@ -3,6 +3,180 @@ using UnityEngine;
 
 public static class MadjongGenerator
 {
+    public struct GridCell
+    {
+        public Vector2Int GridPos; // координаты в сетке
+        public Vector2 WorldPos;   // мировые координаты
+
+        public GridCell(Vector2Int gridPos, Vector2 worldPos)
+        {
+            GridPos = gridPos;
+            WorldPos = worldPos;
+        }
+
+        // чтобы HashSet работал корректно
+        public override bool Equals(object obj)
+        {
+            if (!(obj is GridCell)) return false;
+            GridCell other = (GridCell)obj;
+            return WorldPos == other.WorldPos; // сравниваем по мировой позиции
+        }
+
+        public override int GetHashCode()
+        {
+            return WorldPos.GetHashCode();
+        }
+    }
+
+    public struct TileData
+    {
+        public Vector2 WorldPos;
+        public Vector2Int GridPos;
+        public Enums.TileType TileType;
+        public int Layer;
+
+        public TileData(Vector2 worldPos, Vector2Int gridPos, int layer, Enums.TileType tileType)
+        {
+            WorldPos = worldPos;
+            GridPos = gridPos;
+            Layer = layer;
+            TileType = tileType;
+        }
+    }
+
+    // === Генерация ===
+    public static (List<TileData> tiles, HashSet<Enums.DishType> dishes, int layersCount) Generate(LevelData data)
+    {
+        var result = new List<TileData>();
+        var availableDishes = new HashSet<Enums.DishType>();
+
+        // словарь: ключ = layer, value = все занятые ячейки
+        var grid = new Dictionary<int, HashSet<GridCell>>();
+
+        int pairsLeft = data.pairsCount;
+        int actualLayers = 0;
+
+        // === 0-й слой: baseLayer ===
+        var baseCells = new List<GridCell>();
+        for (int y = 0; y < data.height; y++)
+        {
+            for (int x = 0; x < data.width; x++)
+            {
+                int index = y * data.width + x;
+                if (data.baseLayer[index] == 1)
+                {
+                    var gridPos = new Vector2Int(x, y);
+                    var worldPos = (Vector2)gridPos;
+                    baseCells.Add(new GridCell(gridPos, worldPos));
+                }
+            }
+        }
+
+        PlacePairsOnLayer(baseCells, 0, data, grid, result, availableDishes, ref pairsLeft);
+        actualLayers++;
+
+        // === остальные слои ===
+        for (int layer = 1; layer < data.layersCount; layer++)
+        {
+            var positions = GeneratePyramidLayerMask(layer, grid);
+            if (positions.Count == 0) break;
+
+            PlacePairsOnLayer(positions, layer, data, grid, result, availableDishes, ref pairsLeft);
+            actualLayers++;
+        }
+
+        return (result, availableDishes, actualLayers);
+    }
+
+    // === Установка пар ===
+    private static void PlacePairsOnLayer(
+        List<GridCell> positions,
+        int layer,
+        LevelData data,
+        Dictionary<int, HashSet<GridCell>> grid,
+        List<TileData> result,
+        HashSet<Enums.DishType> availableDishes,
+        ref int pairsLeft)
+    {
+        if (!grid.ContainsKey(layer))
+            grid[layer] = new HashSet<GridCell>();
+
+        var availableTileTypesCopy = new List<Enums.TileType>(data.availableTileTypes);
+
+        while (positions.Count >= 2 && pairsLeft > 0)
+        {
+            // выбираем тип плитки
+            Enums.TileType tileType;
+            if (availableTileTypesCopy.Count >= pairsLeft)
+            {
+                int typeIdx = Random.Range(0, availableTileTypesCopy.Count);
+                tileType = availableTileTypesCopy[typeIdx];
+                availableTileTypesCopy.RemoveAt(typeIdx);
+            }
+            else
+            {
+                tileType = data.availableTileTypes[Random.Range(0, data.availableTileTypes.Count)];
+            }
+
+            if (DishMapping.TryGetDish(tileType, out var dishType))
+                availableDishes.Add(dishType);
+
+            // выбираем 2 случайные ячейки
+            int idx1 = Random.Range(0, positions.Count);
+            var cell1 = positions[idx1];
+            positions.RemoveAt(idx1);
+
+            int idx2 = Random.Range(0, positions.Count);
+            var cell2 = positions[idx2];
+            positions.RemoveAt(idx2);
+
+            // отмечаем в grid
+            grid[layer].Add(cell1);
+            grid[layer].Add(cell2);
+
+            // добавляем в результат
+            result.Add(new TileData(cell1.WorldPos, cell1.GridPos, layer, tileType));
+            result.Add(new TileData(cell2.WorldPos, cell2.GridPos, layer, tileType));
+
+            pairsLeft--;
+        }
+    }
+
+    // === Генерация маски пирамиды ===
+    private static List<GridCell> GeneratePyramidLayerMask(int layer, Dictionary<int, HashSet<GridCell>> grid)
+    {
+        var positions = new List<GridCell>();
+        if (!grid.ContainsKey(layer - 1)) return positions;
+
+        var prevLayer = grid[layer - 1];
+
+        foreach (var cell in prevLayer)
+        {
+            Vector2 p = cell.WorldPos;
+
+            // проверяем 4 опоры (квадрат 2x2)
+            if (prevLayer.Contains(new GridCell(Vector2Int.zero, p)) &&
+                prevLayer.Contains(new GridCell(Vector2Int.zero, p + Vector2.right)) &&
+                prevLayer.Contains(new GridCell(Vector2Int.zero, p + Vector2.up)) &&
+                prevLayer.Contains(new GridCell(Vector2Int.zero, p + Vector2.one)))
+            {
+                // центр квадрата (смещённая клетка)
+                var newWorldPos = p + new Vector2(0.5f, 0.5f);
+                var newGridPos = new Vector2Int(Mathf.RoundToInt(newWorldPos.x), Mathf.RoundToInt(newWorldPos.y));
+                positions.Add(new GridCell(newGridPos, newWorldPos));
+            }
+        }
+
+        return positions;
+    }
+}
+
+
+/*using System.Collections.Generic;
+using UnityEngine;
+
+public static class MadjongGenerator
+{
     public struct TileData
     {
         public Vector2 WorldPos;
@@ -45,8 +219,7 @@ public static class MadjongGenerator
 
         // === остальные слои ===
         for (int layer = 1; layer < data.layersCount; layer++)
-        {
-
+        { 
             var positions = GeneratePyramidLayerMask(layer, grid);
             if (positions.Count == 0) break;
             PlacePairsOnLayer(positions, layer, data, grid, result, availableDishes, ref pairsLeft); 
@@ -122,34 +295,7 @@ public static class MadjongGenerator
 
             pairsLeft--;
         }
-    }
-
-    private static List<Vector2> GenerateLayerMaskWithSupport(int layer, bool[,,] grid)
-    {
-        var positions = new List<Vector2>();
-        int height = grid.GetLength(1);
-        int width = grid.GetLength(2);
-
-        for (int y = 0; y < height - 1; y++)
-        {
-            for (int x = 0; x < width - 1; x++)
-            {
-                int supportCount = 0;
-                if (grid[layer - 1, y, x]) supportCount++;
-                if (grid[layer - 1, y, x + 1]) supportCount++;
-                if (grid[layer - 1, y + 1, x]) supportCount++;
-                if (grid[layer - 1, y + 1, x + 1]) supportCount++;
-
-                if (supportCount >= 2)
-                {
-                    float offset = supportCount == 4 ? 0.5f : 0f;
-                    positions.Add(new Vector2(x + offset, y + offset));
-                }
-            }
-        }
-
-        return positions;
-    }
+    } 
     private static List<Vector2> GeneratePyramidLayerMask(int layer, bool[,,] grid)
     {
         var positions = new List<Vector2>();
@@ -176,3 +322,4 @@ public static class MadjongGenerator
         return positions;
     }
 }
+*/
