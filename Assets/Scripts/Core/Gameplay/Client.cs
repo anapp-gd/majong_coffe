@@ -1,21 +1,18 @@
 using UnityEngine;
 
 public class Client : MonoBehaviour
-{
-    [SerializeField] private float waitTime = 10f; // сколько ждёт клиент
-
+{ 
     private Enums.DishType _wantedDish;
     private ServingWindow _window;
     private float _timer;
     private System.Action<Client> _onLeave;
 
-    public void Init(Enums.DishType dish, ServingWindow window, System.Action<Client> onLeave)
+    public void Init(float wait, Enums.DishType dish, ServingWindow window, System.Action<Client> onLeave)
     {
-        _timer = waitTime;
         _wantedDish = dish;
         _window = window;
-        _onLeave = onLeave;
-
+        _onLeave = onLeave; 
+        _timer = wait;
     }
 
     private void Update()
@@ -27,7 +24,7 @@ public class Client : MonoBehaviour
             TakeDish();
         }
     }
-    void TakeDish()
+    public void TakeDish()
     {
         if (_window.TryTakeDish(_wantedDish, out Dish dish))
         {

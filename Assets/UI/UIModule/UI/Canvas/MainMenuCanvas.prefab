@@ -1174,7 +1174,7 @@ MonoBehaviour:
   _btnPlay: {fileID: 4000233470541925185}
   _btnBuild: {fileID: 6160144963215606293}
   _titlePlay: {fileID: 3085198690705025917}
-  _titleBuild: {fileID: 0}
+  _titleBuild: {fileID: 3353656544306053605}
   _progressTitle: {fileID: 77247747685974618}
   _progressFill: {fileID: 753293824906096968}
   _duration: 1.5
@@ -1950,7 +1950,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.3056603, g: 0.3056603, b: 0.3056603, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

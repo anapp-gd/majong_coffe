@@ -5,8 +5,10 @@ public class ClientService : MonoBehaviour
 {
     private Transform _spawnPoint;
     [SerializeField] private Client clientPrefab; 
-    [SerializeField] private float spawnInterval = 5f;
-    [SerializeField] private int maxClients = 5;
+    [SerializeField] private float _spawnInterval = 5f;
+    [SerializeField] private int _maxClients = 5;
+
+    private float _clientDelayTake = 5f;
 
     private PlayState _state;
     private float _timer;
@@ -20,6 +22,22 @@ public class ClientService : MonoBehaviour
         _state.PlayStatusChanged += OnPlayStatusChange;
         _availableDishes = availableDishes;
         _spawnPoint = GameObject.FindWithTag("SpawnPoint").transform;
+        var gameConfig = ConfigModule.GetConfig<GameConfig>();
+        _spawnInterval = gameConfig.ClientSpawnDelay;
+        _maxClients = gameConfig.MaxClientCount;
+        _clientDelayTake = gameConfig.ClientTakeDelay;
+        _state.BoardCleanChange += BoardClean;
+    } 
+
+    void BoardClean()
+    {
+        foreach (var client in _clients)
+        {
+            client.TakeDish();
+        }
+
+        _spawnInterval = 0f;
+        _clientDelayTake = 0f;
     }
 
     void OnPlayStatusChange(PlayState.PlayStatus status)
@@ -35,14 +53,14 @@ public class ClientService : MonoBehaviour
             return;
 
         // если очередь полна€ Ч ждЄм
-        if (_clients.Count >= maxClients)
+        if (_clients.Count >= _maxClients)
             return;
 
         _timer -= Time.deltaTime;
         if (_timer <= 0f)
         {
             SpawnClient();
-            _timer = spawnInterval;
+            _timer = _spawnInterval;
         }
     }
 
@@ -57,7 +75,7 @@ public class ClientService : MonoBehaviour
 
         var client = Instantiate(clientPrefab, spawnPos, Quaternion.identity); 
 
-        client.Init(dish, _state.ServingWindow, OnClientLeft);
+        client.Init(_clientDelayTake, dish, _state.ServingWindow, OnClientLeft);
 
         _clients.Add(client);
 

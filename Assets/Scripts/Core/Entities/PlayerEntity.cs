@@ -20,6 +20,7 @@ public class PlayerEntity : SourceEntity
         }
     }
     private int _currentLevel;
+    private int _currentUpgrade;
 
     private const int _maxBalance = 100000; 
 
@@ -47,11 +48,36 @@ public class PlayerEntity : SourceEntity
         {
             _metaResouceValue = 0;
         }
+
+        if (PlayerPrefs.HasKey("upgrade"))
+        {
+            _currentUpgrade = PlayerPrefs.GetInt("upgrade");
+        }
+        else
+        {
+            _currentUpgrade = -1;
+        }
     }
 
     public void Upgrade()
     {
+        var upgradeConfig = ConfigModule.GetConfig<UpgradeConfig>();
+        
+        if (upgradeConfig.TryGetUpgrade(_currentUpgrade + 1, out LevelInfo levelInfo))
+        {
+            if (TrySubResourceValue(levelInfo.Cost))
+            {
+                _currentUpgrade++;
 
+                int max = upgradeConfig.GetMaxLevelUpgrade();
+
+                float value = (float)_currentUpgrade / max;
+
+                ObserverEntity.Instance.UpdateUpgradeProcessChanged(value, _currentLevel, max);
+
+                PlayerPrefs.SetInt("upgrade", _currentUpgrade);
+            }
+        }
     }
 
     public void SetNextLevel()
@@ -63,6 +89,8 @@ public class PlayerEntity : SourceEntity
         if (levelConfig.TryGetLevelData(nextLevel, out LevelData data))
         {
             _currentLevel = nextLevel;
+
+            PlayerPrefs.SetInt("level", _currentLevel);
         } 
     }
 
@@ -82,6 +110,7 @@ public class PlayerEntity : SourceEntity
         }
 
         _metaResouceValue -= value;
+        PlayerPrefs.SetInt("resource", _metaResouceValue);
         ObserverEntity.Instance.UpdatePlayerMetaResourceChanged(_metaResouceValue);
 
         return true;
@@ -109,6 +138,7 @@ public class PlayerEntity : SourceEntity
             return false; // ничего не изменилось
 
         _metaResouceValue = newBalance;
+        PlayerPrefs.SetInt("resource", _metaResouceValue);
         ObserverEntity.Instance.UpdatePlayerMetaResourceChanged(_metaResouceValue);
         return true;
     }

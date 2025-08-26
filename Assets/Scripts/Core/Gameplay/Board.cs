@@ -1,6 +1,5 @@
 ﻿using DG.Tweening;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -54,7 +53,8 @@ public class Board : MonoBehaviour
 
         foreach (var tileData in data.tiles)
         {
-            Vector3 worldPos = new Vector3(
+            Vector3 worldPos = new Vector3
+            (
                 tileData.WorldPos.x * tileSize + offsetX,
                 tileData.WorldPos.y * tileSize + offsetY,
                 0f
@@ -128,6 +128,7 @@ public class Board : MonoBehaviour
             else
             {
                 Debug.Log("Все слои очищены — WIN");
+                _state.BoardClean();
                 OnWin?.Invoke();
             }
         }

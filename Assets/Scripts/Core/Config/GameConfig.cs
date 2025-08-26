@@ -6,8 +6,7 @@ public class GameConfig : Config
 {
     public float ClientSpawnDelay;
     public float ClientTakeDelay;
-    public int MaxClientCount;
-    public int MaxDishCount;
+    public int MaxClientCount; 
 
     public override IEnumerator Init()
     {

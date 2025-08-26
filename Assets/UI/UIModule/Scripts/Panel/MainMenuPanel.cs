@@ -26,7 +26,7 @@ public class MainMenuPanel : SourcePanel
         _btnPlay.onClick.AddListener(OnPlay);
         _btnBuild.onClick.AddListener(OnUpgrade);
 
-        ObserverEntity.Instance.UpgradeProgreesChanged += OnProgressUpdate;
+        ObserverEntity.Instance.UpgradeProgreesChanged += OnProgressUpdate; 
     }
 
     public override void OnOpen(params Action[] onComplete)
@@ -34,7 +34,25 @@ public class MainMenuPanel : SourcePanel
         base.OnOpen(onComplete);
 
         _titlePlay.text = $"Start ({PlayerEntity.Instance.GetCurrentLevel + 1})";
-        _titleBuild.text = $"Build ({10})";
+
+        var upgradeConfig = ConfigModule.GetConfig<UpgradeConfig>();
+
+        int max = upgradeConfig.GetMaxLevelUpgrade();
+
+        if (upgradeConfig.TryGetUpgrade(PlayerEntity.Instance.GetCurrentLevel, out LevelInfo levelInfo))
+        {
+            _titleBuild.text = $"Build ({levelInfo.Cost})";
+            _progressTitle.text = $"{levelInfo.Level}/{max}";
+            _progressFill.fillAmount = (float)levelInfo.Level / max;
+        }
+        else
+        {
+            var startlevelInfo = upgradeConfig.GetStartLevelUpgrade();
+
+            _progressFill.fillAmount = (float)0 / max;
+            _titleBuild.text = $"Build ({startlevelInfo.Cost})";
+            _progressTitle.text = $"{0}/{max}";
+        }
     }
 
     void OnProgressUpdate(float targetFill, int startValue, int targetValue)
@@ -43,6 +61,15 @@ public class MainMenuPanel : SourcePanel
         {
             StopCoroutine(_animateCoroutine);
             _animateCoroutine = null;
+        }
+
+        var upgradeConfig = ConfigModule.GetConfig<UpgradeConfig>();
+
+        if (upgradeConfig.TryGetUpgrade(PlayerEntity.Instance.GetCurrentLevel, out LevelInfo levelInfo))
+        {
+            int max = upgradeConfig.GetMaxLevelUpgrade();
+            _progressTitle.text = $"{levelInfo.Level}/{max}";
+            _titleBuild.text = $"Build ({levelInfo.Cost})"; 
         }
 
         _animateCoroutine = StartCoroutine(AnimateRoutine(targetFill, startValue, targetValue));

@@ -44,6 +44,8 @@ public class PlayState : State
         }
     }
 
+    public event Action BoardCleanChange;
+
     public int GetResaultValue => _resultValue;
     private int _resultValue;
 
@@ -63,6 +65,11 @@ public class PlayState : State
         _window.OnServingUpdate += OnServingWindowUpdate;
 
         UIModule.Inject(this, _board, _window, _client);
+    }
+
+    public void BoardClean()
+    {
+        BoardCleanChange?.Invoke();
     }
 
     public void AddValue(int value)
@@ -137,6 +144,7 @@ public class PlayState : State
          
         PlayStatusChanged?.Invoke(PlayStatus.lose);
         _status = PlayStatus.lose;
+        
     }
 
     private void HandleTileClick(TileView clickedTile)
