@@ -1,11 +1,18 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "TextureConfig", menuName = "Config/TextureConfig")]
 public class TextureConfig : Config, ISerializationCallbackReceiver
 {
+    [Header("Папки для автозаполнения")]
+    [FolderPath] public string TileFolder;
+    [FolderPath] public string DishFolder;
+
     [Header("Ингредиенты (TileType)")]
     public List<TileTextureData> TileTextures;
 
@@ -70,61 +77,129 @@ public class TextureConfig : Config, ISerializationCallbackReceiver
         SyncDishList();
     }
 
-    private void SyncTileList()
+    public void SyncTileList()
     {
         var enumValues = (Enums.TileType[])Enum.GetValues(typeof(Enums.TileType));
-        if (TileTextures == null || TileTextures.Count < enumValues.Length)
+
+        if (TileTextures == null)
             TileTextures = new List<TileTextureData>();
 
-        for (int i = 0; i < enumValues.Length; i++)
+        // делаем словарь по TileType (чтобы не потерять ссылки на Sprite)
+        var dict = new Dictionary<Enums.TileType, TileTextureData>();
+        foreach (var data in TileTextures)
+            if (!dict.ContainsKey(data.TileType))
+                dict[data.TileType] = data;
+
+        // пересобираем список ровно по enum'ам
+        var newList = new List<TileTextureData>();
+        foreach (var type in enumValues)
         {
-            if (i >= TileTextures.Count)
+            if (dict.TryGetValue(type, out var existing))
             {
-                TileTextures.Add(new TileTextureData
-                {
-                    TileType = enumValues[i],
-                    Name = enumValues[i].ToString()
-                });
+                existing.TileType = type;
+                existing.Name = type.ToString();
+                newList.Add(existing);
             }
             else
             {
-                TileTextures[i].TileType = enumValues[i];
-                TileTextures[i].Name = enumValues[i].ToString();
+                newList.Add(new TileTextureData
+                {
+                    TileType = type,
+                    Name = type.ToString()
+                });
             }
         }
 
-        if (TileTextures.Count > enumValues.Length)
-            TileTextures.RemoveRange(enumValues.Length, TileTextures.Count - enumValues.Length);
+        TileTextures = newList;
     }
 
-    private void SyncDishList()
+    public void SyncDishList()
     {
         var enumValues = (Enums.DishType[])Enum.GetValues(typeof(Enums.DishType));
-        if (DishTextures == null || DishTextures.Count < enumValues.Length)
+
+        if (DishTextures == null)
             DishTextures = new List<DishTextureData>();
 
-        for (int i = 0; i < enumValues.Length; i++)
+        var dict = new Dictionary<Enums.DishType, DishTextureData>();
+        foreach (var data in DishTextures)
+            if (!dict.ContainsKey(data.DishType))
+                dict[data.DishType] = data;
+
+        var newList = new List<DishTextureData>();
+        foreach (var type in enumValues)
         {
-            if (i >= DishTextures.Count)
+            if (dict.TryGetValue(type, out var existing))
             {
-                DishTextures.Add(new DishTextureData
-                {
-                    DishType = enumValues[i],
-                    Name = enumValues[i].ToString()
-                });
+                existing.DishType = type;
+                existing.Name = type.ToString();
+                newList.Add(existing);
             }
             else
             {
-                DishTextures[i].DishType = enumValues[i];
-                DishTextures[i].Name = enumValues[i].ToString();
+                newList.Add(new DishTextureData
+                {
+                    DishType = type,
+                    Name = type.ToString()
+                });
             }
         }
 
-        if (DishTextures.Count > enumValues.Length)
-            DishTextures.RemoveRange(enumValues.Length, DishTextures.Count - enumValues.Length);
+        DishTextures = newList;
     }
     #endregion
+
+#if UNITY_EDITOR
+    public void AutoAssignSprites<TEnum, TData>(
+    List<TData> list,
+    Func<TData, TEnum> getType,
+    Action<TData, Sprite> setSprite,
+    string folderPath
+)
+    {
+        if (string.IsNullOrEmpty(folderPath)) return;
+        if (!AssetDatabase.IsValidFolder(folderPath)) return;
+
+        var guids = AssetDatabase.FindAssets("t:Sprite", new[] { folderPath });
+        var spriteList = new List<Sprite>(); 
+
+        foreach (var guid in guids)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            if (sprite != null) spriteList.Add(sprite);
+        }
+
+        // Для каждого элемента списка
+        foreach (var item in list)
+        {
+            string key = getType(item).ToString().ToLower();
+            Sprite assigned = null;
+
+            // Начинаем проверку от полной длины к 3 символам
+            for (int len = key.Length; len >= 3; len--)
+            {
+                string subKey = key.Substring(0, len);
+
+                foreach (var sprite in spriteList)
+                {
+                    if (sprite.name.ToLower().Contains(subKey))
+                    {
+                        assigned = sprite;
+                        break;
+                    }
+                }
+
+                if (assigned != null)
+                    break; // нашли спрайт — выходим
+            }
+
+            if (assigned != null)
+                setSprite(item, assigned);
+        }
+    }
+#endif
 }
+
 
 [System.Serializable]
 public class TileTextureData

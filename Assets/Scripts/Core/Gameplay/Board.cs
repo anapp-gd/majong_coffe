@@ -6,12 +6,11 @@ using UnityEngine;
 
 public class Board : MonoBehaviour
 {
-    public event Action OnLose;
-    public event Action OnWin;
+    public event Action OnLose; 
 
     [SerializeField] private TileView tileViewPrefab;
-    [SerializeField] private float tileSize = 1f;
-    [SerializeField, Range(0f, 1f)] private float lowerLayerDarken = 0.5f;
+    [SerializeField] private float tileSizeX = 1f;
+    [SerializeField] private float tileSizeY = 1f;
 
     private LevelData _levelData;
     private PlayState _state;
@@ -48,37 +47,31 @@ public class Board : MonoBehaviour
             if (t.WorldPos.y > maxY) maxY = t.GridPos.y;
         }
 
-        float offsetX = -(maxX * tileSize) / 2f + customOffset.x;
-        float offsetY = -(maxY * tileSize) / 2f + customOffset.y;
+        float offsetX = -(maxX * tileSizeX) / 2f + customOffset.x;
+        float offsetY = -(maxY * tileSizeY) / 2f + customOffset.y;
 
         foreach (var tileData in data.tiles)
         {
             Vector3 worldPos = new Vector3
             (
-                tileData.WorldPos.x * tileSize + offsetX,
-                tileData.WorldPos.y * tileSize + offsetY,
+                tileData.WorldPos.x * tileSizeX + offsetX,
+                tileData.WorldPos.y * tileSizeY + offsetY,
                 0f
             );
-
-            var tile = Instantiate(tileViewPrefab, worldPos, Quaternion.identity, transform);
-            tile.GridPos = tileData.GridPos;
-            tile.WorldPos = worldPos;
-            tile.Init(state, tileData.TileType, tileData.Layer);
+             
+            var tile = Instantiate(tileViewPrefab, worldPos, Quaternion.identity, transform); 
+            tile.Init(state, tileData, tileData.TileType, tileData.Layer);
 
             _allTiles.Add(tile);
 
-            var spriteRenderer = tile.GetComponent<SpriteRenderer>();
-            if (spriteRenderer != null)
+            if (tile.IsAvailable())
             {
-                spriteRenderer.sortingOrder = tileData.Layer;
-                spriteRenderer.color = Color.HSVToRGB(((int)tile.TileType % 12) / 12f, 0.8f, 1f);
-
-                if (tileData.Layer < CurrentLayer)
-                {
-                    spriteRenderer.color *= lowerLayerDarken;
-                    tile.Disable();
-                }
+                tile.Enable();
             }
+            else
+            { 
+                tile.Disable();
+            } 
         }
     } 
 
@@ -86,6 +79,7 @@ public class Board : MonoBehaviour
     {
         _status = playStatus;
     }
+
     public void RemoveTiles(TileView a, TileView b)
     {
         if (_status != PlayState.PlayStatus.play) return;
@@ -94,7 +88,7 @@ public class Board : MonoBehaviour
 
         _allTiles.Remove(a);
         _allTiles.Remove(b);
-
+         
         Sequence seq = DOTween.Sequence();
 
         seq.Join(a.RemoveWithJoin(joinPoint));
@@ -103,42 +97,36 @@ public class Board : MonoBehaviour
         // Когда обе анимации завершены
         seq.OnComplete(() =>
         {
-            CheckLayerAfterRemove(a.LayerIndex);
+            CheckLayerAfterRemove();
         });
     }
-    private void CheckLayerAfterRemove(int layer)
+
+    private void UpdateAllTiles()
     {
-        if (IsLayerCleared(layer))
+        foreach (var tile in _allTiles)
         {
-            int nextLayer = layer - 1;
-            CurrentLayer = nextLayer;
-
-            Debug.Log($"Слой {layer} очищен! Теперь активен слой {CurrentLayer}");
-
-            if (CurrentLayer >= 0)
+            if (tile.IsAvailable())
             {
-                ApplyNormalColorToLayer(CurrentLayer);
-
-                if (!HasAvailableMoves(CurrentLayer))
-                {
-                    Debug.Log("Нет доступных ходов — GAME OVER");
-                    OnLose?.Invoke();
-                }
+                tile.Enable();
             }
             else
             {
-                Debug.Log("Все слои очищены — WIN");
-                _state.BoardClean();
-                OnWin?.Invoke();
+                tile.Disable();
             }
         }
-        else
+    }
+
+    private void CheckLayerAfterRemove()
+    {
+        UpdateAllTiles();
+
+        if (IsBoardClear())
         {
-            if (!HasAvailableMoves(layer))
-            {
-                Debug.Log("Нет доступных ходов — GAME OVER");
-                OnLose?.Invoke();
-            }
+            _state.SetRemoveAllTiles();
+        }
+        else if(!HasAvailableMoves()) 
+        {
+            OnLose?.Invoke();
         }
     }
 
@@ -146,43 +134,27 @@ public class Board : MonoBehaviour
     {
         return _allTiles.Count == 0;
     }
-    private bool IsLayerCleared(int layer)
+     
+    public bool HasAvailableMoves()
     {
-        return !_allTiles.Any(t => t.LayerIndex == layer);
-    }
-    public bool HasAvailableMoves(int layer)
-    {
-        var clickable = GetTilesOnLayer(layer)
-            .Where(t => t.IsAvailable(layer))
-            .ToList();
+        var availables = MadjongGenerator.GetFreeTiles();
 
-        for (int i = 0; i < clickable.Count; i++)
+        for (int i = 0; i < availables.Count; i++)
         {
-            for (int j = i + 1; j < clickable.Count; j++)
+            for (int j = i + 1; j < availables.Count; j++)
             {
-                if (clickable[i].TileType == clickable[j].TileType)
-                { 
+                if (availables[i].TileType == availables[j].TileType)
+                {
                     return true;
                 }
             }
-        }
+        } 
 
         return false;
     }
+
     public IEnumerable<TileView> GetTilesOnLayer(int layer)
     {
         return _allTiles.Where(t => t.LayerIndex == layer);
-    } 
-    private void ApplyNormalColorToLayer(int layer)
-    {
-        foreach (var tile in GetTilesOnLayer(layer))
-        {
-            tile.Enable();
-            var spriteRenderer = tile.GetComponent<SpriteRenderer>();
-            if (spriteRenderer != null)
-            {
-                spriteRenderer.color = Color.HSVToRGB(((int)tile.TileType % 12) / 12f, 0.8f, 1f);
-            }
-        }
-    }
+    }  
 }

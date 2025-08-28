@@ -37,7 +37,7 @@ public class ClientService : MonoBehaviour
         }
 
         _spawnInterval = 0f;
-        _clientDelayTake = 0f;
+        _clientDelayTake = 0f; 
     }
 
     void OnPlayStatusChange(PlayState.PlayStatus status)

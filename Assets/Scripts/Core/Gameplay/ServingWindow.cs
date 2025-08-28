@@ -53,6 +53,11 @@ public class ServingWindow : MonoBehaviour
             Debug.Log($"Нужного блюда ({dishType}) не было, выдано случайное: {dish.Type}");
         }
 
+        if (_readyDishes.Count == 0)
+        {
+            _state.SetTableClear();
+        }
+
         OnServingUpdate?.Invoke(_readyDishes);
         return true;
     }

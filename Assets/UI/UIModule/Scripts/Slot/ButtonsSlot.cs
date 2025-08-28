@@ -9,7 +9,7 @@ public class ButtonsSlot : SourceSlot
     public override SourceSlot Init(SourceLayout layout)
     {
         base.Init(layout);
-        _btnClick.interactable = false;
+        if(_btnClick) _btnClick.interactable = false;
         _btnExit?.onClick.AddListener(OnExit);
         _btnSettings?.onClick.AddListener(OnSettings);
         return this;

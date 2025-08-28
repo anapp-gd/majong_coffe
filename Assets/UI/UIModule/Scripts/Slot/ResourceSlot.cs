@@ -8,7 +8,7 @@ public class ResourceSlot : SourceSlot
     {
         base.Init(layout);
         _title = GetComponentInChildren<Text>();
-        _btnClick.interactable = false;
+        if(_btnClick) _btnClick.interactable = false;
         ObserverEntity.Instance.PlayerMetaResourceChanged += OnUpdateResourceValue;
         OnUpdateResourceValue(PlayerEntity.Instance.GetResource);
         return this;

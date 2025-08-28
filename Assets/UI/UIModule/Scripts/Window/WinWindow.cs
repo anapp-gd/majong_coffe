@@ -7,6 +7,7 @@ public class WinWindow : SourceWindow
 {
     [SerializeField] Text _resultTitle;
     [SerializeField] Button _next;
+    [SerializeField] Transform[] _winStars;
 
     [UIInject] PlayState _state;
 

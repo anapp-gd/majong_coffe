@@ -9,11 +9,12 @@ public class MainMenuPanel : SourcePanel
     [SerializeField] Button _btnPlay;
     [SerializeField] Button _btnBuild;
 
-    [SerializeField] TextMeshProUGUI _titlePlay;
-    [SerializeField] TextMeshProUGUI _titleBuild;
+    [SerializeField] Text _titlePlay;
+    [SerializeField] Text _titleBuild;
 
     [SerializeField] Text _progressTitle;
     [SerializeField] Image _progressFill;
+    [SerializeField] Slider _progressSlider;
 
     [SerializeField] private float _duration = 1.5f;
 
@@ -41,15 +42,21 @@ public class MainMenuPanel : SourcePanel
 
         if (upgradeConfig.TryGetUpgrade(PlayerEntity.Instance.GetCurrentUpgrade, out LevelInfo levelInfo))
         {
+            float value = (float)levelInfo.Level / max;
+
             _titleBuild.text = $"Build ({levelInfo.Cost})";
             _progressTitle.text = $"{levelInfo.Level}/{max}";
-            _progressFill.fillAmount = (float)levelInfo.Level / max;
+            _progressFill.fillAmount = value;
+            _progressSlider.value = value;
         }
         else
         {
             var startlevelInfo = upgradeConfig.GetStartLevelUpgrade();
 
-            _progressFill.fillAmount = (float)0 / max;
+            float value = (float)0 / max;
+
+            _progressFill.fillAmount = value;
+            _progressSlider.value = value;
             _titleBuild.text = $"Build ({startlevelInfo.Cost})";
             _progressTitle.text = $"{0}/{max}";
         }
@@ -76,8 +83,8 @@ public class MainMenuPanel : SourcePanel
     }
 
     private IEnumerator AnimateRoutine(float targetFill, int startValue, int targetValue)
-    {
-        float startFill = _progressFill.fillAmount; 
+    { 
+        float startFill = _progressSlider.value; 
 
         float time = 0f;
         while (time < _duration)
@@ -85,7 +92,11 @@ public class MainMenuPanel : SourcePanel
             time += Time.deltaTime;
             float t = Mathf.Clamp01(time / _duration);
 
-            _progressFill.fillAmount = Mathf.Lerp(startFill, targetFill, t);
+            float value = Mathf.Lerp(startFill, targetFill, t);
+             
+            _progressFill.fillAmount = value;
+            _progressSlider.value = value;
+
             int currentValue = Mathf.RoundToInt(Mathf.Lerp(startValue, targetValue, t));
             _progressTitle.text = $"${currentValue}/{targetValue}";
 
@@ -93,6 +104,7 @@ public class MainMenuPanel : SourcePanel
         }
 
         _progressFill.fillAmount = targetFill;
+        _progressSlider.value = targetFill;
         _progressTitle.text = $"${targetValue}/{targetValue}";
 
         _animateCoroutine = null;

@@ -9,7 +9,7 @@ public class LevelInfoSlot : SourceSlot
     {
         base.Init(layout);
         _title = GetComponentInChildren<Text>(true);
-        _btnClick.interactable = false;
+        if (_btnClick) _btnClick.interactable = false;
         return this;
     }
 

@@ -48,6 +48,8 @@ public class PlayState : State
 
     public int GetResaultValue => _resultValue;
     private int _resultValue;
+    private WinConditions _winConditions;
+    public bool IsWin => _winConditions.IsVictory();
 
     protected override void Awake()
     {
@@ -65,12 +67,22 @@ public class PlayState : State
         _window.OnServingUpdate += OnServingWindowUpdate;
 
         UIModule.Inject(this, _board, _window, _client);
+
+        _winConditions = new WinConditions(new[] 
+        {
+            WinCondition.TableClear, WinCondition.RemoveAllTiles
+        });
     }
 
-    public void BoardClean()
+    public void SetRemoveAllTiles()
     {
-        BoardCleanChange?.Invoke();
+        _winConditions.SetCompleted(WinCondition.RemoveAllTiles, true);
     }
+
+    public void SetTableClear()
+    {
+        _winConditions.SetCompleted(WinCondition.TableClear, true);
+    } 
 
     public void AddValue(int value)
     {
@@ -107,19 +119,12 @@ public class PlayState : State
 
     private void OnDestroy()
     {
-        _board.OnLose -= Lose;
-        _board.OnWin -= Win;
+        _board.OnLose -= Lose; 
     }
 
     void OnServingWindowUpdate(List<Dish> currentDishes)
     {
-        if (currentDishes.Count == 0)
-        {
-            if (_board.IsBoardClear())
-            {
-                Win();
-            }
-        }
+        if (IsWin) Win(); 
     }
 
     public void Win()
@@ -151,7 +156,7 @@ public class PlayState : State
     {
         if (_status != PlayStatus.play) return;
 
-        if (!clickedTile.IsAvailable(_board.CurrentLayer))
+        if (!clickedTile.IsAvailable())
             return;
 
         if (_window.IsFull())
