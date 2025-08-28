@@ -117,7 +117,10 @@ public class MainMenuPanel : SourcePanel
 
     void OnUpgrade()
     {
-        MenuState.Instance.Upgrade();
+        if (UIModule.TryGetCanvas<MainMenuCanvas>(out var mainMenuCanvas))
+        {
+            mainMenuCanvas.OpenPanel<BuildMenuPanel>();
+        }
     }
     
     public override void OnDispose()
