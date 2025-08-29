@@ -112,8 +112,108 @@ public static class MadjongGenerator
         OnTilesUpdated?.Invoke();
         return (result, availableDishes, actualLayers);
     }
-
     private static void PlacePairsOnLayer(
+    List<Vector2> positions,
+    int layer,
+    LevelData data,
+    List<TileData> result,
+    HashSet<Enums.DishType> availableDishes,
+    ref int pairsLeft)
+    {
+        var availableTileTypesCopy = new List<Enums.TileType>(data.availableTileTypes);
+
+        // сортируем позиции по X (слева -> справа)
+        positions.Sort((a, b) => a.x.CompareTo(b.x));
+
+        // --- сначала крайние пары ---
+        while (pairsLeft > 0 && positions.Count >= 2)
+        {
+            Vector2 wp1, wp2;
+
+            if (positions.Count >= 2)
+            {
+                // проверяем пару слева
+                if (Mathf.Abs(positions[0].x - positions[1].x) <= 1f)
+                {
+                    wp1 = positions[0];
+                    wp2 = positions[1];
+                    positions.RemoveRange(0, 2);
+                }
+                // проверяем пару справа
+                else if (Mathf.Abs(positions[^1].x - positions[^2].x) <= 1f)
+                {
+                    wp1 = positions[^1];
+                    wp2 = positions[^2];
+                    positions.RemoveRange(positions.Count - 2, 2);
+                }
+                else
+                {
+                    // по одной с каждой стороны (по краям)
+                    wp1 = positions[0];
+                    wp2 = positions[^1];
+                    positions.RemoveAt(positions.Count - 1);
+                    positions.RemoveAt(0);
+                }
+            }
+            else break;
+
+            // выбрать тип плитки
+            Enums.TileType tileType;
+            if (availableTileTypesCopy.Count >= pairsLeft)
+            {
+                int typeIdx = UnityEngine.Random.Range(0, availableTileTypesCopy.Count);
+                tileType = availableTileTypesCopy[typeIdx];
+                availableTileTypesCopy.RemoveAt(typeIdx);
+            }
+            else
+            {
+                tileType = data.availableTileTypes[UnityEngine.Random.Range(0, data.availableTileTypes.Count)];
+            }
+
+            if (DishMapping.TryGetDish(tileType, out var dishType))
+                availableDishes.Add(dishType);
+
+            var td1 = new TileData(wp1, Vector2Int.RoundToInt(wp1), layer, tileType);
+            var td2 = new TileData(wp2, Vector2Int.RoundToInt(wp2), layer, tileType);
+
+            result.Add(td1);
+            result.Add(td2);
+
+            gridAll[new GridPos3(wp1, layer)] = td1;
+            gridAll[new GridPos3(wp2, layer)] = td2;
+
+            pairsLeft--;
+        }
+
+        // --- если остались позиции (внутренние) ---
+        while (positions.Count >= 2 && pairsLeft > 0)
+        {
+            int idx1 = UnityEngine.Random.Range(0, positions.Count);
+            var wp1 = positions[idx1];
+            positions.RemoveAt(idx1);
+
+            int idx2 = UnityEngine.Random.Range(0, positions.Count);
+            var wp2 = positions[idx2];
+            positions.RemoveAt(idx2);
+
+            var tileType = data.availableTileTypes[UnityEngine.Random.Range(0, data.availableTileTypes.Count)];
+            if (DishMapping.TryGetDish(tileType, out var dishType))
+                availableDishes.Add(dishType);
+
+            var td1 = new TileData(wp1, Vector2Int.RoundToInt(wp1), layer, tileType);
+            var td2 = new TileData(wp2, Vector2Int.RoundToInt(wp2), layer, tileType);
+
+            result.Add(td1);
+            result.Add(td2);
+
+            gridAll[new GridPos3(wp1, layer)] = td1;
+            gridAll[new GridPos3(wp2, layer)] = td2;
+
+            pairsLeft--;
+        }
+    }
+
+    /*private static void PlacePairsOnLayer(
     List<Vector2> positions,
     int layer,
     LevelData data,
@@ -205,6 +305,7 @@ public static class MadjongGenerator
             pairsLeft--;
         }
     }
+*/
     // маска для размещения плиток слоя (пирамида: центр 2x2)
     private static List<Vector2> GeneratePyramidLayerMask(int layer)
     {

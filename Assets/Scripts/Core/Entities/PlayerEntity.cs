@@ -1,3 +1,4 @@
+using NUnit.Framework.Interfaces;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,19 +21,9 @@ public class PlayerEntity : SourceEntity
             return _currentLevel;
         }
     }
-    private int _currentLevel;
+    private int _currentLevel; 
 
-    public int GetCurrentUpgrade
-    {
-        get
-        {
-            return _currentUpgrade;
-        }
-    }
-
-    public List<ItemData> Data;
-
-    private int _currentUpgrade;
+    public List<ItemData> Data; 
 
     private const int _maxBalance = 100000; 
 
@@ -43,45 +34,49 @@ public class PlayerEntity : SourceEntity
 
     public override void Init()
     {
-        if (PlayerPrefs.HasKey("level"))
-        {
-            _currentLevel = PlayerPrefs.GetInt("level");
-        }
-        else
-        {
-            _currentLevel = 0;
-        }
+        Load();
+    }
 
-        if (PlayerPrefs.HasKey("resource"))
-        {
-            _metaResouceValue = PlayerPrefs.GetInt("resource");
-        }
-        else
-        {
-            _metaResouceValue = 0;
-        }
-
-        if (PlayerPrefs.HasKey("upgrade"))
-        {
-            _currentUpgrade = PlayerPrefs.GetInt("upgrade");
-        }
-        else
-        {
-            _currentUpgrade = -1;
-        }
-
-        Data = new ();
+    public void Load()
+    { 
+        Data = new();
 
         var saveData = SaveModule.Load<SaveData>();
 
         if (saveData.itemsData.Count > 0)
         {
-
             foreach (var item in saveData.itemsData)
             {
                 Data.Add(new ItemData(item.Level, item.Type, item.Cost));
             }
         }
+
+        _currentLevel = saveData.Level;
+        _metaResouceValue = saveData.MetaResources;
+    }
+
+    public void Save()
+    {
+        List<ItemSaveData> itemsData = new List<ItemSaveData>();
+
+        foreach (var item in Data)
+        {
+            itemsData.Add(new ItemSaveData()
+            {
+                Cost = item.Cost,
+                Level = item.Level,
+                Type = item.Type,
+            });
+        }
+
+        var data = new SaveData()
+        {
+            Level = _currentLevel,
+            MetaResources = _metaResouceValue,
+            itemsData = itemsData
+        };
+
+        SaveModule.Save(data);
     }
 
     public void AddItem(ItemData item)
@@ -89,6 +84,8 @@ public class PlayerEntity : SourceEntity
         MenuState.Instance.BuyItem(item.Type);
 
         Data.Add(item);
+
+        Save();
     } 
 
     public void SetNextLevel()
@@ -101,7 +98,7 @@ public class PlayerEntity : SourceEntity
         {
             _currentLevel = nextLevel;
 
-            PlayerPrefs.SetInt("level", _currentLevel);
+            Save();
         } 
     }
 
@@ -123,7 +120,7 @@ public class PlayerEntity : SourceEntity
         _metaResouceValue -= value;
         PlayerPrefs.SetInt("resource", _metaResouceValue);
         ObserverEntity.Instance.UpdatePlayerMetaResourceChanged(_metaResouceValue);
-
+        Save();
         return true;
     }
 
@@ -151,6 +148,7 @@ public class PlayerEntity : SourceEntity
         _metaResouceValue = newBalance;
         PlayerPrefs.SetInt("resource", _metaResouceValue);
         ObserverEntity.Instance.UpdatePlayerMetaResourceChanged(_metaResouceValue);
+        Save();
         return true;
     }
 }
