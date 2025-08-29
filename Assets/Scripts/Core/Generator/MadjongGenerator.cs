@@ -114,15 +114,60 @@ public static class MadjongGenerator
     }
 
     private static void PlacePairsOnLayer(
-        List<Vector2> positions,
-        int layer,
-        LevelData data,
-        List<TileData> result,
-        HashSet<Enums.DishType> availableDishes,
-        ref int pairsLeft)
+    List<Vector2> positions,
+    int layer,
+    LevelData data,
+    List<TileData> result,
+    HashSet<Enums.DishType> availableDishes,
+    ref int pairsLeft)
     {
         var availableTileTypesCopy = new List<Enums.TileType>(data.availableTileTypes);
 
+        // --- гарантируем первую пару ---
+        if (pairsLeft > 0 && positions.Count >= 2)
+        {
+            Vector2 wp1, wp2;
+
+            // сортируем позиции по X, чтобы легко брать крайние
+            positions.Sort((a, b) => a.x.CompareTo(b.x));
+
+            int mode = UnityEngine.Random.Range(0, 3); // 0=две слева, 1=две справа, 2=по краям
+            if (mode == 0)
+            {
+                wp1 = positions[0];
+                wp2 = positions[1];
+            }
+            else if (mode == 1)
+            {
+                wp1 = positions[positions.Count - 1];
+                wp2 = positions[positions.Count - 2];
+            }
+            else
+            {
+                wp1 = positions[0];
+                wp2 = positions[positions.Count - 1];
+            }
+
+            positions.Remove(wp1);
+            positions.Remove(wp2);
+
+            var tileType = data.availableTileTypes[UnityEngine.Random.Range(0, data.availableTileTypes.Count)];
+            if (DishMapping.TryGetDish(tileType, out var dishType))
+                availableDishes.Add(dishType);
+
+            var td1 = new TileData(wp1, Vector2Int.RoundToInt(wp1), layer, tileType);
+            var td2 = new TileData(wp2, Vector2Int.RoundToInt(wp2), layer, tileType);
+
+            result.Add(td1);
+            result.Add(td2);
+
+            gridAll[new GridPos3(wp1, layer)] = td1;
+            gridAll[new GridPos3(wp2, layer)] = td2;
+
+            pairsLeft--;
+        }
+
+        // --- остальные пары рандомом ---
         while (positions.Count >= 2 && pairsLeft > 0)
         {
             Enums.TileType tileType;
@@ -160,7 +205,6 @@ public static class MadjongGenerator
             pairsLeft--;
         }
     }
-
     // маска для размещения плиток слоя (пирамида: центр 2x2)
     private static List<Vector2> GeneratePyramidLayerMask(int layer)
     {
