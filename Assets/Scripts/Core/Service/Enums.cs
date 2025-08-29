@@ -77,5 +77,18 @@ public class Enums
         Croutons, 
         GrilledShrimp, 
         Sandwich 
+    } 
+    public enum ItemType 
+    { 
+        plant, 
+        menu, 
+        chairs, 
+        blower, 
+        lamps, 
+        table, 
+        coffeMachine, 
+        candyBar, 
+        jukebox, 
+        diner
     }
 }

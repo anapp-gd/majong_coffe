@@ -5,46 +5,25 @@ using System.Linq;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "UpgradeConfig", menuName = "Config/UpgradeConfig")]
-public class UpgradeConfig : Config
+public class UpgradeConfig : Config, ISerializationCallbackReceiver
 {
-    public List<LevelInfo> Items;
+    public List<ItemBase> Items;
 
     public override IEnumerator Init()
     {
         yield return null;
     }
 
-    public LevelInfo GetStartLevelUpgrade()
-    {
-        return Items[0];
+    public void OnAfterDeserialize()
+    { 
     }
 
-    public bool TryGetUpgrade(int level, out LevelInfo levelInfo)
+    public void OnBeforeSerialize()
     {
-        levelInfo = null;
-
-        if (level < 0)
+        if (Items != null && Items.Count > 2)
         {
-            return false;
+            Items.Sort((a, b) => a.ItemData.Level.CompareTo(b.ItemData.Level));
         }
-
-        if (level < Items.Count)
-        {
-            levelInfo = Items[level];
-        }
-
-        return levelInfo != null;
-    }
-
-    public int GetMaxLevelUpgrade()
-    {
-        return Items.Last().Level;
     }
 }
-
-[Serializable]
-public class LevelInfo
-{
-    public int Cost;
-    public int Level;
-}
+ 

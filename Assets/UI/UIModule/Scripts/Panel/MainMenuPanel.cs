@@ -38,7 +38,7 @@ public class MainMenuPanel : SourcePanel
 
         var upgradeConfig = ConfigModule.GetConfig<UpgradeConfig>();
 
-        int max = upgradeConfig.GetMaxLevelUpgrade();
+        /*int max = upgradeConfig.GetMaxLevelUpgrade();
 
         if (upgradeConfig.TryGetUpgrade(PlayerEntity.Instance.GetCurrentUpgrade, out LevelInfo levelInfo))
         {
@@ -59,7 +59,7 @@ public class MainMenuPanel : SourcePanel
             _progressSlider.value = value;
             _titleBuild.text = $"Build ({startlevelInfo.Cost})";
             _progressTitle.text = $"{0}/{max}";
-        }
+        }*/
     }
 
     void OnProgressUpdate(float targetFill, int startValue, int targetValue)
@@ -72,12 +72,12 @@ public class MainMenuPanel : SourcePanel
 
         var upgradeConfig = ConfigModule.GetConfig<UpgradeConfig>();
 
-        if (upgradeConfig.TryGetUpgrade(PlayerEntity.Instance.GetCurrentUpgrade, out LevelInfo levelInfo))
+        /*if (upgradeConfig.TryGetUpgrade(PlayerEntity.Instance.GetCurrentUpgrade, out LevelInfo levelInfo))
         {
             int max = upgradeConfig.GetMaxLevelUpgrade();
             _progressTitle.text = $"{levelInfo.Level}/{max}";
             _titleBuild.text = $"Build ({levelInfo.Cost})"; 
-        }
+        }*/
 
         _animateCoroutine = StartCoroutine(AnimateRoutine(targetFill, startValue, targetValue));
     }

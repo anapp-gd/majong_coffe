@@ -1,6 +1,7 @@
 using System.IO;
 using UnityEngine;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 public static class SaveModule
 {
@@ -68,11 +69,20 @@ public static class SaveModule
 public class SaveData
 {
     public int Level;
-    public int MetaResources; 
-
+    public int MetaResources;
+    public List<ItemSaveData> itemsData;
     public SaveData()
     {
         Level = 0;
         MetaResources = 0; 
+        itemsData = new List<ItemSaveData>();
     }
+}
+
+[System.Serializable]
+public class ItemSaveData
+{
+    public int Level;
+    public Enums.ItemType Type;
+    public int Cost;
 }

@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 307170429}
   - component: {fileID: 307170428}
+  - component: {fileID: 307170430}
   m_Layer: 0
   m_Name: Chairs_back
   m_TagString: Untagged
@@ -206,6 +207,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &307170430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 307170427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ef3730f081df342877b542f463b327, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 2
 --- !u!1 &320982199
 GameObject:
   m_ObjectHideFlags: 0
@@ -216,6 +230,7 @@ GameObject:
   m_Component:
   - component: {fileID: 320982201}
   - component: {fileID: 320982200}
+  - component: {fileID: 320982202}
   m_Layer: 0
   m_Name: Jukebox_back
   m_TagString: Untagged
@@ -293,6 +308,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &320982202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320982199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ef3730f081df342877b542f463b327, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 8
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -473,6 +501,7 @@ GameObject:
   m_Component:
   - component: {fileID: 875007986}
   - component: {fileID: 875007985}
+  - component: {fileID: 875007987}
   m_Layer: 0
   m_Name: Blower_back
   m_TagString: Untagged
@@ -550,6 +579,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &875007987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 875007984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ef3730f081df342877b542f463b327, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 3
 --- !u!1 &952768887
 GameObject:
   m_ObjectHideFlags: 0
@@ -560,6 +602,7 @@ GameObject:
   m_Component:
   - component: {fileID: 952768889}
   - component: {fileID: 952768888}
+  - component: {fileID: 952768890}
   m_Layer: 0
   m_Name: Table_back
   m_TagString: Untagged
@@ -637,6 +680,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &952768890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 952768887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ef3730f081df342877b542f463b327, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 5
 --- !u!1 &1277507333
 GameObject:
   m_ObjectHideFlags: 0
@@ -647,6 +703,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1277507335}
   - component: {fileID: 1277507334}
+  - component: {fileID: 1277507336}
   m_Layer: 0
   m_Name: Menu_back
   m_TagString: Untagged
@@ -724,6 +781,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1277507336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1277507333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ef3730f081df342877b542f463b327, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 1
 --- !u!1 &1313289539
 GameObject:
   m_ObjectHideFlags: 0
@@ -821,6 +891,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1376581315}
   - component: {fileID: 1376581314}
+  - component: {fileID: 1376581316}
   m_Layer: 0
   m_Name: CoffeeMachine_back
   m_TagString: Untagged
@@ -898,6 +969,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1376581316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1376581313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ef3730f081df342877b542f463b327, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 6
 --- !u!1 &1524411263
 GameObject:
   m_ObjectHideFlags: 0
@@ -908,6 +992,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1524411265}
   - component: {fileID: 1524411264}
+  - component: {fileID: 1524411266}
   m_Layer: 0
   m_Name: CandyBar_back
   m_TagString: Untagged
@@ -985,6 +1070,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1524411266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1524411263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ef3730f081df342877b542f463b327, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 7
 --- !u!1 &1571983579
 GameObject:
   m_ObjectHideFlags: 0
@@ -995,6 +1093,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1571983581}
   - component: {fileID: 1571983580}
+  - component: {fileID: 1571983582}
   m_Layer: 0
   m_Name: Lamps_back
   m_TagString: Untagged
@@ -1072,6 +1171,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1571983582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1571983579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ef3730f081df342877b542f463b327, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 4
 --- !u!1 &1912600743
 GameObject:
   m_ObjectHideFlags: 0
@@ -1219,6 +1331,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2076732935}
   - component: {fileID: 2076732934}
+  - component: {fileID: 2076732936}
   m_Layer: 0
   m_Name: Diner_back
   m_TagString: Untagged
@@ -1296,6 +1409,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2076732936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076732933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ef3730f081df342877b542f463b327, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 9
 --- !u!1 &2085791194
 GameObject:
   m_ObjectHideFlags: 0
@@ -1306,6 +1432,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2085791196}
   - component: {fileID: 2085791195}
+  - component: {fileID: 2085791197}
   m_Layer: 0
   m_Name: Plant
   m_TagString: Untagged
@@ -1383,6 +1510,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2085791197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2085791194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ef3730f081df342877b542f463b327, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 0
 --- !u!1001 &3323827732823541601
 PrefabInstance:
   m_ObjectHideFlags: 0

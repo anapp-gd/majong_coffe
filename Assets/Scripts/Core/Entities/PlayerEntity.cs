@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerEntity : SourceEntity
@@ -28,6 +29,8 @@ public class PlayerEntity : SourceEntity
             return _currentUpgrade;
         }
     }
+
+    public List<ItemData> Data;
 
     private int _currentUpgrade;
 
@@ -66,28 +69,27 @@ public class PlayerEntity : SourceEntity
         {
             _currentUpgrade = -1;
         }
-    }
 
-    public void Upgrade()
-    {
-        var upgradeConfig = ConfigModule.GetConfig<UpgradeConfig>();
-        
-        if (upgradeConfig.TryGetUpgrade(_currentUpgrade + 1, out LevelInfo levelInfo))
+        Data = new ();
+
+        var saveData = SaveModule.Load<SaveData>();
+
+        if (saveData.itemsData.Count > 0)
         {
-            if (TrySubResourceValue(levelInfo.Cost))
+
+            foreach (var item in saveData.itemsData)
             {
-                _currentUpgrade++;
-
-                int max = upgradeConfig.GetMaxLevelUpgrade();
-
-                float value = (float)_currentUpgrade / max;
-
-                ObserverEntity.Instance.UpdateUpgradeProcessChanged(value, _currentLevel, max);
-
-                PlayerPrefs.SetInt("upgrade", _currentUpgrade);
+                Data.Add(new ItemData(item.Level, item.Type, item.Cost));
             }
         }
     }
+
+    public void AddItem(ItemData item)
+    {
+        MenuState.Instance.BuyItem(item.Type);
+
+        Data.Add(item);
+    } 
 
     public void SetNextLevel()
     {

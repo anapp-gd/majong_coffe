@@ -1,8 +1,18 @@
 using UnityEngine;
-public abstract class ItemBase : ScriptableObject, ISerializationCallbackReceiver
+
+[CreateAssetMenu(fileName = "ItemBase", menuName = "Scriptable Objects/Newitem")]
+public class ItemBase : ScriptableObject, ISerializationCallbackReceiver
 {
     [ReadOnlyInspector] public string KEY_ID;
-    public abstract void Buy();
+    public ItemData ItemData;
+
+    public void Buy()
+    {
+        if (ItemData.TryBuy(out var item))
+        {
+            PlayerEntity.Instance.AddItem(item);
+        }
+    }
 
     public void OnAfterDeserialize()
     {

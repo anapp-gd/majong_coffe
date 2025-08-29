@@ -1,3 +1,6 @@
+using System.Linq;
+using UnityEditor.PackageManager;
+using UnityEditor.PackageManager.UI;
 using UnityEngine.SceneManagement;
 
 public class MenuState : State
@@ -10,10 +13,16 @@ public class MenuState : State
         }
     }
 
+    private ItemView[] _items;
 
     protected override void Awake()
     {
+        _items = FindObjectsByType<ItemView>(UnityEngine.FindObjectsSortMode.None);
 
+        foreach (var item in _items)
+        {
+            item.gameObject.SetActive(false);
+        }
     }
 
     protected override void Start()
@@ -21,6 +30,30 @@ public class MenuState : State
         if (UIModule.OpenCanvas<MainMenuCanvas>(out var menuCanvas))
         {
             menuCanvas.OpenPanel<MainMenuPanel>();
+        }
+
+        var playerEntity = PlayerEntity.Instance;
+
+        var list = playerEntity.Data;
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            var item = _items.First(_ => _.Type == list[i].Type);
+
+            if (item != null)
+            {
+                item.gameObject.SetActive(true);
+            }
+        } 
+    }
+
+    public void BuyItem(Enums.ItemType type)
+    {
+        var item = _items.First(_ => _.Type == type);
+
+        if (item != null)
+        {
+            item.gameObject.SetActive(true);
         }
     }
 
@@ -35,11 +68,5 @@ public class MenuState : State
     public void Play()
     {
         SceneManager.LoadScene(2);
-    }
-
-    public void Upgrade()
-    {
-        //todo upgrade  
-        PlayerEntity.Instance.Upgrade();
-    }
+    } 
 }

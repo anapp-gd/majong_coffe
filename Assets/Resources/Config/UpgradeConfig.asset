@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: UpgradeConfig
   m_EditorClassIdentifier: 
   Items:
-  - Cost: 15
-    Level: 1
-  - Cost: 25
-    Level: 2
-  - Cost: 50
-    Level: 3
-  - Cost: 75
-    Level: 4
-  - Cost: 100
-    Level: 5
+  - {fileID: 11400000, guid: 54199355bbf234d4391d1709551153cb, type: 2}
+  - {fileID: 11400000, guid: 004972ccba0ed9a4896bbd2462818ecb, type: 2}
+  - {fileID: 11400000, guid: 51c60b78a46c91540890b18efc526bc9, type: 2}
+  - {fileID: 11400000, guid: 537170b52ed311148874e7367a63150c, type: 2}
+  - {fileID: 11400000, guid: d62c05cb4579a8c4eb9827aee4126eb4, type: 2}
+  - {fileID: 11400000, guid: cdeffe8db5bb59e4681d10dc70838379, type: 2}
+  - {fileID: 11400000, guid: 1891da27aa2edbb42a6e64704c86b65b, type: 2}
+  - {fileID: 11400000, guid: 59ca02abdad27b545a30342601576a81, type: 2}
+  - {fileID: 11400000, guid: bca4ebc43a25e8b45af698dd15c7f734, type: 2}
+  - {fileID: 11400000, guid: 639c5f0e004503b4cbb7ae16b35990f3, type: 2}
