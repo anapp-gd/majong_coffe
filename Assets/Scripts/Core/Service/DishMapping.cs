@@ -39,9 +39,23 @@ public static class DishMapping
         { Enums.TileType.Shrimp, Enums.DishType.GrilledShrimp }, 
         { Enums.TileType.LettuceLeaf, Enums.DishType.Sandwich }, 
     };
+     
+    private static readonly Dictionary<Enums.DishType, Enums.TileType> reverseMap; 
+
+    static DishMapping()
+    {
+        reverseMap = new Dictionary<Enums.DishType, Enums.TileType>();
+        foreach (var kvp in map)
+            reverseMap[kvp.Value] = kvp.Key;
+    }
 
     public static bool TryGetDish(Enums.TileType tile, out Enums.DishType dish)
     {
         return map.TryGetValue(tile, out dish);
+    }
+
+    public static bool TryGetTile(Enums.DishType dish, out Enums.TileType tile)
+    {
+        return reverseMap.TryGetValue(dish, out tile);
     }
 }

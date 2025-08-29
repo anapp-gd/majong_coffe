@@ -93,19 +93,36 @@ public abstract class SourcePanel : MonoBehaviour
 
         return returnedWindow as T;
     }
+
+    public virtual T GetWindow<T>() where T : SourceWindow
+    {
+        SourceWindow returnedWindow = null;
+
+        foreach (var sourceWindow in _windows)
+        {
+            if (sourceWindow is T window)
+            {
+                returnedWindow = window;
+            }
+        }
+
+        return returnedWindow as T; 
+    }
+
+
     public virtual T GetLayout<T>() where T : SourceLayout
     {
-        SourceLayout returnedWindow = null;
+        SourceLayout returnedLayout = null;
 
-        foreach (var sourceWindow in _layouts)
+        foreach (var sourceLayout in _layouts)
         {
-            if (sourceWindow is T panel)
+            if (sourceLayout is T layout)
             {
-                returnedWindow = panel;
+                returnedLayout = layout;
             } 
         } 
 
-        return returnedWindow as T;
+        return returnedLayout as T;
     }
     public virtual T OpenLayout<T>() where T : SourceLayout
     {

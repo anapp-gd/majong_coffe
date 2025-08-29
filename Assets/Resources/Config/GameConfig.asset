@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da5c3b19aa321a64682159775e8827c7, type: 3}
   m_Name: GameConfig
   m_EditorClassIdentifier: 
-  ClientSpawnDelay: 2
-  ClientTakeDelay: 2
+  ClientSpawnDelay: 3
+  ClientTakeDelay: 9
   MaxClientCount: 5

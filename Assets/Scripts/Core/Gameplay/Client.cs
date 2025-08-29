@@ -1,7 +1,8 @@
 using UnityEngine;
 
 public class Client : MonoBehaviour
-{ 
+{
+    public Enums.DishType WantedType => _wantedDish;
     private Enums.DishType _wantedDish;
     private ServingWindow _window;
     private float _timer;

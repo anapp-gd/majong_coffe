@@ -79,6 +79,21 @@ public class ClientService : MonoBehaviour
 
         _clients.Add(client);
 
+        if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
+        {
+            if (playCanvas.TryGetPanel<PlayPanel>(out var panel))
+            {
+                var dishes = new List<Enums.DishType>();
+
+                foreach (var c in _clients)
+                {
+                    dishes.Add(c.WantedType);
+                }
+
+                panel.GetWindow<TipWindow>().UpdateSlots(dishes);
+            }
+        }
+
         Debug.Log($"Новый клиент заказал: {dish}");
     }
 

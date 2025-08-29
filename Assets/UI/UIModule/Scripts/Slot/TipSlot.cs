@@ -1,16 +1,35 @@
 using UnityEngine;
+using UnityEngine.UI;
 
-public class TipSlot : MonoBehaviour
+public class TipSlot : SourceSlot
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
+    public Enums.DishType Data;
+
+    [SerializeField] Image _dishIcon;
+    [SerializeField] Image _tileIcon;
+
+    public override void OnActive()
+    { 
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void OnClick()
+    { 
+    }
+
+    public override void UpdateView()
     {
-        
+        var textureConfig = ConfigModule.GetConfig<TextureConfig>();
+
+        if (textureConfig.TryGetTexture(Data, out Sprite sprite))
+        {
+            _dishIcon.sprite = sprite;
+        }
+         
+        if (DishMapping.TryGetTile(Data, out Enums.TileType tile) && textureConfig.TryGetTexture(tile, out Sprite texture))
+        {
+            _tileIcon.sprite = texture;
+        }
+
+        gameObject.SetActive(true);
     }
 }

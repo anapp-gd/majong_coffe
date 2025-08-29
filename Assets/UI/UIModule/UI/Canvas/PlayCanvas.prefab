@@ -286,6 +286,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f45ca9dbaf4c3e4a9646f7af0124815, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsButton: 0
+  EnableIcon: 1
+  Data: 0
+  _dishIcon: {fileID: 1058116979676297738}
+  _tileIcon: {fileID: 1550516805979303626}
 --- !u!114 &8415801645035206189
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5032,6 +5037,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f45ca9dbaf4c3e4a9646f7af0124815, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsButton: 0
+  EnableIcon: 1
+  Data: 0
+  _dishIcon: {fileID: 1904500295692431494}
+  _tileIcon: {fileID: 105587726749300705}
 --- !u!114 &6995629196791837547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5223,6 +5233,7 @@ GameObject:
   - component: {fileID: 5947346925287976487}
   - component: {fileID: 703901346617807132}
   - component: {fileID: 127393552403807691}
+  - component: {fileID: 3625227776054039312}
   m_Layer: 5
   m_Name: TipWindow
   m_TagString: Untagged
@@ -5316,6 +5327,18 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &3625227776054039312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6298373973038946253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6791430fd62233b48b395df3c0d7eaeb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6329726815136540771
 GameObject:
   m_ObjectHideFlags: 0
@@ -5842,6 +5865,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f45ca9dbaf4c3e4a9646f7af0124815, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsButton: 0
+  EnableIcon: 1
+  Data: 0
+  _dishIcon: {fileID: 3032446962035187721}
+  _tileIcon: {fileID: 117650983026368491}
 --- !u!114 &6852148253417129703
 MonoBehaviour:
   m_ObjectHideFlags: 0
