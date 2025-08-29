@@ -13,7 +13,9 @@ public class InterfaceConfig : Config
     public Sprite VibroOff;
     public Sprite ButtonOn;
     public Sprite ButtonOff;
-
+    public Sprite BuyButton;
+    public Sprite BuyedButton;
+    public Sprite CantBuyButton;
     public override IEnumerator Init()
     {
         yield return null;

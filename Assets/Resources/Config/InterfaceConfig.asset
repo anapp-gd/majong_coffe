@@ -20,3 +20,6 @@ MonoBehaviour:
   VibroOff: {fileID: 21300000, guid: b59f6db545ea5e742bc4bb7a0c4328e2, type: 3}
   ButtonOn: {fileID: 21300000, guid: 524170b1b4e8cab49ab10da88d4f254c, type: 3}
   ButtonOff: {fileID: 21300000, guid: 2d56065b71c23ff4e91782e8dcd8c210, type: 3}
+  BuyButton: {fileID: 21300000, guid: eb4e993f291a9d84985cde9529197e20, type: 3}
+  BuyedButton: {fileID: 21300000, guid: 5dfe725b7b8ce5b4a94cd0378f19703b, type: 3}
+  CantBuyButton: {fileID: 21300000, guid: 2d56065b71c23ff4e91782e8dcd8c210, type: 3}

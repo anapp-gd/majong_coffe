@@ -84,7 +84,7 @@ public class PlayerEntity : SourceEntity
         MenuState.Instance.BuyItem(item.Type);
 
         Data.Add(item);
-
+         
         Save();
     } 
 

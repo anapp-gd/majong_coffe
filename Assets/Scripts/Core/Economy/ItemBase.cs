@@ -6,12 +6,16 @@ public class ItemBase : ScriptableObject, ISerializationCallbackReceiver
     [ReadOnlyInspector] public string KEY_ID;
     public ItemData ItemData;
 
-    public void Buy()
+    public bool Buy()
     {
         if (ItemData.TryBuy(out var item))
         {
             PlayerEntity.Instance.AddItem(item);
+
+            return true;
         }
+
+        return false;
     }
 
     public void OnAfterDeserialize()

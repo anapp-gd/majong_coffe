@@ -1,6 +1,5 @@
-using System;
-using System.Collections;
-using TMPro;
+using System; 
+using System.Linq; 
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,9 +24,7 @@ public class MainMenuPanel : SourcePanel
         base.Init(canvasParent);
 
         _btnPlay.onClick.AddListener(OnPlay);
-        _btnBuild.onClick.AddListener(OnUpgrade);
-
-        ObserverEntity.Instance.UpgradeProgreesChanged += OnProgressUpdate; 
+        _btnBuild.onClick.AddListener(OnUpgrade); 
     }
 
     public override void OnOpen(params Action[] onComplete)
@@ -38,50 +35,36 @@ public class MainMenuPanel : SourcePanel
 
         var upgradeConfig = ConfigModule.GetConfig<UpgradeConfig>();
 
-        /*int max = upgradeConfig.GetMaxLevelUpgrade();
+        int max = upgradeConfig.Items.Max(x => x.ItemData.Level);
+        int current = PlayerEntity.Instance.Data.Max(x => x.Level);
 
-        if (upgradeConfig.TryGetUpgrade(PlayerEntity.Instance.GetCurrentUpgrade, out LevelInfo levelInfo))
+        float value = Mathf.Clamp01((float)current / max);
+
+        var nextLevelInfo = upgradeConfig.Items.Find(x => x.ItemData.Level == current + 1);
+
+        if (nextLevelInfo != null)
         {
-            float value = (float)levelInfo.Level / max;
-
-            _titleBuild.text = $"Build ({levelInfo.Cost})";
-            _progressTitle.text = $"{levelInfo.Level}/{max}";
-            _progressFill.fillAmount = value;
-            _progressSlider.value = value;
+            _titleBuild.text = $"Build ({nextLevelInfo.ItemData.Cost})";
+            _progressTitle.text = $"{current}/{max}";
         }
         else
         {
-            var startlevelInfo = upgradeConfig.GetStartLevelUpgrade();
-
-            float value = (float)0 / max;
-
-            _progressFill.fillAmount = value;
-            _progressSlider.value = value;
-            _titleBuild.text = $"Build ({startlevelInfo.Cost})";
-            _progressTitle.text = $"{0}/{max}";
-        }*/
-    }
-
-    void OnProgressUpdate(float targetFill, int startValue, int targetValue)
-    {
-        if (_animateCoroutine != null)
-        {
-            StopCoroutine(_animateCoroutine);
-            _animateCoroutine = null;
+            _titleBuild.text = "Max level reached";
+            _progressTitle.text = $"{current}/{max}";
         }
 
-        var upgradeConfig = ConfigModule.GetConfig<UpgradeConfig>();
-
-        /*if (upgradeConfig.TryGetUpgrade(PlayerEntity.Instance.GetCurrentUpgrade, out LevelInfo levelInfo))
-        {
-            int max = upgradeConfig.GetMaxLevelUpgrade();
-            _progressTitle.text = $"{levelInfo.Level}/{max}";
-            _titleBuild.text = $"Build ({levelInfo.Cost})"; 
-        }*/
-
-        _animateCoroutine = StartCoroutine(AnimateRoutine(targetFill, startValue, targetValue));
+        _progressFill.fillAmount = value;
+        _progressSlider.value = value;
     }
 
+    /*if (_animateCoroutine != null)
+    {
+        StopCoroutine(_animateCoroutine);
+        _animateCoroutine = null;
+    }
+
+    _animateCoroutine = StartCoroutine(AnimateRoutine(value, current, max));
+    
     private IEnumerator AnimateRoutine(float targetFill, int startValue, int targetValue)
     { 
         float startFill = _progressSlider.value; 
@@ -98,7 +81,7 @@ public class MainMenuPanel : SourcePanel
             _progressSlider.value = value;
 
             int currentValue = Mathf.RoundToInt(Mathf.Lerp(startValue, targetValue, t));
-            _progressTitle.text = $"${currentValue}/{targetValue}";
+            _progressTitle.text = $"{currentValue}/{targetValue}";
 
             yield return null;
         }
@@ -109,6 +92,7 @@ public class MainMenuPanel : SourcePanel
 
         _animateCoroutine = null;
     }
+    */
 
     void OnPlay()
     {
@@ -126,8 +110,7 @@ public class MainMenuPanel : SourcePanel
     public override void OnDispose()
     { 
         base.OnDispose();
-
-        ObserverEntity.Instance.UpgradeProgreesChanged -= OnProgressUpdate;
+         
         _btnPlay.onClick.RemoveAllListeners();
         _btnBuild.onClick.RemoveAllListeners();
     }
