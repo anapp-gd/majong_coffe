@@ -74,6 +74,14 @@ public class PlayState : State
         });
     }
 
+    public override void Close()
+    {
+        if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
+        {
+            playCanvas.OpenPanel<PlayPanel>();
+        }
+    }
+
     public void SetRemoveAllTiles()
     {
         _winConditions.SetCompleted(WinCondition.RemoveAllTiles, true);

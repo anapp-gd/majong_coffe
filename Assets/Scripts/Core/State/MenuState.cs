@@ -24,6 +24,14 @@ public class MenuState : State
         }
     }
 
+    public override void Close()
+    {
+        if (UIModule.TryGetCanvas<MainMenuCanvas>(out var menuCanvas))
+        {
+            menuCanvas.OpenPanel<MainMenuPanel>();
+        }
+    }
+
     public void Play()
     {
         SceneManager.LoadScene(2);

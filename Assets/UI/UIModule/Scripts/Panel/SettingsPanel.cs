@@ -104,4 +104,14 @@ public class SettingsPanel : SourcePanel
             btn.image.sprite = interfaceConfig.ButtonOff;
         }
     }
+
+    public override void OnDispose()
+    {
+        base.OnDispose();
+
+        _btnClose.onClick.RemoveAllListeners();
+        _btnMusic.onClick.RemoveAllListeners();
+        _btnSound.onClick.RemoveAllListeners();
+        _btnVibro.onClick.RemoveAllListeners();
+    }
 }
