@@ -18,6 +18,10 @@ public abstract class State : MonoBehaviour
     }
     protected abstract void Awake();
     protected abstract void Start();
+    public virtual void Close()
+    {
+
+    }
     protected virtual void Update()
     {
 

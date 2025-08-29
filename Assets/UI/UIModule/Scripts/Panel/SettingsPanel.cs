@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,33 +20,36 @@ public class SettingsPanel : SourcePanel
         _btnClose.onClick.AddListener(OnClose);
         _btnSound.onClick.AddListener(OnSoundChange);
         _btnMusic.onClick.AddListener(OnMusicChange);
-        _btnVibro.onClick.AddListener(OnVibroChange);
+        _btnVibro.onClick.AddListener(OnVibroChange); 
+    }
 
-        // загрузка текущего состояния
-        UpdateButtons();
+    public override void OnOpen(params Action[] onComplete)
+    {
+        UpdateButtons(); 
+        base.OnOpen(onComplete);
     }
 
     void OnClose()
-    { 
-
+    {
+        State.Instance.Close();
     }
 
     void OnSoundChange()
     {
         TogglePref(SOUND_KEY);
-        UpdateButtons();
+        SetButtonState(SOUND_KEY, _btnSound, PlayerPrefs.GetInt(SOUND_KEY, 1) == 1);
     }
 
     void OnMusicChange()
     {
         TogglePref(MUSIC_KEY);
-        UpdateButtons();
+        SetButtonState(MUSIC_KEY, _btnMusic, PlayerPrefs.GetInt(MUSIC_KEY, 1) == 1);
     }
 
     void OnVibroChange()
     {
         TogglePref(VIBRO_KEY);
-        UpdateButtons();
+        SetButtonState(VIBRO_KEY, _btnVibro, PlayerPrefs.GetInt(VIBRO_KEY, 1) == 1);
     }
 
     void TogglePref(string key)
@@ -57,16 +61,47 @@ public class SettingsPanel : SourcePanel
     }
 
     void UpdateButtons()
-    {
-        SetButtonState(_btnSound, PlayerPrefs.GetInt(SOUND_KEY, 1) == 1);
-        SetButtonState(_btnMusic, PlayerPrefs.GetInt(MUSIC_KEY, 1) == 1);
-        SetButtonState(_btnVibro, PlayerPrefs.GetInt(VIBRO_KEY, 1) == 1);
+    { 
+        SetButtonState(SOUND_KEY, _btnSound, PlayerPrefs.GetInt(SOUND_KEY, 1) == 1);
+        SetButtonState(MUSIC_KEY, _btnMusic, PlayerPrefs.GetInt(MUSIC_KEY, 1) == 1);
+        SetButtonState(VIBRO_KEY, _btnVibro, PlayerPrefs.GetInt(VIBRO_KEY, 1) == 1);
     }
 
-    void SetButtonState(Button btn, bool enabled)
+    void SetButtonState(string key, Button btn, bool enabled)
     {
-        var colors = btn.colors;
-        colors.normalColor = enabled ? Color.green : Color.gray;
-        btn.colors = colors;
+        var interfaceConfig = ConfigModule.GetConfig<InterfaceConfig>();
+
+        var buttonIcon = btn.transform.GetChild(0).GetComponent<Image>();
+
+        switch (key)
+        {
+            case SOUND_KEY: 
+                if (enabled)
+                    buttonIcon.sprite = interfaceConfig.SoundOn; 
+                else
+                    buttonIcon.sprite = interfaceConfig.SoundOff; 
+                break;
+            case MUSIC_KEY:
+                if (enabled)
+                    buttonIcon.sprite = interfaceConfig.MusicOn;
+                else
+                    buttonIcon.sprite = interfaceConfig.MusicOff;
+                break;
+            case VIBRO_KEY:
+                if (enabled)
+                    buttonIcon.sprite = interfaceConfig.VibroOn;
+                else
+                    buttonIcon.sprite = interfaceConfig.VibroOff;
+                break;
+        } 
+
+        if (enabled)
+        {
+            btn.image.sprite = interfaceConfig.ButtonOn;
+        }
+        else
+        {
+            btn.image.sprite = interfaceConfig.ButtonOff;
+        }
     }
 }

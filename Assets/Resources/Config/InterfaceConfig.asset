@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c65f1c9df036ac419ef1e8c3480c8cc, type: 3}
+  m_Name: InterfaceConfig
+  m_EditorClassIdentifier: 
+  SoundOn: {fileID: 21300000, guid: bec1f9fbc66474c409185ed3166a7149, type: 3}
+  SoundOff: {fileID: 21300000, guid: 8882bf533526da744a6b80aae9053412, type: 3}
+  MusicOn: {fileID: 21300000, guid: 131fe1e90d928f941af30e01508fd2cb, type: 3}
+  MusicOff: {fileID: 21300000, guid: b06992bae98d98a4fa8ccef39cf71506, type: 3}
+  VibroOn: {fileID: 21300000, guid: 1ac0019eeb206004f9e8825fbbcba7a1, type: 3}
+  VibroOff: {fileID: 21300000, guid: b59f6db545ea5e742bc4bb7a0c4328e2, type: 3}
+  ButtonOn: {fileID: 21300000, guid: 524170b1b4e8cab49ab10da88d4f254c, type: 3}
+  ButtonOff: {fileID: 21300000, guid: 2d56065b71c23ff4e91782e8dcd8c210, type: 3}
