@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Client : MonoBehaviour
 {
+    [SerializeField] private Sprite[] _views; 
     public Enums.DishType WantedType => _wantedDish;
     private Enums.DishType _wantedDish;
     private ServingWindow _window;
@@ -14,6 +15,10 @@ public class Client : MonoBehaviour
         _window = window;
         _onLeave = onLeave; 
         _timer = wait;
+        if (_views != null && TryGetComponent<SpriteRenderer>(out var renderer) && _views.Length > 0)
+        {
+            renderer.sprite = _views[Random.Range(0, _views.Length)];
+        }
     }
 
     private void Update()

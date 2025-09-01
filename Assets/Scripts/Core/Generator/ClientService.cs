@@ -69,26 +69,47 @@ public class ClientService : MonoBehaviour
         var dish = GetRandomDish();
 
         Vector3 spawnPos = _spawnPoint.position;
-
         spawnPos.y += 5f;
-        spawnPos.x += Random.Range(-5, 5);
 
-        var client = Instantiate(clientPrefab, spawnPos, Quaternion.identity); 
+        const float minDistance = 2.0f; // минимальное расстояние между клиентами
+        const int maxAttempts = 10;     // максимум попыток поиска места
+
+        int attempts = 0;
+        bool positionValid;
+
+        do
+        {
+            spawnPos.x = _spawnPoint.position.x + Random.Range(-5f, 5f);
+
+            positionValid = true;
+            foreach (var c in _clients)
+            {
+                if (Vector3.Distance(c.transform.position, spawnPos) < minDistance)
+                {
+                    positionValid = false;
+                    break;
+                }
+            }
+
+            attempts++;
+        }
+        while (!positionValid && attempts < maxAttempts);
+
+        // создаём клиента
+        var client = Instantiate(clientPrefab, spawnPos, Quaternion.identity);
 
         client.Init(_clientDelayTake, dish, _state.ServingWindow, OnClientLeft);
 
         _clients.Add(client);
 
+        // обновляем UI
         if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
         {
             if (playCanvas.TryGetPanel<PlayPanel>(out var panel))
             {
                 var dishes = new List<Enums.DishType>();
-
                 foreach (var c in _clients)
-                {
                     dishes.Add(c.WantedType);
-                }
 
                 panel.GetWindow<TipWindow>().UpdateSlots(dishes);
             }
@@ -115,6 +136,20 @@ public class ClientService : MonoBehaviour
         if (_clients.Contains(client))
             _clients.Remove(client);
 
+        if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
+        {
+            if (playCanvas.TryGetPanel<PlayPanel>(out var panel))
+            {
+                var dishes = new List<Enums.DishType>();
+
+                foreach (var c in _clients)
+                {
+                    dishes.Add(c.WantedType);
+                }
+
+                panel.GetWindow<TipWindow>().UpdateSlots(dishes);
+            }
+        }
         Debug.Log("Клиент ушёл, освободилось место в очереди");
     }
 }
