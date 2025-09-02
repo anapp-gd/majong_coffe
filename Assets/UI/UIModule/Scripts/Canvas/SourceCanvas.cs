@@ -9,7 +9,7 @@ public abstract class SourceCanvas : MonoBehaviour
     public bool isInited { get; protected set; }
 
     public bool IsOpenOnStart;
-
+    public RenderMode renderMode => _canvas.renderMode;
     public virtual void Init()
     {
         _canvas = GetComponent<Canvas>();

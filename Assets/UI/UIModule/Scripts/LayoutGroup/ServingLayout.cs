@@ -19,7 +19,40 @@ public class ServingLayout : SourceLayout
         }
 
         return this;
-    } 
+    }
+
+    public OrderSlot GetNextSlot()
+    {
+        for (int i = 0; i < _slots.Length; i++)
+        {
+            if (_slots[i] is OrderSlot orderSlot && !orderSlot.IsBusy)
+            {
+                orderSlot.SetNextPos();
+
+                return orderSlot;
+            }
+        }
+
+        return null; // fallback: сам layout
+    }
+
+    public void AddDish(OrderSlot slot, Dish dish)
+    {
+        slot.Data = dish;
+        slot.UpdateView(); 
+    }
+
+    public void Remove(Dish dish)
+    {
+        for (int i = 0; i < _slots.Length; i++)
+        {
+            if (_slots[i] is OrderSlot orderSlot && ReferenceEquals(orderSlot.Data, dish))
+            {
+                orderSlot.Remove();
+                break;
+            }
+        }
+    }
 
     public override void OnInject()
     {

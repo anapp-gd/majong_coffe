@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class WinWindow : SourceWindow
 {
+    [SerializeField] ParticleSystem[] _winParticles;
+
     [SerializeField] Text _resultTitle;
     [SerializeField] Button _next;
     [SerializeField] Transform[] _winStars;
@@ -23,7 +25,33 @@ public class WinWindow : SourceWindow
     public override void OnOpen()
     {
         base.OnOpen();
+
+        PlayParticles();
+
         StartCoroutine(ResultTitleUpdate());
+    }
+
+    public override void OnClose()
+    {
+        base.OnClose();
+
+        DisposeParticles();
+    }
+
+    void DisposeParticles()
+    {
+        for (int i = 0; i < _winParticles.Length; i++)
+        {
+            _winParticles[i].gameObject.SetActive(false);
+        } 
+    }
+
+    void PlayParticles()
+    {
+        for (int i = 0; i < _winParticles.Length; i++)
+        {
+            _winParticles[i].gameObject.SetActive(true);
+        }
     }
 
     IEnumerator ResultTitleUpdate()

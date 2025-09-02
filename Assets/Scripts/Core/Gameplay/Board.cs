@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
 
 public class Board : MonoBehaviour
@@ -80,7 +81,7 @@ public class Board : MonoBehaviour
         _status = playStatus;
     }
 
-    public void RemoveTiles(TileView a, TileView b)
+    public void RemoveTiles(TileView a, TileView b, Action<Vector3> spawn, Action<Vector3> callback)
     {
         if (_status != PlayState.PlayStatus.play) return;
 
@@ -91,12 +92,13 @@ public class Board : MonoBehaviour
          
         Sequence seq = DOTween.Sequence();
 
-        seq.Join(a.RemoveWithJoin(joinPoint));
-        seq.Join(b.RemoveWithJoin(joinPoint));
+        seq.Join(a.RemoveWithJoin(joinPoint, spawn));
+        seq.Join(b.RemoveWithJoin(joinPoint, spawn));
 
         // Когда обе анимации завершены
         seq.OnComplete(() =>
         {
+            callback?.Invoke(joinPoint);
             CheckLayerAfterRemove();
         });
     }
@@ -117,7 +119,7 @@ public class Board : MonoBehaviour
     }
 
     private void CheckLayerAfterRemove()
-    {
+    { 
         UpdateAllTiles();
 
         if (IsBoardClear())

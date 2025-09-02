@@ -20,13 +20,20 @@ public class ServingWindow : MonoBehaviour
         _status = playStatus;
     }
 
-    public void AddDish(Dish dish)
+    public void AddDish(Vector3 worldMergePos, Dish dish)
     {
         if (_status != PlayState.PlayStatus.play) return;
 
-        _readyDishes.Add(dish);
-        Debug.Log($"{dish.Type} добавлено в окно выдачи");
-        OnServingUpdate?.Invoke(_readyDishes);
+        if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
+        {
+            var playPanel = playCanvas.GetPanel<PlayPanel>();
+
+            playPanel.InvokeMoveTile(worldMergePos, dish);
+
+            Debug.Log($"{dish.Type} добавлено в окно выдачи");
+        }
+
+        _readyDishes.Add(dish); 
     }
 
     public bool TryTakeDish(Enums.DishType dishType, out Dish dish)
@@ -53,12 +60,20 @@ public class ServingWindow : MonoBehaviour
             Debug.Log($"Нужного блюда ({dishType}) не было, выдано случайное: {dish.Type}");
         }
 
+
+        if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
+        {
+            var playPanel = playCanvas.GetPanel<PlayPanel>();
+
+            playPanel.RemoveTile(dish); 
+            Debug.Log($"{dish.Type} убрано из окна выдачи");
+        }
+
         if (_readyDishes.Count == 0)
         {
             _state.SetTableClear();
         }
-
-        OnServingUpdate?.Invoke(_readyDishes);
+         
         return true;
     }
 

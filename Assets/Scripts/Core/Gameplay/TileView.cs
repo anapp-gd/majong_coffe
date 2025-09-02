@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System;
 using UnityEngine;
 
 public class TileView : MonoBehaviour
@@ -12,6 +13,7 @@ public class TileView : MonoBehaviour
     [SerializeField, ReadOnlyInspector] private Enums.TileType _tileType;
     [SerializeField, ReadOnlyInspector] private int _layer;
     [SerializeField] private SpriteRenderer _renderer;
+    [SerializeField] private Transform _selected;
     private SpriteRenderer _view;
     private PlayState _state;
     private BoxCollider2D _collider;
@@ -56,6 +58,8 @@ public class TileView : MonoBehaviour
         { 
             _renderer.sprite = texture;
         }
+
+        if (_selected) _selected.gameObject.SetActive(false);
     }
 
     public void Disable()
@@ -64,6 +68,7 @@ public class TileView : MonoBehaviour
         _view.color = _disableColor;
         _renderer.color = _disableColor;
         _collider.enabled = false;
+        if (_selected) _selected.gameObject.SetActive(false);
     }
 
     public void Enable()
@@ -90,25 +95,39 @@ public class TileView : MonoBehaviour
     }
     public void Select()
     {
+        if (_selected) _selected.gameObject.SetActive(true);
+
         transform.DOScale(_baseScale * 1.08f, 0.15f)
                  .SetLoops(2, LoopType.Yoyo);
     }
      
     public void Deselect()
     {
+        if (_selected) _selected.gameObject.SetActive(false);
+
         transform.DOScale(_baseScale, 0.1f);
     }
 
-    public Tween RemoveWithJoin(Vector3 to)
+    public Tween RemoveWithJoin(Vector3 to, Action<Vector3> spawnMergeEffect)
     {
         Sequence seq = DOTween.Sequence();
-        seq.Append(transform.DOMove(to, 0.25f));
-        seq.Append(transform.DOScale(0f, 0.2f).OnComplete(onComplete));
+
+        // 1. Двигаем
+        seq.Append(transform.DOMove(to, 0.15f));
+
+        // 2. Колбэк между движением и скейлом
+        if (spawnMergeEffect != null)
+            seq.AppendCallback(() => spawnMergeEffect(to));
+
+        // 3. Скалируем
+        seq.Append(transform.DOScale(0f, 0.15f).OnComplete(onComplete));
+
         return seq;
     }
 
     void onComplete()
     {
+        if (_selected) _selected.gameObject.SetActive(false);
         MadjongGenerator.RemoveTile(_data);
         Destroy(gameObject);
     }

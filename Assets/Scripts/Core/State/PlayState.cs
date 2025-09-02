@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,8 +14,9 @@ public class PlayState : State
         {
             return (PlayState)State.Instance;
         }
-    } 
+    }
 
+    [SerializeField] private Transform mergeEffect;
     [SerializeField] private Vector2 offset; 
     [SerializeField] private Board board;
     public ServingWindow ServingWindow
@@ -193,19 +195,23 @@ public class PlayState : State
 
         if (_firstTile.CompareType(clickedTile.TileType))
         {
-            if (DishMapping.TryGetDish(clickedTile.TileType, out Enums.DishType type))
-            {
-                var textureConfig = ConfigModule.GetConfig<TextureConfig>();
+            Vector3 joinPoint = (_firstTile.transform.position + clickedTile.transform.position) / 2f;
 
-                if (textureConfig.TryGetTextureData(type, out DishTextureData data))
+            _board.RemoveTiles(_firstTile, clickedTile, InvokeMergeEffect, x =>
+            {  
+                if (DishMapping.TryGetDish(clickedTile.TileType, out Enums.DishType type))
                 {
-                    var dish = new Dish(type, data.TextureDish); 
-                    _window.AddDish(dish); 
-                }
-            }
+                    var textureConfig = ConfigModule.GetConfig<TextureConfig>();
 
-            _board.RemoveTiles(_firstTile, clickedTile);
-            _firstTile = null;
+                    if (textureConfig.TryGetTextureData(type, out DishTextureData data))
+                    {
+                        var dish = new Dish(type, data.TextureDish);
+                        _window.AddDish(x, dish);
+                    }
+
+                    _firstTile = null;
+                }
+            }); 
         }
         else
         {
@@ -213,6 +219,21 @@ public class PlayState : State
             _firstTile = clickedTile;
             _firstTile.Select();
         }
+    }
+
+    void InvokeMergeEffect(Vector3 joinPoint)
+    {
+        var effect = Instantiate(mergeEffect, joinPoint, Quaternion.identity);
+
+        StartCoroutine(WaitDestroy(effect));
+    }
+
+
+    IEnumerator WaitDestroy(Transform destroyed)
+    {
+        yield return new WaitForSeconds(1f);
+
+        Destroy(destroyed.gameObject);
     }
 
     public enum PlayStatus { play, pause, win, lose}
