@@ -3,15 +3,17 @@ using UnityEngine;
 
 public class ClientService : MonoBehaviour
 {
-    private Transform _spawnPoint;
-    [SerializeField] private Client clientPrefab; 
-    [SerializeField] private float _spawnInterval = 5f;
+    [SerializeField] private Transform _spawnPoint;
+    [SerializeField] private Client clientPrefab;
+    [SerializeField] private float _spawnInterval = 1f;
     [SerializeField] private int _maxClients = 5;
+    [SerializeField] private float _queueSpacing = 2f; // расстояние между клиентами
 
-    private float _clientDelayTake = 5f;
+    private float _takeTimer = 1f;
+    private float _clientDelayTake = 1f;
 
     private PlayState _state;
-    private float _timer;
+    private float _spawnTimer = 1f;
     private List<Client> _clients = new List<Client>();
     private PlayState.PlayStatus _status;
     private HashSet<Enums.DishType> _availableDishes;
@@ -22,23 +24,13 @@ public class ClientService : MonoBehaviour
         _state.PlayStatusChanged += OnPlayStatusChange;
         _availableDishes = availableDishes;
         _spawnPoint = GameObject.FindWithTag("SpawnPoint").transform;
+
         var gameConfig = ConfigModule.GetConfig<GameConfig>();
+
         _spawnInterval = gameConfig.ClientSpawnDelay;
         _maxClients = gameConfig.MaxClientCount;
-        _clientDelayTake = gameConfig.ClientTakeDelay;
-        _state.BoardCleanChange += BoardClean;
+        _clientDelayTake = gameConfig.ClientTakeDelay; 
     } 
-
-    void BoardClean()
-    {
-        foreach (var client in _clients)
-        {
-            client.TakeDish();
-        }
-
-        _spawnInterval = 0f;
-        _clientDelayTake = 0f; 
-    }
 
     void OnPlayStatusChange(PlayState.PlayStatus status)
     {
@@ -48,19 +40,39 @@ public class ClientService : MonoBehaviour
     private void Update()
     {
         if (_status != PlayState.PlayStatus.play) return;
+        if (_availableDishes == null || _availableDishes.Count == 0) return;
 
-        if (_availableDishes == null || _availableDishes.Count == 0)
-            return;
+        HandleSpawning();
+        HandleTaking();
+    }
 
-        // если очередь полная — ждём
-        if (_clients.Count >= _maxClients)
-            return;
+    private void HandleSpawning()
+    {
+        if (_clients.Count >= _maxClients) return;
 
-        _timer -= Time.deltaTime;
-        if (_timer <= 0f)
+        _spawnTimer -= Time.deltaTime;
+        if (_spawnTimer <= 0f)
         {
             SpawnClient();
-            _timer = _spawnInterval;
+            _spawnTimer = _spawnInterval;
+        }
+    }
+
+    private void HandleTaking()
+    {
+        if (_clients.Count == 0) return;
+
+        _takeTimer -= Time.deltaTime;
+        if (_takeTimer <= 0f)
+        {
+            // всегда первый в очереди пытается взять
+            var firstClient = _clients[0];
+            if (firstClient != null)
+            {
+                firstClient.TryTakeDish(); // у клиента метод, который решает "получилось/нет"
+            }
+
+            _takeTimer = _clientDelayTake;
         }
     }
 
@@ -68,53 +80,15 @@ public class ClientService : MonoBehaviour
     {
         var dish = GetRandomDish();
 
-        Vector3 spawnPos = _spawnPoint.position;
-        spawnPos.y += 5f;
+        // позиция в очереди: SpawnPoint - первый, дальше с отступами
+        Vector3 spawnPos = _spawnPoint.position + Vector3.right * (_clients.Count * _queueSpacing);
 
-        const float minDistance = 2.0f; // минимальное расстояние между клиентами
-        const int maxAttempts = 10;     // максимум попыток поиска места
-
-        int attempts = 0;
-        bool positionValid;
-
-        do
-        {
-            spawnPos.x = _spawnPoint.position.x + Random.Range(-5f, 5f);
-
-            positionValid = true;
-            foreach (var c in _clients)
-            {
-                if (Vector3.Distance(c.transform.position, spawnPos) < minDistance)
-                {
-                    positionValid = false;
-                    break;
-                }
-            }
-
-            attempts++;
-        }
-        while (!positionValid && attempts < maxAttempts);
-
-        // создаём клиента
         var client = Instantiate(clientPrefab, spawnPos, Quaternion.identity);
-
-        client.Init(_clientDelayTake, dish, _state.ServingWindow, OnClientLeft);
+        client.Init(dish, _state.ServingWindow, OnClientLeft); // убираем локальный таймер
 
         _clients.Add(client);
 
-        // обновляем UI
-        if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
-        {
-            if (playCanvas.TryGetPanel<PlayPanel>(out var panel))
-            {
-                var dishes = new List<Enums.DishType>();
-                foreach (var c in _clients)
-                    dishes.Add(c.WantedType);
-
-                panel.GetWindow<TipWindow>().UpdateSlots(dishes);
-            }
-        }
-
+        UpdateUI();
         Debug.Log($"Новый клиент заказал: {dish}");
     }
 
@@ -136,20 +110,29 @@ public class ClientService : MonoBehaviour
         if (_clients.Contains(client))
             _clients.Remove(client);
 
+        // после ухода смещаем всех вперёд
+        for (int i = 0; i < _clients.Count; i++)
+        {
+            Vector3 targetPos = _spawnPoint.position + Vector3.right * (i * _queueSpacing);
+            _clients[i].MoveToQueuePosition(targetPos);
+        }
+
+        UpdateUI();
+        Debug.Log("Клиент ушёл, очередь сдвинулась");
+    }
+
+    private void UpdateUI()
+    {
         if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
         {
             if (playCanvas.TryGetPanel<PlayPanel>(out var panel))
             {
                 var dishes = new List<Enums.DishType>();
-
                 foreach (var c in _clients)
-                {
                     dishes.Add(c.WantedType);
-                }
 
                 panel.GetWindow<TipWindow>().UpdateSlots(dishes);
             }
         }
-        Debug.Log("Клиент ушёл, освободилось место в очереди");
     }
 }

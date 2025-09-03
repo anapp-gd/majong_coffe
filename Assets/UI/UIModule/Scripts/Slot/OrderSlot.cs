@@ -15,11 +15,12 @@ public class OrderSlot : SourceSlot
     { 
     }
 
-    public void SetNextPos()
+    public void SetNextPos(Dish dish)
     {
+        Data = dish;
         IsBusy = true;
         _icon.enabled = false;
-        _background.enabled = false;
+        _background.enabled = true;
         gameObject.SetActive(true);
     }
 
@@ -41,8 +42,7 @@ public class OrderSlot : SourceSlot
 
     public void Remove()
     {
-        Data = null;
-
+        Data = null; 
         _background.enabled = false;
         _icon.enabled = false;
         IsBusy = false;

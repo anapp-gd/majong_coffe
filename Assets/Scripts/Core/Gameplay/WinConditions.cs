@@ -16,9 +16,14 @@ public class WinConditions
     {
         if (conditions.ContainsKey(condition))
             conditions[condition] = value;
+
+        if (IsVictory())
+        {
+            PlayState.Instance.Win();
+        }
     }
 
-    public bool IsVictory()
+    bool IsVictory()
     {
         foreach (var kvp in conditions)
             if (!kvp.Value) return false;

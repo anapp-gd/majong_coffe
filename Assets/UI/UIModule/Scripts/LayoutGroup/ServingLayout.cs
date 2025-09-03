@@ -21,13 +21,13 @@ public class ServingLayout : SourceLayout
         return this;
     }
 
-    public OrderSlot GetNextSlot()
+    public OrderSlot GetNextSlot(Dish dish)
     {
         for (int i = 0; i < _slots.Length; i++)
         {
             if (_slots[i] is OrderSlot orderSlot && !orderSlot.IsBusy)
             {
-                orderSlot.SetNextPos();
+                orderSlot.SetNextPos(dish);
 
                 return orderSlot;
             }
@@ -36,9 +36,8 @@ public class ServingLayout : SourceLayout
         return null; // fallback: сам layout
     }
 
-    public void AddDish(OrderSlot slot, Dish dish)
-    {
-        slot.Data = dish;
+    public void AddDish(OrderSlot slot)
+    { 
         slot.UpdateView(); 
     }
 

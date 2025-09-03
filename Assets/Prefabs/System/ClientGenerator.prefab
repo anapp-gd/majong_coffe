@@ -44,6 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c131a73c7d7e7b41a327c81d5a5bbed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _spawnPoint: {fileID: 0}
   clientPrefab: {fileID: 4432573220843846515, guid: 99a3f9b919cca56458ef7afdd1c8df84, type: 3}
-  spawnInterval: 5
-  maxClients: 5
+  _spawnInterval: 5
+  _maxClients: 5
+  _queueSpacing: 2.5

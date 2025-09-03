@@ -50,33 +50,25 @@ public class PlayPanel : SourcePanel
         // Спавним с нулевым scale
         flyRect.localScale = Vector3.zero;
 
-        // 4. Конечный слот
-        var targetSlot = GetLayout<ServingLayout>().GetNextSlot();
+        // 1. Получаем слот
+        var targetSlot = GetLayout<ServingLayout>().GetNextSlot(dish);
         var rectTargetSlot = targetSlot.GetComponent<RectTransform>();
 
-        // Конвертируем позицию слота в local canvas coords
+        // 2. Конвертируем позицию слота в local canvas coords
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvasRect,
             RectTransformUtility.WorldToScreenPoint(null, rectTargetSlot.position),
             null,
             out Vector2 endLocalPos);
 
-        // 5. Анимация (последовательность)
+        // 3. Настройки анимации
         float duration = 0.6f;
 
-        Sequence seq = DOTween.Sequence();
-
-        // Этап 1: "поп-ап" (scale 0 → 1)
-        seq.Append(flyRect.DOScale(1f, 0.25f).SetEase(Ease.OutBack));
-
-        // Этап 2: полёт
-        seq.Append(flyRect.DOAnchorPos(endLocalPos, duration).SetEase(Ease.InOutCubic));
-
-        // Этап 3: добавляем в layout
-        seq.OnComplete(() =>
+        // 4. Запускаем анимацию через FlyIcon 
+        flyIcon.PlayFly(flyRect, endLocalPos, duration, () =>
         {
-            layout.AddDish(targetSlot, dish);
-            flyIcon.Finish();
+            layout.AddDish(targetSlot); // добавляем блюдо
+            flyIcon.Finish();           // добиваем punch-эффектом
         });
     }
 }

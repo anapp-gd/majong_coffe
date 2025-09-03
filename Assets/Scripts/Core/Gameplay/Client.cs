@@ -1,74 +1,79 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
+using DG.Tweening;
 
 public class Client : MonoBehaviour
 {
-    [SerializeField] private Sprite[] _views; 
+    [SerializeField] private Sprite[] _views;
+    [SerializeField] private Transform _happyReaction;
+    [SerializeField] private Transform _angryReaction;
+    [SerializeField] private Transform _sadReaction;
     public Enums.DishType WantedType => _wantedDish;
+
     private Enums.DishType _wantedDish;
     private ServingWindow _window;
-    private float _timer;
     private System.Action<Client> _onLeave;
 
-    public void Init(float wait, Enums.DishType dish, ServingWindow window, System.Action<Client> onLeave)
+    public void Init(Enums.DishType dish, ServingWindow window, System.Action<Client> onLeave)
     {
         _wantedDish = dish;
         _window = window;
-        _onLeave = onLeave; 
-        _timer = wait;
+        _onLeave = onLeave;
+
         if (_views != null && TryGetComponent<SpriteRenderer>(out var renderer) && _views.Length > 0)
         {
             renderer.sprite = _views[Random.Range(0, _views.Length)];
         }
+
+        // —Å—Ä–∞–∑—É –≤—ã–∫–ª—é—á–∞–µ–º –≤—Å–µ —Ä–µ–∞–∫—Ü–∏–∏
+        _happyReaction?.gameObject.SetActive(false);
+        _angryReaction?.gameObject.SetActive(false);
+        _sadReaction?.gameObject.SetActive(false);
     }
 
-    private void Update()
-    {
-        _timer -= Time.deltaTime;
-
-        if (_timer <= 0f)
-        {
-            TakeDish();
-        }
-    }
-    public void TakeDish()
+    public void TryTakeDish()
     {
         if (_window.TryTakeDish(_wantedDish, out Dish dish))
         {
             if (_wantedDish == dish.Type)
-            {
-                //  ÎËÂÌÚ ÔÓÎÛ˜ËÎ ËÏÂÌÌÓ ÚÓ, ˜ÚÓ ıÓÚÂÎ
                 Leave(dish, success: true);
-            }
             else
-            {
-                //  ÎËÂÌÚ ÔÓÎÛ˜ËÎ ‰Û„ÓÂ ·Î˛‰Ó
                 Leave(dish, success: false);
-            }
         }
         else
         {
-            // ¬ÓÓ·˘Â ÌÂ ÔÓÎÛ˜ËÎÓÒ¸ ‚ÁˇÚ¸ ·Î˛‰Ó
             Leave(null, success: false);
         }
     }
 
-    void Leave(Dish dish, bool success)
+    public void MoveToQueuePosition(Vector3 target, float duration = 0.4f, System.Action onArrived = null)
     {
-        // TODO: ‡ÌËÏ‡ˆËˇ ÛıÓ‰‡ + ÔÓ‰Ò˜ÂÚ Ó˜ÍÓ‚
+        DOTween.Kill(transform);
 
+        transform.DOMove(target, duration)
+            .SetEase(Ease.OutCubic)
+            .OnComplete(() => onArrived?.Invoke());
+    }
+
+    private void Leave(Dish dish, bool success)
+    {
         int value = 0;
+        Transform reaction = null;
 
         if (!success)
         {
             if (dish == null)
-                Debug.Log(" ÎËÂÌÚ Û¯∏Î ÌÂ‰Ó‚ÓÎ¸Ì˚Ï! (ÌÂ ÓÒÚ‡ÎÓÒ¸ ·Î˛‰)");
+            {
+                Debug.Log("–ö–ª–∏–µ–Ω—Ç —É—à—ë–ª –Ω–µ–¥–æ–≤–æ–ª—å–Ω—ã–º! (–Ω–µ –æ—Å—Ç–∞–ª–æ—Å—å –±–ª—é–¥)");
+                reaction = _angryReaction;
+            }
             else
             {
                 if (PlayerEntity.Instance.TryAddResourceValue(5))
-                { 
+                {
                     value = 5;
-                    Debug.Log($" ÎËÂÌÚ Û¯∏Î ÌÂ‰Ó‚ÓÎ¸Ì˚Ï! ’ÓÚÂÎ {_wantedDish}, ‡ ÔÓÎÛ˜ËÎ {dish.Type}");
+                    Debug.Log($"–ö–ª–∏–µ–Ω—Ç —É—à—ë–ª –Ω–µ–¥–æ–≤–æ–ª—å–Ω—ã–º! –•–æ—Ç–µ–ª {_wantedDish}, –∞ –ø–æ–ª—É—á–∏–ª {dish.Type}");
                 }
+                reaction = _sadReaction;
             }
         }
         else
@@ -76,12 +81,37 @@ public class Client : MonoBehaviour
             if (PlayerEntity.Instance.TryAddResourceValue(10))
             {
                 value = 10;
-                Debug.Log($" ÎËÂÌÚ Û¯∏Î ‰Ó‚ÓÎ¸Ì˚È! œÓÎÛ˜ËÎ {_wantedDish}"); 
+                Debug.Log($"–ö–ª–∏–µ–Ω—Ç —É—à—ë–ª –¥–æ–≤–æ–ª—å–Ω—ã–π! –ü–æ–ª—É—á–∏–ª {_wantedDish}");
             }
+            reaction = _happyReaction;
         }
 
         PlayState.Instance.AddValue(value);
-        _onLeave?.Invoke(this);
-        Destroy(gameObject);
+
+        // --- –ê–Ω–∏–º–∞—Ü–∏—è —Ä–µ–∞–∫—Ü–∏–∏ –ø–µ—Ä–µ–¥ —É—Ö–æ–¥–æ–º ---
+        if (reaction != null)
+        {
+            reaction.gameObject.SetActive(true);
+            reaction.localPosition = Vector3.zero;
+            reaction.localScale = Vector3.zero;
+
+            Sequence seq = DOTween.Sequence();
+            seq.Append(reaction.DOScale(1f, 0.2f).SetEase(Ease.OutBack));
+            seq.Join(reaction.DOLocalMoveY(1.5f, 0.6f).SetEase(Ease.OutCubic));
+            seq.AppendInterval(0.2f); 
+            seq.OnComplete(() =>
+            {
+                DOTween.Kill(transform); // —É–±–∏–≤–∞–µ–º —Ç–≤–∏–Ω—ã –æ–±—ä–µ–∫—Ç–∞
+                _onLeave?.Invoke(this);  // —Ç–µ–ø–µ—Ä—å —Å–∏–≥–Ω–∞–ª–∏–º —Å–µ—Ä–≤–∏—Å—É ‚Üí –æ—á–µ—Ä–µ–¥—å —Å–¥–≤–∏–Ω–µ—Ç—Å—è
+                Destroy(gameObject);
+            });
+        }
+        else
+        {
+            // fallback: –µ—Å–ª–∏ —Ä–µ–∞–∫—Ü–∏–∏ –Ω–µ—Ç
+            DOTween.Kill(transform);
+            _onLeave?.Invoke(this);
+            Destroy(gameObject);
+        }
     }
 }

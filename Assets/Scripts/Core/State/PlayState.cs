@@ -44,14 +44,11 @@ public class PlayState : State
         {
             _haseDish = value;
         }
-    }
-
-    public event Action BoardCleanChange;
+    } 
 
     public int GetResaultValue => _resultValue;
     private int _resultValue;
-    private WinConditions _winConditions;
-    public bool IsWin => _winConditions.IsVictory();
+    private WinConditions _winConditions; 
 
     protected override void Awake()
     {
@@ -64,9 +61,7 @@ public class PlayState : State
         _client = Instantiate(client);
         _client.Init(this, _haseDish);
 
-        _board.OnLose += Lose;
-
-        _window.OnServingUpdate += OnServingWindowUpdate;
+        _board.OnLose += Lose; 
 
         UIModule.Inject(this, _board, _window, _client);
 
@@ -131,11 +126,7 @@ public class PlayState : State
     {
         _board.OnLose -= Lose; 
     }
-
-    void OnServingWindowUpdate(List<Dish> currentDishes)
-    {
-        if (IsWin) Win(); 
-    }
+     
 
     public void Win()
     {
@@ -158,8 +149,7 @@ public class PlayState : State
         }
          
         PlayStatusChanged?.Invoke(PlayStatus.lose);
-        _status = PlayStatus.lose;
-        
+        _status = PlayStatus.lose; 
     }
 
     private void HandleTileClick(TileView clickedTile)

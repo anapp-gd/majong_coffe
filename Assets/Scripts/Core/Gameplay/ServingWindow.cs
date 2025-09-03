@@ -40,7 +40,8 @@ public class ServingWindow : MonoBehaviour
     {
         dish = null;
 
-        if (_status != PlayState.PlayStatus.play) return false;
+        if (_status != PlayState.PlayStatus.play)
+            return false;
 
         if (_readyDishes == null || _readyDishes.Count == 0)
             return false; // нет блюд вообще
@@ -48,34 +49,28 @@ public class ServingWindow : MonoBehaviour
         // пробуем найти нужное
         dish = _readyDishes.Find(d => d.Type == dishType);
 
-        if (dish != null)
-        {
-            _readyDishes.Remove(dish);
-            Debug.Log($"{dish.Type} забрано из окна выдачи");
-        }
-        else
-        {
-            dish = _readyDishes[UnityEngine.Random.Range(0, _readyDishes.Count)];
-            _readyDishes.Remove(dish);
-            Debug.Log($"Нужного блюда ({dishType}) не было, выдано случайное: {dish.Type}");
-        }
+        // если нужного нет → берём первый
+        if (dish == null)
+            dish = _readyDishes[0];
 
+        if (dish == null)
+            return false;
 
         if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
         {
             var playPanel = playCanvas.GetPanel<PlayPanel>();
-
-            playPanel.RemoveTile(dish); 
+            playPanel.RemoveTile(dish);
             Debug.Log($"{dish.Type} убрано из окна выдачи");
         }
 
+        _readyDishes.Remove(dish);
+
         if (_readyDishes.Count == 0)
-        {
             _state.SetTableClear();
-        }
-         
+
         return true;
     }
+
 
     public bool IsFull()
     {
