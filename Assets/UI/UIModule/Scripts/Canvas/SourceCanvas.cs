@@ -22,8 +22,6 @@ public abstract class SourceCanvas : MonoBehaviour
 
         _panels.ForEach(panel => panel.Init(this));
 
-        _canvas.enabled = IsOpenOnStart;
-
         foreach (var panel in _panels)
         {
             if (panel.isOpenOnInit) panel.OnOpen();
@@ -33,6 +31,11 @@ public abstract class SourceCanvas : MonoBehaviour
         isInited = true;
 
         gameObject.SetActive(true);
+
+        if (IsOpenOnStart)
+        {
+            InvokeCanvas();
+        }
     } 
 
     public virtual void OnInject()
