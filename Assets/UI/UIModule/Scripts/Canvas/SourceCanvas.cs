@@ -81,7 +81,7 @@ public abstract class SourceCanvas : MonoBehaviour
         return returnedPanel as T;
     }
 
-    public virtual T OpenPanel<T>() where T : SourcePanel
+    public virtual T OpenPanel<T>(bool isAbove = false) where T : SourcePanel
     {
         SourcePanel returnedPanel = null;
 
@@ -99,7 +99,7 @@ public abstract class SourceCanvas : MonoBehaviour
             }
             else
             {
-                sourcePanel.OnCLose();
+                if(!isAbove) sourcePanel.OnCLose();
             }
         }
 

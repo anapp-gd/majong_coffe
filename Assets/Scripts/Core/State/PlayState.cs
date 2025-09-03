@@ -134,7 +134,7 @@ public class PlayState : State
 
         if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
         {
-            playCanvas.OpenPanel<WinPanel>().OpenWindow<WinWindow>();
+            playCanvas.OpenPanel<WinPanel>(true).OpenWindow<WinWindow>();
         }
 
         PlayStatusChanged?.Invoke(PlayStatus.win);
@@ -145,7 +145,7 @@ public class PlayState : State
     {
         if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
         {
-            playCanvas.OpenPanel<LosePanel>().OpenWindow<LoseWindow>();
+            playCanvas.OpenPanel<LosePanel>(true).OpenWindow<LoseWindow>();
         }
          
         PlayStatusChanged?.Invoke(PlayStatus.lose);

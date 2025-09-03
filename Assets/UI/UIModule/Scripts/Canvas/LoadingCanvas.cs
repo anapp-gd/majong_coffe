@@ -34,12 +34,16 @@ public class LoadingCanvas : SourceCanvas
             yield return new WaitForSeconds(delay);
         }
     }
+
     public override void CloseCanvas()
     {
         base.CloseCanvas();
 
-        StopCoroutine(coroutine);
+        if (coroutine != null)
+        {
+            StopCoroutine(coroutine);
 
-        coroutine = null;
+            coroutine = null;
+        }
     } 
 }

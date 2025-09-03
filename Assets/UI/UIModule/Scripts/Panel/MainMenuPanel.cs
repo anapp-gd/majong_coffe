@@ -31,7 +31,7 @@ public class MainMenuPanel : SourcePanel
     {
         base.OnOpen(onComplete);
 
-        _titlePlay.text = $"Start ({PlayerEntity.Instance.GetCurrentLevel + 1})";
+        _titlePlay.text = $"{PlayerEntity.Instance.GetCurrentLevel + 1}";
 
         var upgradeConfig = ConfigModule.GetConfig<UpgradeConfig>();
 
@@ -44,7 +44,7 @@ public class MainMenuPanel : SourcePanel
 
         if (nextLevelInfo != null)
         {
-            _titleBuild.text = $"Build ({nextLevelInfo.ItemData.Cost})";
+            _titleBuild.text = $"{nextLevelInfo.ItemData.Cost}";
             _progressTitle.text = $"{current}/{max}";
         }
         else
