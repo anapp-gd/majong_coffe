@@ -193,6 +193,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GridPos: {x: 0, y: 0}
   WorldPos: {x: 0, y: 0}
+  _audioMerge: {fileID: 8300000, guid: d94cd94a3d97c2443ad8e6f79ee0f991, type: 3}
+  _audioTap: {fileID: 8300000, guid: 476565466affdac459ec4d144732d379, type: 3}
   _lowerLayerDarken: 0.5
   _tileType: 0
   _layer: 0

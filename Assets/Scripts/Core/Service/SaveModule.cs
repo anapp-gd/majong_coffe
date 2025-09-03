@@ -70,6 +70,9 @@ public class SaveData
 {
     public int Level;
     public int MetaResources;
+    public bool IsSound;
+    public bool IsMusic;
+    public bool IsVibro;
     public List<ItemSaveData> itemsData;
     public SaveData()
     {

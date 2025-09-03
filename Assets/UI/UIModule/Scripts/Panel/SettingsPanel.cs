@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class SettingsPanel : SourcePanel
 {
+    [SerializeField] AudioClip _audioClick;
+
     [SerializeField] Button _btnSound;
     [SerializeField] Button _btnMusic;
     [SerializeField] Button _btnVibro;
@@ -13,10 +15,12 @@ public class SettingsPanel : SourcePanel
     const string MUSIC_KEY = "MusicEnabled";
     const string VIBRO_KEY = "VibroEnabled";
 
+    private AudioSource _audioSource;
+
     public override void Init(SourceCanvas canvasParent)
     {
         base.Init(canvasParent);
-
+        _audioSource = gameObject.AddComponent<AudioSource>();
         _btnClose.onClick.AddListener(OnClose);
         _btnSound.onClick.AddListener(OnSoundChange);
         _btnMusic.onClick.AddListener(OnMusicChange);
@@ -31,40 +35,53 @@ public class SettingsPanel : SourcePanel
 
     void OnClose()
     {
+        if(PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioClick);
+
+        PlayerEntity.Instance.Save();
+
         State.Instance.Close();
     }
 
     void OnSoundChange()
     {
-        TogglePref(SOUND_KEY);
-        SetButtonState(SOUND_KEY, _btnSound, PlayerPrefs.GetInt(SOUND_KEY, 1) == 1);
+        if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioClick);
+
+        bool result = !PlayerEntity.Instance.IsSound;
+
+        SetButtonState(SOUND_KEY, _btnSound, result);
+
+        PlayerEntity.Instance.IsSound = result; 
     }
 
     void OnMusicChange()
     {
-        TogglePref(MUSIC_KEY);
-        SetButtonState(MUSIC_KEY, _btnMusic, PlayerPrefs.GetInt(MUSIC_KEY, 1) == 1);
+        if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioClick);
+
+        bool result = !PlayerEntity.Instance.IsMusic;
+
+        SetButtonState(MUSIC_KEY, _btnMusic, result);
+
+        PlayerEntity.Instance.IsMusic = result;
+
+        UIModule.Play();
     }
 
     void OnVibroChange()
     {
-        TogglePref(VIBRO_KEY);
-        SetButtonState(VIBRO_KEY, _btnVibro, PlayerPrefs.GetInt(VIBRO_KEY, 1) == 1);
-    }
+        if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioClick);
 
-    void TogglePref(string key)
-    {
-        int value = PlayerPrefs.GetInt(key, 1); // по умолчанию включено
-        value = value == 1 ? 0 : 1;
-        PlayerPrefs.SetInt(key, value);
-        PlayerPrefs.Save();
-    }
+        bool result = !PlayerEntity.Instance.IsVibro;
+
+        SetButtonState(VIBRO_KEY, _btnVibro, result);
+
+        PlayerEntity.Instance.IsVibro = result;
+    } 
 
     void UpdateButtons()
     { 
-        SetButtonState(SOUND_KEY, _btnSound, PlayerPrefs.GetInt(SOUND_KEY, 1) == 1);
-        SetButtonState(MUSIC_KEY, _btnMusic, PlayerPrefs.GetInt(MUSIC_KEY, 1) == 1);
-        SetButtonState(VIBRO_KEY, _btnVibro, PlayerPrefs.GetInt(VIBRO_KEY, 1) == 1);
+        SetButtonState(SOUND_KEY, _btnSound, PlayerEntity.Instance.IsSound);
+        SetButtonState(MUSIC_KEY, _btnMusic, PlayerEntity.Instance.IsMusic);
+        SetButtonState(VIBRO_KEY, _btnVibro, PlayerEntity.Instance.IsVibro);
     }
 
     void SetButtonState(string key, Button btn, bool enabled)

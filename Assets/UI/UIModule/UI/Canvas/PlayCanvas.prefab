@@ -2453,6 +2453,7 @@ MonoBehaviour:
   isOpenOnInit: 0
   isAlwaysOpen: 0
   isOpen: 0
+  _audioClick: {fileID: 8300000, guid: a2ebc323fb9757f4db9ae814cf4b9188, type: 3}
   _btnSound: {fileID: 5950254745097765122}
   _btnMusic: {fileID: 6735348470695740972}
   _btnVibro: {fileID: 720145720555740849}
@@ -53034,6 +53035,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsOpenInit: 1
   IsAlwaysOpen: 1
+  _audioClick: {fileID: 8300000, guid: a2ebc323fb9757f4db9ae814cf4b9188, type: 3}
   _btnSettings: {fileID: 6317254173817015727}
   _btnMenu: {fileID: 1083623096442284634}
 --- !u!1 &4732955572221468174
@@ -53276,6 +53278,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 095a81ac43374024a9c564874a235658, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _audioClick: {fileID: 8300000, guid: a2ebc323fb9757f4db9ae814cf4b9188, type: 3}
   _btnRestart: {fileID: 7554705488128826797}
 --- !u!1 &5077947830659894042
 GameObject:
@@ -81180,6 +81183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b35336eb46727e4a868481a13abe42d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _audioClick: {fileID: 8300000, guid: a2ebc323fb9757f4db9ae814cf4b9188, type: 3}
   _winParticles:
   - {fileID: 6395136120039771143}
   - {fileID: 3560783977753581428}

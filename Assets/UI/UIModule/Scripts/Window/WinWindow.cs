@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class WinWindow : SourceWindow
 {
+    [SerializeField] AudioClip _audioClick;
+    private AudioSource _audioSource;
     [SerializeField] ParticleSystem[] _winParticles;
 
     [SerializeField] Text _resultTitle;
@@ -18,6 +20,7 @@ public class WinWindow : SourceWindow
     public override SourceWindow Init(SourcePanel panel)
     {
         base.Init(panel);
+        _audioSource = gameObject.AddComponent<AudioSource>();
         _next.onClick.AddListener(OnNext);
         return this;
     }
@@ -83,6 +86,11 @@ public class WinWindow : SourceWindow
 
     void OnNext()
     {
+        if (PlayerEntity.Instance.IsSound)
+        {
+            _audioSource.PlayOneShot(_audioClick);
+        }
+
         if (UIModule.OpenCanvas<LoadingCanvas>(out var loadingCanvas))
         {
             loadingCanvas.OpenPanel<LoadingPanel>();

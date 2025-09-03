@@ -62,13 +62,15 @@ public class ShopBuildSlot : SourceSlot
     
     public void TryBuild()
     {
+        var interfaceConfig = ConfigModule.GetConfig<InterfaceConfig>();
+
         if (Data.Buy())
         {
             _buyBtn.interactable = false;
+            _buyImage.sprite = interfaceConfig.BuyedButton;
         } 
         else
         { 
-            var interfaceConfig = ConfigModule.GetConfig<InterfaceConfig>();
             _buyBtn.image.sprite = interfaceConfig.CantBuyButton;
         }
     }

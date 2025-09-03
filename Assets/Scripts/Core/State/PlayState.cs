@@ -5,9 +5,12 @@ using UnityEngine;
 
 public class PlayState : State
 {
+    [SerializeField] private AudioClip _audioWin;
+    [SerializeField] private AudioClip _audioLose;
+
     public event Action<PlayStatus> PlayStatusChanged;
     private PlayStatus _status;
-
+    private AudioSource _audioSource;
     public static new PlayState Instance
     {
         get
@@ -52,6 +55,8 @@ public class PlayState : State
 
     protected override void Awake()
     {
+        _audioSource = gameObject.AddComponent<AudioSource>();
+
         _board = Instantiate(board);
         _board.Init(this, offset);
 
@@ -139,6 +144,8 @@ public class PlayState : State
 
         PlayStatusChanged?.Invoke(PlayStatus.win);
         _status = PlayStatus.win;
+
+        _audioSource.PlayOneShot(_audioWin);
     }
 
     public void Lose()
@@ -149,7 +156,9 @@ public class PlayState : State
         }
          
         PlayStatusChanged?.Invoke(PlayStatus.lose);
-        _status = PlayStatus.lose; 
+        _status = PlayStatus.lose;
+
+        _audioSource.PlayOneShot(_audioLose);
     }
 
     private void HandleTileClick(TileView clickedTile)

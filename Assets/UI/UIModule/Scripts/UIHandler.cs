@@ -5,13 +5,32 @@ using System.Reflection;
 using UnityEngine;
 
 public class UIHandler : MonoBehaviour
-{  
+{
+    [SerializeField] private AudioClip _ambient;
+    private AudioSource _audioSource;
     private List<SourceCanvas> _canvases = new();
     private List<SourcePanel> _panels = new();
     private List<SourceLayout> _layouts = new();
     private List<SourceWindow> _windows = new();
     private List<SourceSlot> _slots = new();
-     
+
+    private void Awake()
+    {
+        _audioSource = gameObject.AddComponent<AudioSource>();
+        _audioSource.clip = _ambient;
+        _audioSource.loop = true;
+        _audioSource.volume = 1f;
+        _audioSource.playOnAwake = false;
+    }
+
+    public void Play()
+    {
+        if (!_audioSource.isPlaying && PlayerEntity.Instance.IsMusic)
+            _audioSource.Play();
+        else
+            _audioSource.Stop();
+    } 
+
     public void Init()
     {
         _canvases = GetComponentsInChildren<SourceCanvas>(true).ToList();
@@ -29,6 +48,8 @@ public class UIHandler : MonoBehaviour
         }
 
         _canvases.ForEach(canvas => canvas.Init());
+
+        Play();
     }
 
     public void Inject(params object[] data) 

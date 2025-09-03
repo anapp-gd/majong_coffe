@@ -23,7 +23,10 @@ public class PlayerEntity : SourceEntity
     }
     private int _currentLevel; 
 
-    public List<ItemData> Data; 
+    public List<ItemData> Data;
+    public bool IsSound = true;
+    public bool IsMusic = true;
+    public bool IsVibro = true;
 
     private const int _maxBalance = 100000; 
 
@@ -51,6 +54,9 @@ public class PlayerEntity : SourceEntity
             }
         }
 
+        IsVibro = saveData.IsVibro;
+        IsSound = saveData.IsSound;
+        IsMusic = saveData.IsMusic;
         _currentLevel = saveData.Level;
         _metaResouceValue = saveData.MetaResources;
     }
@@ -73,7 +79,10 @@ public class PlayerEntity : SourceEntity
         {
             Level = _currentLevel,
             MetaResources = _metaResouceValue,
-            itemsData = itemsData
+            itemsData = itemsData,
+            IsMusic = IsMusic,
+            IsSound = IsSound,
+            IsVibro = IsVibro,
         };
 
         SaveModule.Save(data);

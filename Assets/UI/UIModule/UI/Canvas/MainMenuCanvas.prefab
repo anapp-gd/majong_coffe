@@ -755,6 +755,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1378548836589914254}
+        m_TargetAssemblyTypeName: BuildMenuPanel, Assembly-CSharp
+        m_MethodName: PlaySound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnHold:
     m_PersistentCalls:
       m_Calls: []
@@ -980,6 +992,18 @@ MonoBehaviour:
       - m_Target: {fileID: 6246527550902441699}
         m_TargetAssemblyTypeName: ShopBuildSlot, Assembly-CSharp
         m_MethodName: TryBuild
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1378548836589914254}
+        m_TargetAssemblyTypeName: BuildMenuPanel, Assembly-CSharp
+        m_MethodName: PlaySound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2442,7 +2466,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2337825342688907650}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8300000, guid: a2ebc323fb9757f4db9ae814cf4b9188, type: 3}
+        m_TargetAssemblyTypeName: UnityEngine.Object, UnityEngine
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1697450902071255867
 GameObject:
   m_ObjectHideFlags: 0
@@ -4053,6 +4089,7 @@ MonoBehaviour:
   isOpenOnInit: 0
   isAlwaysOpen: 0
   isOpen: 0
+  _audioClick: {fileID: 8300000, guid: a2ebc323fb9757f4db9ae814cf4b9188, type: 3}
   _btnClose: {fileID: 1152849603119626300}
 --- !u!114 &7902756555967413433
 MonoBehaviour:
@@ -4703,6 +4740,18 @@ MonoBehaviour:
       - m_Target: {fileID: 6772278873795813155}
         m_TargetAssemblyTypeName: ShopBuildSlot, Assembly-CSharp
         m_MethodName: TryBuild
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1378548836589914254}
+        m_TargetAssemblyTypeName: BuildMenuPanel, Assembly-CSharp
+        m_MethodName: PlaySound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5526,6 +5575,7 @@ MonoBehaviour:
   isOpenOnInit: 0
   isAlwaysOpen: 0
   isOpen: 0
+  _audioClick: {fileID: 8300000, guid: a2ebc323fb9757f4db9ae814cf4b9188, type: 3}
   _btnSound: {fileID: 3543477076462316449}
   _btnMusic: {fileID: 1794557434386153563}
   _btnVibro: {fileID: 4209533122538141149}
@@ -5816,6 +5866,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsOpenInit: 1
   IsAlwaysOpen: 1
+  _audioClick: {fileID: 8300000, guid: a2ebc323fb9757f4db9ae814cf4b9188, type: 3}
   _btnSettings: {fileID: 4023234091276131214}
 --- !u!1 &4109846372502856003
 GameObject:
@@ -6036,6 +6087,18 @@ MonoBehaviour:
       - m_Target: {fileID: 7006749813059099967}
         m_TargetAssemblyTypeName: ShopBuildSlot, Assembly-CSharp
         m_MethodName: TryBuild
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1378548836589914254}
+        m_TargetAssemblyTypeName: BuildMenuPanel, Assembly-CSharp
+        m_MethodName: PlaySound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6616,6 +6679,7 @@ MonoBehaviour:
   isOpenOnInit: 0
   isAlwaysOpen: 0
   isOpen: 0
+  _audioClick: {fileID: 8300000, guid: a2ebc323fb9757f4db9ae814cf4b9188, type: 3}
   _btnPlay: {fileID: 4000233470541925185}
   _btnBuild: {fileID: 6160144963215606293}
   _titlePlay: {fileID: 6638766608056336660}
@@ -7242,6 +7306,18 @@ MonoBehaviour:
       - m_Target: {fileID: 7030816645811443595}
         m_TargetAssemblyTypeName: ShopBuildSlot, Assembly-CSharp
         m_MethodName: TryBuild
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1378548836589914254}
+        m_TargetAssemblyTypeName: BuildMenuPanel, Assembly-CSharp
+        m_MethodName: PlaySound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8122,6 +8198,18 @@ MonoBehaviour:
       - m_Target: {fileID: 8945035866997404688}
         m_TargetAssemblyTypeName: ShopBuildSlot, Assembly-CSharp
         m_MethodName: TryBuild
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1378548836589914254}
+        m_TargetAssemblyTypeName: BuildMenuPanel, Assembly-CSharp
+        m_MethodName: PlaySound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -9224,6 +9312,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1378548836589914254}
+        m_TargetAssemblyTypeName: BuildMenuPanel, Assembly-CSharp
+        m_MethodName: PlaySound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnHold:
     m_PersistentCalls:
       m_Calls: []
@@ -9554,6 +9654,18 @@ MonoBehaviour:
       - m_Target: {fileID: 7710323243454244918}
         m_TargetAssemblyTypeName: ShopBuildSlot, Assembly-CSharp
         m_MethodName: TryBuild
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1378548836589914254}
+        m_TargetAssemblyTypeName: BuildMenuPanel, Assembly-CSharp
+        m_MethodName: PlaySound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10220,6 +10332,18 @@ MonoBehaviour:
       - m_Target: {fileID: 7174328127514937002}
         m_TargetAssemblyTypeName: ShopBuildSlot, Assembly-CSharp
         m_MethodName: TryBuild
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1378548836589914254}
+        m_TargetAssemblyTypeName: BuildMenuPanel, Assembly-CSharp
+        m_MethodName: PlaySound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -11998,6 +12122,18 @@ MonoBehaviour:
       - m_Target: {fileID: 7282409124862903522}
         m_TargetAssemblyTypeName: ShopBuildSlot, Assembly-CSharp
         m_MethodName: TryBuild
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1378548836589914254}
+        m_TargetAssemblyTypeName: BuildMenuPanel, Assembly-CSharp
+        m_MethodName: PlaySound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

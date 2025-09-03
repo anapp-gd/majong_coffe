@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public class MainMenuPanel : SourcePanel
 {
+    [SerializeField] AudioClip _audioClick;
+    private AudioSource _audioSource;
+
     [SerializeField] Button _btnPlay;
     [SerializeField] Button _btnBuild;
 
@@ -22,7 +25,7 @@ public class MainMenuPanel : SourcePanel
     public override void Init(SourceCanvas canvasParent)
     {
         base.Init(canvasParent);
-
+        _audioSource = gameObject.AddComponent<AudioSource>();
         _btnPlay.onClick.AddListener(OnPlay);
         _btnBuild.onClick.AddListener(OnUpgrade); 
     }
@@ -55,52 +58,24 @@ public class MainMenuPanel : SourcePanel
 
         _progressFill.fillAmount = value;
         _progressSlider.value = value;
-    }
-
-    /*if (_animateCoroutine != null)
-    {
-        StopCoroutine(_animateCoroutine);
-        _animateCoroutine = null;
-    }
-
-    _animateCoroutine = StartCoroutine(AnimateRoutine(value, current, max));
-    
-    private IEnumerator AnimateRoutine(float targetFill, int startValue, int targetValue)
-    { 
-        float startFill = _progressSlider.value; 
-
-        float time = 0f;
-        while (time < _duration)
-        {
-            time += Time.deltaTime;
-            float t = Mathf.Clamp01(time / _duration);
-
-            float value = Mathf.Lerp(startFill, targetFill, t);
-             
-            _progressFill.fillAmount = value;
-            _progressSlider.value = value;
-
-            int currentValue = Mathf.RoundToInt(Mathf.Lerp(startValue, targetValue, t));
-            _progressTitle.text = $"{currentValue}/{targetValue}";
-
-            yield return null;
-        }
-
-        _progressFill.fillAmount = targetFill;
-        _progressSlider.value = targetFill;
-        _progressTitle.text = $"${targetValue}/{targetValue}";
-
-        _animateCoroutine = null;
-    }
-    */
+    } 
 
     void OnPlay()
     {
+        if (PlayerEntity.Instance.IsSound)
+        {
+            _audioSource.PlayOneShot(_audioClick);
+        }
         MenuState.Instance.Play();
     }
 
     void OnUpgrade()
     {
+        if (PlayerEntity.Instance.IsSound)
+        {
+            _audioSource.PlayOneShot(_audioClick);
+        }
+
         if (UIModule.TryGetCanvas<MainMenuCanvas>(out var mainMenuCanvas))
         {
             mainMenuCanvas.OpenPanel<BuildMenuPanel>();

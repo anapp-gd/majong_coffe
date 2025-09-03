@@ -9,6 +9,8 @@ public class TileView : MonoBehaviour
     public int LayerIndex => _layer;
     public Enums.TileType TileType => _tileType;
 
+    [SerializeField] private AudioClip _audioMerge;
+    [SerializeField] private AudioClip _audioTap;
     [SerializeField, Range(0f, 1f)] private float _lowerLayerDarken = 0.5f;
     [SerializeField, ReadOnlyInspector] private Enums.TileType _tileType;
     [SerializeField, ReadOnlyInspector] private int _layer;
@@ -21,6 +23,7 @@ public class TileView : MonoBehaviour
     private Color _disableColor;
     private Color _enableColor; 
     private Vector3 _baseScale;
+    private AudioSource _audioSource;
     public void Init(PlayState state, MadjongGenerator.TileData data, Enums.TileType type, int layer)
     {
         _state = state;
@@ -28,7 +31,7 @@ public class TileView : MonoBehaviour
         _layer = layer;
         _data = data;
         _view = GetComponent<SpriteRenderer>();
-
+        _audioSource = gameObject.AddComponent<AudioSource>();
         GridPos = data.GridPos;
         WorldPos = data.WorldPos;
 
@@ -97,6 +100,8 @@ public class TileView : MonoBehaviour
     {
         if (_selected) _selected.gameObject.SetActive(true);
 
+        if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioTap);
+
         transform.DOScale(_baseScale * 1.08f, 0.15f)
                  .SetLoops(2, LoopType.Yoyo);
     }
@@ -104,6 +109,8 @@ public class TileView : MonoBehaviour
     public void Deselect()
     {
         if (_selected) _selected.gameObject.SetActive(false);
+
+        if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioTap);
 
         transform.DOScale(_baseScale, 0.1f);
     }
@@ -118,6 +125,11 @@ public class TileView : MonoBehaviour
         // 2. Колбэк между движением и скейлом
         if (spawnMergeEffect != null)
             seq.AppendCallback(() => spawnMergeEffect(to));
+
+        seq.AppendCallback(() =>
+        {
+            if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioMerge);
+        });
 
         // 3. Скалируем
         seq.Append(transform.DOScale(0f, 0.15f).OnComplete(onComplete));
