@@ -20,6 +20,7 @@ public class ServingWindow : MonoBehaviour
         _status = playStatus;
     }
 
+
     public void AddDish(Vector3 worldMergePos, Dish dish)
     {
         if (_status != PlayState.PlayStatus.play) return;

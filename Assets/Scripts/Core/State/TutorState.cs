@@ -1,81 +1,35 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayState : State
+public class TutorState : PlayState
 {
-    [SerializeField] protected AudioClip _audioWin;
-    [SerializeField] protected AudioClip _audioLose;
-
-    public event Action<PlayStatus> PlayStatusChanged;
-    protected PlayStatus _status;
-    protected AudioSource _audioSource;
-    public static new PlayState Instance
+    [SerializeField] private  LevelData levelData;
+     
+    public static new TutorState Instance
     {
         get
         {
-            return (PlayState)State.Instance;
-        }
-    }
-
-    [SerializeField] protected Transform mergeEffect;
-    [SerializeField] protected Vector2 offset; 
-    [SerializeField] protected Board board;
-    public ServingWindow ServingWindow
-    {
-        get => _window; 
-    }
-    [SerializeField] protected ServingWindow window;
-    public ClientService ClientService
-    {
-        get => _client;
-    }
-    [SerializeField] protected ClientService client;
-
-    protected Board _board;
-    protected ServingWindow _window;
-    protected ClientService _client;
-    protected Camera _camera;
-
-    protected TileView _firstTile;
-
-    protected HashSet<Enums.DishType> _haseDish;
-    public HashSet<Enums.DishType> SetHashDishes 
-    { 
-        set
-        {
-            _haseDish = value;
+            return (TutorState)State.Instance;
         }
     } 
-
-    public int GetResaultValue => _resultValue;
-    protected int _resultValue;
-    protected WinConditions _winConditions; 
 
     protected override void Awake()
     {
         _audioSource = gameObject.AddComponent<AudioSource>();
-
-        int currentLevel = PlayerEntity.Instance.GetCurrentLevel;
-
-        if (ConfigModule.GetConfig<LevelConfig>().TryGetLevelData(currentLevel, out var levelData))
-        {
-            _board = Instantiate(board);
-            _board.Init(this, offset, levelData);
-        }
-
+         
+        _board = Instantiate(board);
+        _board.Init(this, offset, levelData);
+         
         _window = Instantiate(window);
         _window.Init(this);
 
         _client = Instantiate(client);
         _client.Init(this, _haseDish);
 
-        _board.OnLose += Lose; 
+        _board.OnLose += Lose;
 
         UIModule.Inject(this, _board, _window, _client);
 
-        _winConditions = new WinConditions(new[] 
+        _winConditions = new WinConditions(new[]
         {
             WinCondition.TableClear, WinCondition.RemoveAllTiles
         });
@@ -89,19 +43,17 @@ public class PlayState : State
         }
     }
 
-    public virtual void SetRemoveAllTiles()
+    public override void SetRemoveAllTiles()
     {
         _winConditions.SetCompleted(WinCondition.RemoveAllTiles, true);
-
-        _client.Finish();
     }
 
-    public virtual void SetTableClear()
+    public override void SetTableClear()
     {
         _winConditions.SetCompleted(WinCondition.TableClear, true);
-    } 
+    }
 
-    public virtual void AddValue(int value)
+    public override void AddValue(int value)
     {
         _resultValue += value;
     }
@@ -115,8 +67,7 @@ public class PlayState : State
             playCanvas.OpenPanel<PlayPanel>();
         }
 
-        InvokePlayStatusChanged(PlayStatus.play);
-
+        InvokePlayStatusChanged(PlayStatus.play); 
         _status = PlayStatus.play;
     }
 
@@ -132,17 +83,13 @@ public class PlayState : State
                 HandleTileClick(tile);
             }
         }
-    }
+    } 
 
-    protected virtual void OnDestroy()
+    public override void Win()
     {
-        _board.OnLose -= Lose; 
-    }
-     
+        PlayerEntity.Instance.TutorDone = true;
 
-    public virtual void Win()
-    {
-        PlayerEntity.Instance.SetNextLevel();
+        PlayerEntity.Instance.Save();
 
         if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
         {
@@ -155,7 +102,7 @@ public class PlayState : State
         _audioSource.PlayOneShot(_audioWin);
     }
 
-    public virtual void Lose()
+    public override void Lose()
     {
         if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
         {
@@ -163,12 +110,12 @@ public class PlayState : State
         }
 
         InvokePlayStatusChanged(PlayStatus.lose);
-       _status = PlayStatus.lose;
+        _status = PlayStatus.lose;
 
         _audioSource.PlayOneShot(_audioLose);
     }
 
-    protected virtual void HandleTileClick(TileView clickedTile)
+    protected override void HandleTileClick(TileView clickedTile)
     {
         if (_status != PlayStatus.play) return;
 
@@ -181,7 +128,7 @@ public class PlayState : State
             {
                 _firstTile.Deselect();
                 _firstTile = null;
-            } 
+            }
             return;
         }
 
@@ -204,7 +151,7 @@ public class PlayState : State
             Vector3 joinPoint = (_firstTile.transform.position + clickedTile.transform.position) / 2f;
 
             _board.RemoveTiles(_firstTile, clickedTile, InvokeMergeEffect, x =>
-            {  
+            {
                 if (DishMapping.TryGetDish(clickedTile.TileType, out Enums.DishType type))
                 {
                     var textureConfig = ConfigModule.GetConfig<TextureConfig>();
@@ -217,7 +164,7 @@ public class PlayState : State
 
                     _firstTile = null;
                 }
-            }); 
+            });
         }
         else
         {
@@ -225,27 +172,5 @@ public class PlayState : State
             _firstTile = clickedTile;
             _firstTile.Select();
         }
-    }
-    
-    protected void InvokePlayStatusChanged(PlayStatus status)
-    {
-        PlayStatusChanged?.Invoke(status);
-    }
-
-    protected virtual void InvokeMergeEffect(Vector3 joinPoint)
-    {
-        var effect = Instantiate(mergeEffect, joinPoint, Quaternion.identity);
-
-        StartCoroutine(WaitDestroy(effect));
-    }
-
-
-    protected virtual IEnumerator WaitDestroy(Transform destroyed)
-    {
-        yield return new WaitForSeconds(1f);
-
-        Destroy(destroyed.gameObject);
-    }
-
-    public enum PlayStatus { play, pause, win, lose}
+    } 
 }

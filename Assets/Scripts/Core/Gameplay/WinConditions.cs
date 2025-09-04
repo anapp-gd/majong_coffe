@@ -17,10 +17,7 @@ public class WinConditions
         if (conditions.ContainsKey(condition))
             conditions[condition] = value;
 
-        if (IsVictory())
-        {
-            PlayState.Instance.Win();
-        }
+        if (IsVictory()) PlayState.Instance.Win(); 
     }
 
     bool IsVictory()

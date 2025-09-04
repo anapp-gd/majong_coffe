@@ -30,8 +30,15 @@ public class ClientService : MonoBehaviour
         _spawnInterval = gameConfig.ClientSpawnDelay;
         _maxClients = gameConfig.MaxClientCount;
         _clientDelayTake = gameConfig.ClientTakeDelay; 
-    } 
+    }
 
+    public void Finish()
+    {
+        foreach (var client in _clients)
+        {
+            client.TryTakeDish();
+        }
+    }
     void OnPlayStatusChange(PlayState.PlayStatus status)
     {
         _status = status;

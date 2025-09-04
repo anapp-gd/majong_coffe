@@ -21,19 +21,14 @@ public class Board : MonoBehaviour
     private int _layersCount = 3;
     private PlayState.PlayStatus _status;
 
-    public void Init(PlayState state, Vector2 customOffset)
+    public void Init(PlayState state, Vector2 customOffset, LevelData levelData)
     {
         _state = state;
         _allTiles.Clear();
 
         _state.PlayStatusChanged += OnStatusChange;
 
-        int currentLevel = PlayerEntity.Instance.GetCurrentLevel;
-
-        if (ConfigModule.GetConfig<LevelConfig>().TryGetLevelData(currentLevel, out var levelData))
-        {
-            _levelData = levelData;
-        }
+        _levelData = levelData;
 
         var data = MadjongGenerator.Generate(_levelData);
 

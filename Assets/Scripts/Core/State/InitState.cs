@@ -35,7 +35,14 @@ public class InitState : State
 
     void onConfigLoaded()
     {
-        SceneManager.LoadScene(targetSceneName);
+        if (PlayerEntity.Instance.TutorDone)
+        { 
+            SceneManager.LoadScene(targetSceneName);
+        }
+        else
+        {
+            SceneManager.LoadScene(3);
+        }
     } 
 
 #if UNITY_EDITOR
