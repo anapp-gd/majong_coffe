@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   KEY_ID: item_001
   ItemData:
-    Level: 1
+    Level: 9
     Icon: {fileID: 21300000, guid: 77768e7af13794c40a148f64e1aa0288, type: 3}
     Type: 0
     Cost: 10

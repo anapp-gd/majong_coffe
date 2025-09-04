@@ -25,7 +25,7 @@ public class InfoLayout : SourceLayout
         }
         if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
         {
-            playCanvas.OpenPanel<SettingsPanel>();
+            playCanvas.OpenPanel<SettingsPanel>(true);
         }
     }
 

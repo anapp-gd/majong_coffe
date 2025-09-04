@@ -12,6 +12,14 @@ public class ShopBuildSlot : SourceSlot
     [SerializeField] private Text _titleCost;
     [SerializeField] private Text _titleLevel;
 
+    private ButtonHoldListener _listner;
+
+    public override SourceSlot Init(SourceLayout layout)
+    {
+        _listner = GetComponentInChildren<ButtonHoldListener>();
+        return base.Init(layout);
+    }
+
     public override void OnActive()
     { 
     }
@@ -39,11 +47,13 @@ public class ShopBuildSlot : SourceSlot
               
             if (isBuyed)
             {
+                _listner.SetInteractable(false);
                 _buyBtn.interactable = false;
                 _buyImage.sprite = interfaceConfig.BuyedButton;
             }
             else
             {
+                _listner.SetInteractable(true);
                 _buyBtn.interactable = true;
                 _buyImage.sprite = interfaceConfig.BuyButton;
 
@@ -64,8 +74,13 @@ public class ShopBuildSlot : SourceSlot
     {
         var interfaceConfig = ConfigModule.GetConfig<InterfaceConfig>();
 
-        if (Data.Buy())
+        var panel = _layout.GetSourcePanel<BuildMenuPanel>();
+
+        if (Data.Buy(()=> { panel.OnOpen(); }))
         {
+            panel.OnCLose();
+
+            _listner.SetInteractable(false);  
             _buyBtn.interactable = false;
             _buyImage.sprite = interfaceConfig.BuyedButton;
         } 

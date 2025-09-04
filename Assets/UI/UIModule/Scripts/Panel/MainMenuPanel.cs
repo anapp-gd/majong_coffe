@@ -39,25 +39,34 @@ public class MainMenuPanel : SourcePanel
         var upgradeConfig = ConfigModule.GetConfig<UpgradeConfig>();
 
         int max = upgradeConfig.Items.Max(x => x.ItemData.Level);
-        int current = PlayerEntity.Instance.Data.Max(x => x.Level);
 
-        float value = Mathf.Clamp01((float)current / max);
+        if (PlayerEntity.Instance.Data.Count > 0)
+        { 
+            int current = PlayerEntity.Instance.Data.Max(x => x.Level);
 
-        var nextLevelInfo = upgradeConfig.Items.Find(x => x.ItemData.Level == current + 1);
+            float value = Mathf.Clamp01((float)current / max);
 
-        if (nextLevelInfo != null)
-        {
-            _titleBuild.text = $"{nextLevelInfo.ItemData.Cost}";
-            _progressTitle.text = $"{current}/{max}";
+            var nextLevelInfo = upgradeConfig.Items.Find(x => x.ItemData.Level == current + 1);
+
+            if (nextLevelInfo != null)
+            {
+                _titleBuild.text = $"{nextLevelInfo.ItemData.Cost}";
+                _progressTitle.text = $"{current}/{max}";
+            }
+            else
+            {
+                _titleBuild.text = "Max level reached";
+                _progressTitle.text = $"{current}/{max}";
+            }
+
+            _progressFill.fillAmount = value;
+            _progressSlider.value = value;
         }
         else
-        {
-            _titleBuild.text = "Max level reached";
-            _progressTitle.text = $"{current}/{max}";
+        { 
+            _titleBuild.text = $"{upgradeConfig.Items[0].ItemData.Cost}";
+            _progressTitle.text = $"{0}/{max}";
         }
-
-        _progressFill.fillAmount = value;
-        _progressSlider.value = value;
     } 
 
     void OnPlay()

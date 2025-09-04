@@ -1,4 +1,5 @@
 using NUnit.Framework.Interfaces;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -88,9 +89,9 @@ public class PlayerEntity : SourceEntity
         SaveModule.Save(data);
     }
 
-    public void AddItem(ItemData item)
+    public void AddItem(ItemData item, Action finish)
     {
-        MenuState.Instance.BuyItem(item.Type);
+        MenuState.Instance.BuyItem(item.Type, finish);
 
         Data.Add(item);
          

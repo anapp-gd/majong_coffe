@@ -33,7 +33,7 @@ public class FlyIcon : MonoBehaviour
         _flySequence = DOTween.Sequence();
 
         // Этап 1: поп-ап
-        _flySequence.Append(flyRect.DOScale(1f, 0.25f).SetEase(Ease.OutBack));
+        _flySequence.Append(flyRect.DOScale(1.5f, 0.25f).SetEase(Ease.OutBack));
 
         // Этап 2: полёт
         _flySequence.Append(flyRect.DOAnchorPos(endLocalPos, duration).SetEase(Ease.InOutCubic));
@@ -54,7 +54,7 @@ public class FlyIcon : MonoBehaviour
         _flySequence?.Kill(); // если летело — стопаем
         _flySequence = null;
 
-        transform.DOPunchScale(Vector3.one * 0.2f, 0.35f, 6, 0.7f)
+        transform.DOPunchScale(Vector3.one * 0.1f, 0.25f, 6, 1f)
             .OnComplete(() => gameObject.SetActive(false));
     }
 }

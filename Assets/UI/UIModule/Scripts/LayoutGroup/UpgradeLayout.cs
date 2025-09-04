@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public class UpgradeLayout : SourceLayout
@@ -9,20 +10,27 @@ public class UpgradeLayout : SourceLayout
 
         int index = 0;
 
+        var items = itemConfig.Items
+            .OrderBy(x => x.ItemData.Level)
+            .ToList();
+
         foreach (var slot in _slots)
         {
             if (slot is ShopBuildSlot shopSlot)
             {
-                shopSlot.Data = itemConfig.Items[index];
+                shopSlot.Data = items[index];
                 index++;
             }
 
             slot.UpdateView();
 
-            if (index >= itemConfig.Items.Count) break;
+            if (index >= items.Count)
+                break;
         }
+
         base.OnOpen();
-    } 
+    }
+
 
     public override void CloseIt()
     {

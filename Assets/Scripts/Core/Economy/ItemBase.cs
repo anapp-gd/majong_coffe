@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "ItemBase", menuName = "Scriptable Objects/Newitem")]
@@ -6,11 +7,11 @@ public class ItemBase : ScriptableObject, ISerializationCallbackReceiver
     [ReadOnlyInspector] public string KEY_ID;
     public ItemData ItemData;
 
-    public bool Buy()
+    public bool Buy(Action onFinish)
     {
         if (ItemData.TryBuy(out var item))
         {
-            PlayerEntity.Instance.AddItem(item);
+            PlayerEntity.Instance.AddItem(item, onFinish);
 
             return true;
         }

@@ -62,7 +62,7 @@ public class PlayPanel : SourcePanel
             out Vector2 endLocalPos);
 
         // 3. Настройки анимации
-        float duration = 0.6f;
+        float duration = 0.3f;
 
         // 4. Запускаем анимацию через FlyIcon 
         flyIcon.PlayFly(flyRect, endLocalPos, duration, () =>
