@@ -17,5 +17,5 @@ MonoBehaviour:
     Level: 8
     Icon: {fileID: 21300000, guid: 55aad6221a4240f4da877c4005a35deb, type: 3}
     Type: 1
-    Cost: 15
+    Cost: 155
     Name: Menu diner

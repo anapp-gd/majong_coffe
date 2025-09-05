@@ -17,5 +17,5 @@ MonoBehaviour:
     Level: 2
     Icon: {fileID: 21300000, guid: 1c4b69c310256ba458444f2a4f224c1f, type: 3}
     Type: 3
-    Cost: 50
+    Cost: 35
     Name: Blower

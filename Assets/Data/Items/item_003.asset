@@ -17,5 +17,5 @@ MonoBehaviour:
     Level: 7
     Icon: {fileID: 21300000, guid: aecc9d084a0362a4da374842160bce2a, type: 3}
     Type: 2
-    Cost: 25
+    Cost: 120
     Name: 'Chairs '
