@@ -106,6 +106,11 @@ public class PlayState : State
         _resultValue += value;
     }
 
+    public List<Enums.TileType> GetAvaiablesTiles()
+    {
+        return _board.GetAvaiableTiles();
+    }
+
     protected override void Start()
     {
         _camera = Camera.main;

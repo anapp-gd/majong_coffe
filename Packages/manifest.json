@@ -1,5 +1,17 @@
 {
-  "dependencies": {
+  "scopedRegistries": [
+    {
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.google.external-dependency-manager",
+        "io.appmetrica.analytics"
+      ]
+    }
+  ],
+  "dependencies": { 
+    "com.google.external-dependency-manager": "1.2.183",
+    "io.appmetrica.analytics": "6.5.2",
     "com.coffee.ui-particle": "https://github.com/mob-sakai/ParticleEffectForUGUI.git",
     "com.unity.ai.navigation": "2.0.8",
     "com.unity.collab-proxy": "2.8.2",

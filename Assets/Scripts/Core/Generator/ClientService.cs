@@ -101,15 +101,28 @@ public class ClientService : MonoBehaviour
 
     private Enums.DishType GetRandomDish()
     {
-        int index = Random.Range(0, _availableDishes.Count);
+        var tiles = _state.GetAvaiablesTiles();
+         
+        int index = Random.Range(0, tiles.Count);
         int i = 0;
 
-        foreach (var dish in _availableDishes)
+        Enums.DishType dish = Enums.DishType.FriedEgg;
+
+        foreach (var tile in tiles)
         {
-            if (i == index) return dish;
+            if (i == index)
+            {
+                if (DishMapping.TryGetDish(tile, out dish))
+                {
+                    break;
+                } 
+            }
+
             i++;
         }
-        return Enums.DishType.FriedEgg; // fallback
+
+
+        return dish;
     }
 
     private void OnClientLeft(Client client)

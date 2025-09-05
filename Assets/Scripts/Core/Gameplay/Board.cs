@@ -1,8 +1,7 @@
 ﻿using DG.Tweening;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEditor.PackageManager.UI;
+using System.Linq; 
 using UnityEngine;
 
 public class Board : MonoBehaviour
@@ -148,6 +147,26 @@ public class Board : MonoBehaviour
         } 
 
         return false;
+    }
+
+    public List<Enums.TileType> GetAvaiableTiles()
+    { 
+        var list = new List<Enums.TileType>();
+
+        var availables = MadjongGenerator.GetFreeTiles();
+
+        for (int i = 0; i < availables.Count; i++)
+        {
+            for (int j = i + 1; j < availables.Count; j++)
+            {
+                if (availables[i].TileType == availables[j].TileType)
+                {
+                    list.Add(availables[i].TileType);
+                }
+            }
+        }
+
+        return list;
     }
 
     public IEnumerable<TileView> GetTilesOnLayer(int layer)
