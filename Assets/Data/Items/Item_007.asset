@@ -17,5 +17,5 @@ MonoBehaviour:
     Level: 5
     Icon: {fileID: 21300000, guid: 2279a7aae6718684ea298b66c26d1556, type: 3}
     Type: 6
-    Cost: 150
+    Cost: 70
     Name: Coffee machine

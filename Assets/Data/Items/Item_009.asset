@@ -17,5 +17,5 @@ MonoBehaviour:
     Level: 3
     Icon: {fileID: 21300000, guid: 5e112fb7e6b72ec45805a9a71ccfe765, type: 3}
     Type: 8
-    Cost: 200
+    Cost: 40
     Name: Jukebox
