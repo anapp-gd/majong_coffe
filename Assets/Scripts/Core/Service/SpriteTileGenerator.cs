@@ -46,6 +46,7 @@ public class SpriteTileGenerator : MonoBehaviour
 
                 var sr = go.AddComponent<SpriteRenderer>();
                 sr.sprite = sprite;
+                sr.sortingOrder = -3;
             }
         }
     }
