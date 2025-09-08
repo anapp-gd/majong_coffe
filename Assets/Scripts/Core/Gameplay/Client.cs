@@ -30,7 +30,7 @@ public class Client : MonoBehaviour
         _sadReaction?.gameObject.SetActive(false);
     }
 
-    public void TryTakeDish()
+    public void FinishTakeDish()
     {
         if (_window.TryTakeDish(_wantedDish, out Dish dish))
         {
@@ -43,6 +43,56 @@ public class Client : MonoBehaviour
         {
             Leave(null, success: false);
         }
+    }
+
+    public void TryTakeDish()
+    {
+        if (_window.TryTakeDish(_wantedDish, out Dish dish))
+        {
+            if (_wantedDish == dish.Type)
+                FinalyLeave(dish, success: true);
+            else
+                FinalyLeave(dish, success: false);
+        }
+        else
+        {
+            FinalyLeave(null, success: false);
+        }
+    }
+
+    void FinalyLeave(Dish dish, bool success)
+    {
+        int value = 0;
+        Transform reaction = null;
+
+        if (!success)
+        {
+            if (dish == null)
+            {
+                Debug.Log("Клиент ушёл недовольным! (не осталось блюд)");
+                reaction = _angryReaction;
+            }
+            else
+            {
+                if (PlayerEntity.Instance.TryAddResourceValue(5))
+                {
+                    value = 5;
+                    Debug.Log($"Клиент ушёл недовольным! Хотел {_wantedDish}, а получил {dish.Type}");
+                }
+                reaction = _sadReaction;
+            }
+        }
+        else
+        {
+            if (PlayerEntity.Instance.TryAddResourceValue(10))
+            {
+                value = 10;
+                Debug.Log($"Клиент ушёл довольный! Получил {_wantedDish}");
+            }
+            reaction = _happyReaction;
+        }
+
+        PlayState.Instance.AddValue(value);
     }
 
     public void MoveToQueuePosition(Vector3 target, float duration = 0.4f, System.Action onArrived = null)

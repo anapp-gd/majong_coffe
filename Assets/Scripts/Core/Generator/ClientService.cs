@@ -36,7 +36,7 @@ public class ClientService : MonoBehaviour
     {
         foreach (var client in _clients)
         {
-            client.TryTakeDish();
+            client.FinishTakeDish();
         }
     }
     void OnPlayStatusChange(PlayState.PlayStatus status)

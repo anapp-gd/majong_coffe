@@ -10,6 +10,8 @@ dependencies {
     implementation 'com.appsflyer:af-android-sdk:6.17.3' // Assets/AppsFlyer/Editor/AppsFlyerDependencies.xml:5
     implementation 'com.appsflyer:purchase-connector:2.1.0' // Assets/AppsFlyer/Editor/AppsFlyerDependencies.xml:8
     implementation 'com.appsflyer:unity-wrapper:6.17.3' // Assets/AppsFlyer/Editor/AppsFlyerDependencies.xml:6
+    implementation 'com.google.android.gms:play-services-appset:16.0.2' // Assets/GameAnalytics/Editor/Android/Dependencies.xml:4
+    implementation 'com.google.android.instantapps:instantapps:1.1.0' // Assets/GameAnalytics/Editor/Android/Dependencies.xml:3
     implementation 'io.appmetrica.analytics:analytics:7.9.0' // Packages/io.appmetrica.analytics/Editor/AppMetricaDependencies.xml:4
 // Android Resolver Dependencies End
 **DEPS**}
@@ -18,7 +20,6 @@ dependencies {
 android {
   packaging {
       exclude ('/lib/armeabi/*' + '*')
-      exclude ('/lib/armeabi-v7a/*' + '*')
       exclude ('/lib/mips/*' + '*')
       exclude ('/lib/mips64/*' + '*')
       exclude ('/lib/x86/*' + '*')

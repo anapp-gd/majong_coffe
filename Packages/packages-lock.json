@@ -337,13 +337,13 @@
       "url": "https://packages.unity.com"
     },
     "io.appmetrica.analytics": {
-      "version": "6.5.2",
+      "version": "https://github.com/appmetrica/appmetrica-unity-plugin.git#v6.5.2",
       "depth": 0,
-      "source": "registry",
+      "source": "git",
       "dependencies": {
         "com.google.external-dependency-manager": "1.2.183"
       },
-      "url": "https://package.openupm.com"
+      "hash": "49ca6c4c338c0913b067e3e8aa0ee45a54412a4a"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
