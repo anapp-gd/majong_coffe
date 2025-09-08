@@ -1,58 +1,62 @@
+using DG.Tweening;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using DG.Tweening;
 
 [ExecuteAlways]
-public class HorizontalQueue2D : MonoBehaviour
+public class WorldHorizontalLayout : MonoBehaviour
 {
     public enum StartEdge { Left, Center, Right }
     public StartEdge startEdge = StartEdge.Center;
 
+    [SerializeField] private int maxCount = 5;
     [SerializeField] private float spacing = 1f;
+    [SerializeField] private float edgeOffset = 0.5f;
+    [SerializeField] private bool fitToParent = true;
 
     private List<Transform> children = new List<Transform>();
 
+    // --- Callbacks ---
+    public event Action<Transform> OnAddStart;
+    public event Action<Transform> OnAddComplete;
+    public event Action<Transform> OnRemoveStart;
+    public event Action<Transform> OnRemoveComplete;
+    public event Action OnRearrangeComplete;
+
     private void Update()
     {
-        // Только в Editor для визуализации
         if (!Application.isPlaying)
-        {
             UpdateLayoutEditor();
-        }
     }
 
     private void GatherChildren()
     {
         children.Clear();
         foreach (Transform t in transform)
-        {
             children.Add(t);
-        }
     }
 
     private Bounds GetParentBounds()
     {
-        GatherChildren();
-        if (children.Count == 0)
-            return new Bounds(Vector3.zero, Vector3.zero);
-
-        Bounds bounds = new Bounds(children[0].localPosition, Vector3.zero);
-        foreach (var child in children)
-        {
-            bounds.Encapsulate(child.localPosition);
-        }
-        return bounds;
+        var parentRenderer = GetComponent<SpriteRenderer>();
+        return parentRenderer != null ? parentRenderer.bounds : new Bounds(Vector3.zero, Vector3.zero);
     }
 
-    public void AddObject(Transform obj)
+    // -------------------- ADD --------------------
+    public bool AddObject(Transform obj)
     {
+        if (obj == null) return false;
+
+        GatherChildren();
+        if (children.Count >= maxCount)
+            return false; // очередь полная
+
         obj.SetParent(transform);
         obj.localScale = Vector3.zero;
 
-        GatherChildren();
-
         Bounds parentBounds = GetParentBounds();
 
+        // Начальная позиция для анимации (от края)
         Vector3 startPos = Vector3.zero;
         switch (startEdge)
         {
@@ -66,58 +70,107 @@ public class HorizontalQueue2D : MonoBehaviour
                 startPos = Vector3.zero;
                 break;
         }
-
         obj.localPosition = startPos;
 
-        // Анимация появления и выравнивания
+        OnAddStart?.Invoke(obj);
+
+        // Появление и перестановка очереди
         Sequence seq = DOTween.Sequence();
         seq.Append(obj.DOScale(Vector3.one, 0.25f).SetEase(Ease.OutBack));
-        seq.AppendCallback(() =>
+        seq.AppendCallback(() => UpdateLayoutAnimated());
+        seq.OnComplete(() => OnAddComplete?.Invoke(obj));
+
+        return true;
+    }
+
+    // -------------------- REMOVE --------------------
+    public void RemoveObject(Transform obj)
+    {
+        if (obj == null) return;
+
+        GatherChildren();
+        if (!children.Contains(obj)) return;
+
+        OnRemoveStart?.Invoke(obj);
+
+        // Анимация исчезновения
+        obj.DOScale(Vector3.zero, 0.25f).SetEase(Ease.InBack).OnComplete(() =>
         {
+            children.Remove(obj);
+            Destroy(obj.gameObject);
             UpdateLayoutAnimated();
+            OnRemoveComplete?.Invoke(obj);
         });
     }
 
+    // -------------------- UPDATE LAYOUT --------------------
     private void UpdateLayoutAnimated()
     {
         GatherChildren();
-        float totalWidth = (children.Count - 1) * spacing;
-        Vector3 leftStart = Vector3.zero;
+        if (children.Count == 0)
+        {
+            OnRearrangeComplete?.Invoke();
+            return;
+        }
 
+        Bounds parentBounds = GetParentBounds();
+        float currentSpacing = spacing;
+        float totalWidth = (children.Count - 1) * currentSpacing;
+
+        if (fitToParent && children.Count > 1)
+        {
+            float parentWidth = parentBounds.size.x - 2 * edgeOffset;
+            if (totalWidth > parentWidth)
+            {
+                currentSpacing = parentWidth / (children.Count - 1);
+                totalWidth = parentWidth;
+            }
+        }
+
+        Vector3 startPos = Vector3.zero;
         switch (startEdge)
         {
             case StartEdge.Left:
-                leftStart = Vector3.zero;
+                startPos = new Vector3(parentBounds.min.x + edgeOffset, 0f, 0f);
                 break;
             case StartEdge.Center:
-                leftStart = new Vector3(-totalWidth / 2f, 0f, 0f);
+                startPos = new Vector3(parentBounds.center.x - totalWidth / 2f, 0f, 0f);
                 break;
             case StartEdge.Right:
-                leftStart = new Vector3(-totalWidth, 0f, 0f);
+                startPos = new Vector3(parentBounds.max.x - totalWidth - edgeOffset, 0f, 0f);
                 break;
         }
 
+        Sequence seq = DOTween.Sequence();
         for (int i = 0; i < children.Count; i++)
         {
-            Vector3 target = leftStart + Vector3.right * (i * spacing);
-            children[i].DOLocalMove(target, 0.5f).SetEase(Ease.OutCubic);
+            Vector3 target = startPos + Vector3.right * (i * currentSpacing);
+            seq.Join(children[i].DOLocalMove(target, 0.5f).SetEase(Ease.OutCubic));
         }
+        seq.OnComplete(() => OnRearrangeComplete?.Invoke());
     }
 
-    [SerializeField] private float edgeOffset = 0.5f; // смещение от края 
+    // -------------------- EDITOR --------------------
     private void UpdateLayoutEditor()
     {
         GatherChildren();
-
         if (children.Count == 0) return;
 
-        // Получаем bounds родителя
-        var parentRenderer = GetComponent<SpriteRenderer>();
-        Bounds parentBounds = parentRenderer != null ? parentRenderer.bounds : new Bounds(Vector3.zero, Vector3.zero);
+        Bounds parentBounds = GetParentBounds();
+        float currentSpacing = spacing;
+        float totalWidth = (children.Count - 1) * currentSpacing;
 
-        float totalWidth = (children.Count - 1) * spacing;
+        if (fitToParent && children.Count > 1)
+        {
+            float parentWidth = parentBounds.size.x - 2 * edgeOffset;
+            if (totalWidth > parentWidth)
+            {
+                currentSpacing = parentWidth / (children.Count - 1);
+                totalWidth = parentWidth;
+            }
+        }
+
         Vector3 startPos = Vector3.zero;
-
         switch (startEdge)
         {
             case StartEdge.Left:
@@ -133,8 +186,18 @@ public class HorizontalQueue2D : MonoBehaviour
 
         for (int i = 0; i < children.Count; i++)
         {
-            children[i].localPosition = startPos + Vector3.right * (i * spacing);
+            children[i].localPosition = startPos + Vector3.right * (i * currentSpacing);
             children[i].localScale = Vector3.one;
+        }
+    }
+
+    // -------------------- CLEAR --------------------
+    public void ClearQueue()
+    {
+        GatherChildren();
+        for (int i = children.Count - 1; i >= 0; i--)
+        {
+            RemoveObject(children[i]);
         }
     }
 }
