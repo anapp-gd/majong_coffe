@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic; 
 using UnityEngine;
 
@@ -81,7 +82,7 @@ public abstract class SourceCanvas : MonoBehaviour
         return returnedPanel as T;
     }
 
-    public virtual T OpenPanel<T>(bool isAbove = false) where T : SourcePanel
+    public virtual T OpenPanel<T>(bool isAbove = false, params Action[] actions) where T : SourcePanel
     {
         SourcePanel returnedPanel = null;
 
@@ -89,7 +90,7 @@ public abstract class SourceCanvas : MonoBehaviour
         {
             if (sourcePanel.isAlwaysOpen)
             {
-                sourcePanel.OnOpen();
+                sourcePanel.OnOpen(actions);
                 continue;
             }
 
@@ -103,7 +104,7 @@ public abstract class SourceCanvas : MonoBehaviour
             }
         }
 
-        if(!returnedPanel.isOpen) returnedPanel.OnOpen();
+        if(!returnedPanel.isOpen) returnedPanel.OnOpen(actions);
 
         return returnedPanel as T;
     }

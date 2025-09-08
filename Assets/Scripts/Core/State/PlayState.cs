@@ -147,6 +147,8 @@ public class PlayState : State
 
     public virtual void Win()
     {
+        if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioWin);
+
         PlayerEntity.Instance.SetNextLevel();
 
         if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
@@ -156,21 +158,18 @@ public class PlayState : State
 
         InvokePlayStatusChanged(PlayStatus.win);
         _status = PlayStatus.win;
-
-        _audioSource.PlayOneShot(_audioWin);
     }
 
     public virtual void Lose()
     {
+        if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioLose);
         if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
         {
             playCanvas.OpenPanel<LosePanel>(true).OpenWindow<LoseWindow>();
         }
 
         InvokePlayStatusChanged(PlayStatus.lose);
-       _status = PlayStatus.lose;
-
-        _audioSource.PlayOneShot(_audioLose);
+       _status = PlayStatus.lose; 
     }
 
     protected virtual void HandleTileClick(TileView clickedTile)

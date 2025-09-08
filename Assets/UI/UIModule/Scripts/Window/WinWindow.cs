@@ -93,10 +93,11 @@ public class WinWindow : SourceWindow
 
         if (UIModule.OpenCanvas<LoadingCanvas>(out var loadingCanvas))
         {
-            loadingCanvas.OpenPanel<LoadingPanel>();
+            loadingCanvas.OpenPanel<LoadingPanel>(false, () =>
+            {
+                SceneManager.LoadScene(1);
+            });
         }
-
-        SceneManager.LoadScene(1);
     }
 
     public override void Dispose()

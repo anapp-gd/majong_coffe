@@ -24,8 +24,14 @@ public class LoseWindow : SourceWindow
         {
             _audioSource.PlayOneShot(_audioClick);
         }
-
-        SceneManager.LoadScene(2);
+        
+        if (UIModule.OpenCanvas<LoadingCanvas>(out var loadingCanvas))
+        {
+            loadingCanvas.OpenPanel<LoadingPanel>(false, () =>
+            {
+                SceneManager.LoadScene(2);
+            });
+        } 
     }
 
     public override void Dispose()
