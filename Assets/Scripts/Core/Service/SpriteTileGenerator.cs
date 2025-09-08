@@ -4,6 +4,7 @@ public class SpriteTileGenerator : MonoBehaviour
 {
     [Header("Настройки сетки")]
     public Sprite sprite;
+    public int SortingOrder = -4;
     [Range(1, 50)] public int rows = 5;
     [Range(1, 50)] public int cols = 5;
     public float cellSize = 1f;
@@ -46,6 +47,7 @@ public class SpriteTileGenerator : MonoBehaviour
 
                 var sr = go.AddComponent<SpriteRenderer>();
                 sr.sprite = sprite;
+                sr.sortingOrder = SortingOrder;
             }
         }
     }

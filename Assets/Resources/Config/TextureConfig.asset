@@ -165,7 +165,7 @@ MonoBehaviour:
     TextureDish: {fileID: 21300000, guid: baaf194e64be4ca49878bfb926e9c3b9, type: 3}
   - DishType: 13
     Name: Tea
-    TextureDish: {fileID: 21300000, guid: 229b4896b2a187e469c52699f97a32c3, type: 3}
+    TextureDish: {fileID: 21300000, guid: eb715101cad4a2a4cb9e8b219b1c3cfb, type: 3}
   - DishType: 14
     Name: Bruschetta
     TextureDish: {fileID: 21300000, guid: 296eb4f3c76853949999114b9fdaa465, type: 3}

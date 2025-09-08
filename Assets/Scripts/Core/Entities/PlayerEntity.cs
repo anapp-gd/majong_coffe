@@ -29,6 +29,7 @@ public class PlayerEntity : SourceEntity
     public bool IsMusic = true;
     public bool IsVibro = true;
     public bool TutorDone = false;
+    public int TutorialStage = 0;
 
     private const int _maxBalance = 100000; 
 
@@ -56,6 +57,7 @@ public class PlayerEntity : SourceEntity
             }
         }
 
+        TutorialStage = saveData.TutorialStage;
         TutorDone = saveData.TutorDone;
         IsVibro = saveData.IsVibro;
         IsSound = saveData.IsSound;
@@ -87,6 +89,7 @@ public class PlayerEntity : SourceEntity
             IsSound = IsSound,
             IsVibro = IsVibro,
             TutorDone = TutorDone,
+            TutorialStage = TutorialStage
         };
 
         SaveModule.Save(data);
