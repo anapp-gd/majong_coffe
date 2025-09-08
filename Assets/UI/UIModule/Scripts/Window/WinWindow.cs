@@ -91,13 +91,16 @@ public class WinWindow : SourceWindow
             _audioSource.PlayOneShot(_audioClick);
         }
 
-        if (UIModule.OpenCanvas<LoadingCanvas>(out var loadingCanvas))
-        {
-            loadingCanvas.OpenPanel<LoadingPanel>(false, () =>
+        if (PlayerEntity.Instance.TutorDone)
+        { 
+            if (UIModule.OpenCanvas<LoadingCanvas>(out var loadingCanvas))
             {
-                SceneManager.LoadScene(1);
-            });
-        }
+                loadingCanvas.OpenPanel<LoadingPanel>(false, () =>
+                {
+                    SceneManager.LoadScene(1);
+                });
+            }
+        } 
     }
 
     public override void Dispose()

@@ -1,7 +1,7 @@
 public class Enums
 {
     public enum TileType 
-    {
+    { 
         Eggs, 
         CoffeeBeans, 
         Bread, 

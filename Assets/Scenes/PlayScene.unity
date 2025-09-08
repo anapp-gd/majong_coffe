@@ -3999,14 +3999,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayState
       objectReference: {fileID: 0}
-    - target: {fileID: 7161927304236260171, guid: 0117a2bf338898e4e92e566a4d66afb9, type: 3}
-      propertyPath: service
-      value: 
-      objectReference: {fileID: 8974939872978371098, guid: ebde44104808ff849ba83aade7ff1bfc, type: 3}
-    - target: {fileID: 7161927304236260171, guid: 0117a2bf338898e4e92e566a4d66afb9, type: 3}
-      propertyPath: offset.y
-      value: -2
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -20173,7 +20165,7 @@ Transform:
   m_GameObject: {fileID: 1007126894}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.99, z: 0}
+  m_LocalPosition: {x: 0, y: 3.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -41814,7 +41806,7 @@ Transform:
   m_GameObject: {fileID: 2048707049}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5.25, z: 0}
+  m_LocalPosition: {x: 0, y: 6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -42292,7 +42284,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 14.8
+  orthographic size: 9.6
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2

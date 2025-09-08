@@ -91,9 +91,14 @@ public class PlayState : State
 
     public virtual void SetRemoveAllTiles()
     {
-        _winConditions.SetCompleted(WinCondition.RemoveAllTiles, true);
-
         _client.Finish();
+        _window.Finish();
+        _winConditions.SetCompleted(WinCondition.RemoveAllTiles, true);
+    }
+
+    public virtual void ForceTakeDish()
+    {
+        _client.ForceTakeDish();
     }
 
     public virtual void SetTableClear()
@@ -179,7 +184,7 @@ public class PlayState : State
         if (!clickedTile.IsAvailable())
             return;
 
-        if (_window.IsFull())
+        if (!_window.IsFree)
         {
             if (_firstTile != null)
             {

@@ -12,11 +12,18 @@ public class ServingWindow : MonoBehaviour
     private List<Dish> _readyDishes = new();
     private PlayState.PlayStatus _status;
     private WorldHorizontalLayout _layout;
+
+    public bool IsFree => _currentInGameCountDishes < 5;
+
+    private int _currentInGameCountDishes;
+    private List<FlyIcon> _currentIconsFly;
+
     public void Init(PlayState state)
     {
         _state = state;
         _state.PlayStatusChanged += OnPlayStatusChange;
         _layout = GetComponent<WorldHorizontalLayout>();
+        _currentIconsFly = new List<FlyIcon>();
     }
 
     void OnPlayStatusChange(PlayState.PlayStatus playStatus)
@@ -30,8 +37,6 @@ public class ServingWindow : MonoBehaviour
         if (_status != PlayState.PlayStatus.play) return;
 
         InvokeMoveTile(worldMergePos, dish);
-
-        _readyDishes.Add(dish); 
     }
 
     void InvokeMoveTile(Vector3 mergeWorldPos, Dish dish)
@@ -54,22 +59,39 @@ public class ServingWindow : MonoBehaviour
         // 3. Настройки анимации
         float duration = 0.3f;
 
+        _currentIconsFly.Add(flyIcon);
+
+        _currentInGameCountDishes++;
+
         // 4. Запускаем анимацию
         flyIcon.PlayFlyWorld(targetPos, duration, () =>
         {
             // Проверяем, свободен ли слот к моменту завершения
-            if (_layout.AddObject(dish, flyIcon.transform))
-            { 
-                flyIcon.Finish(); // punch-эффект
-            }
-            else
+            if (!_layout.AddObject(dish, flyIcon.transform, () =>  OnFlyComplete(dish, flyIcon)))
             {
-                // Слот занят — просто исчезаем
                 flyIcon.CancelFly();
-            }
+            } 
         });
     }
 
+    void OnFlyComplete(Dish dish, FlyIcon icon)
+    {
+        _readyDishes.Add(dish);
+        _currentIconsFly.Remove(icon);
+
+        if (_currentInGameCountDishes >= 5)
+        {
+            _state.ForceTakeDish();
+        }
+    }
+
+    public void Finish()
+    {
+        foreach (var icon in _currentIconsFly)
+        {
+            icon.CancelFly();
+        }
+    }
 
     public bool TryTakeDish(Enums.DishType dishType, out Dish dish)
     {
@@ -95,15 +117,11 @@ public class ServingWindow : MonoBehaviour
 
         _readyDishes.Remove(dish);
 
+        _currentInGameCountDishes--;
+
         if (_readyDishes.Count == 0)
             _state.SetTableClear();
 
         return true;
-    }
-
-
-    public bool IsFull()
-    {
-        return _readyDishes.Count >= 5;
-    }
+    } 
 }

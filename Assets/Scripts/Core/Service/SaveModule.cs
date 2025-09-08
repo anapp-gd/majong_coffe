@@ -71,6 +71,7 @@ public class SaveData
     public int Level;
     public int MetaResources;
     public bool TutorDone;
+    public int TutorialStage;
     public bool IsSound;
     public bool IsMusic;
     public bool IsVibro;

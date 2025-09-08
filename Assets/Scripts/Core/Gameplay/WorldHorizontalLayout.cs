@@ -38,7 +38,7 @@ public class WorldHorizontalLayout : MonoBehaviour
     }
 
     // -------------------- ADD --------------------
-    public bool AddObject(Dish dish, Transform obj)
+    public bool AddObject(Dish dish, Transform obj, Action addCallback)
     {
         if (dish == null || obj == null) return false;
         if (values.Count >= maxCount) return false; // очередь полная
@@ -54,7 +54,7 @@ public class WorldHorizontalLayout : MonoBehaviour
         Sequence seq = DOTween.Sequence();
         seq.Append(obj.DOScale(Vector3.one, 0.25f).SetEase(Ease.OutBack));
         seq.AppendCallback(UpdateLayoutAnimated);
-        seq.OnComplete(() => OnAddComplete?.Invoke(dish, obj));
+        seq.OnComplete(() => addCallback());
 
         return true;
     }

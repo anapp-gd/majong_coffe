@@ -65,6 +65,18 @@ public class ClientService : MonoBehaviour
         }
     }
 
+    public void ForceTakeDish()
+    { 
+        var firstClient = _clients[0];
+
+        if (firstClient != null)
+        {
+            firstClient.TryTakeDish();
+        }
+
+        _takeTimer = _clientDelayTake;
+    }
+
     private void HandleTaking()
     {
         if (_clients.Count == 0) return;

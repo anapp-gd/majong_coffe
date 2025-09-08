@@ -47,15 +47,7 @@ public class FlyIcon : MonoBehaviour
             onArrive?.Invoke();
         });
     }
-
-    /// <summary>
-    /// Завершение с красивым punch-эффектом
-    /// </summary>
-    public void Finish()
-    {
-        _flySequence?.Kill();
-        _flySequence = null;
-    }
+     
 
     /// <summary>
     /// Прервать полёт (например, слот занят)

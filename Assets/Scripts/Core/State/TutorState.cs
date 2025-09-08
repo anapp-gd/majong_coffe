@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TutorState : PlayState
 {
@@ -10,11 +11,17 @@ public class TutorState : PlayState
         {
             return (TutorState)State.Instance;
         }
-    } 
+    }
+
+    int stage;
+    bool isTutorInfo;
 
     protected override void Awake()
     {
+        isTutorInfo = true;
         _audioSource = gameObject.AddComponent<AudioSource>();
+
+        stage = PlayerEntity.Instance.TutorialStage;
 
         _board = Instantiate(board);
         _board.Init(this, offset, levelData);
@@ -45,12 +52,36 @@ public class TutorState : PlayState
 
     public override void SetRemoveAllTiles()
     {
-        _winConditions.SetCompleted(WinCondition.RemoveAllTiles, true);
-    }
-
-    public override void SetTableClear()
-    {
-        _winConditions.SetCompleted(WinCondition.TableClear, true);
+        switch (stage)
+        {
+            case 0:
+                _client.Finish();
+                _window.Finish();
+                Win();
+                break;
+            case 1:
+                _client.Finish();
+                _window.Finish();
+                Win();
+                break;
+            case 2:
+                _client.Finish();
+                _window.Finish();
+                Win();
+                break;
+            default:
+                PlayerEntity.Instance.TutorialStage = 3;
+                PlayerEntity.Instance.TutorDone = true;
+                PlayerEntity.Instance.Save();
+                if (UIModule.OpenCanvas<LoadingCanvas>(out var loadingCanvas))
+                {
+                    loadingCanvas.OpenPanel<LoadingPanel>(false, () =>
+                    {
+                        SceneManager.LoadScene(1);
+                    });
+                }
+                break;
+        }
     }
 
     public override void AddValue(int value)
@@ -87,19 +118,41 @@ public class TutorState : PlayState
 
     public override void Win()
     {
-        PlayerEntity.Instance.TutorDone = true;
+        stage++;
 
-        PlayerEntity.Instance.Save();
+        int indexScene = 0;
 
-        if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
-        {
-            playCanvas.OpenPanel<WinPanel>(true).OpenWindow<WinWindow>();
-        }
+        if (stage == 3) PlayerEntity.Instance.TutorDone = true;
+
+        PlayerEntity.Instance.TutorialStage = stage;
+        PlayerEntity.Instance.Save(); 
 
         InvokePlayStatusChanged(PlayStatus.win);
         _status = PlayStatus.win;
 
         _audioSource.PlayOneShot(_audioWin);
+
+        if (stage == 1) indexScene = 4; 
+
+        if (stage == 2) indexScene = 5;
+
+        if (stage == 3)
+        {
+            if (UIModule.OpenCanvas<LoadingCanvas>(out var loadingCanvas))
+            {
+                loadingCanvas.OpenPanel<LoadingPanel>(false, () =>
+                {
+                    SceneManager.LoadScene(2);
+                });
+            }
+        }
+        else if (UIModule.OpenCanvas<LoadingCanvas>(out var loadingCanvas))
+        {
+            loadingCanvas.OpenPanel<LoadingPanel>(false, () =>
+            {
+                SceneManager.LoadScene(indexScene);
+            });
+        }
     }
 
     public override void Lose()
@@ -122,7 +175,7 @@ public class TutorState : PlayState
         if (!clickedTile.IsAvailable())
             return;
 
-        if (_window.IsFull())
+        if (!_window.IsFree)
         {
             if (_firstTile != null)
             {
@@ -130,6 +183,12 @@ public class TutorState : PlayState
                 _firstTile = null;
             }
             return;
+        }
+
+        if (isTutorInfo)
+        {
+            FindFirstObjectByType<TutorInfo>().gameObject.SetActive(false);
+            isTutorInfo = false;
         }
 
         if (_firstTile == null)
