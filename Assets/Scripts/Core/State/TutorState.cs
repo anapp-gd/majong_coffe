@@ -15,14 +15,14 @@ public class TutorState : PlayState
     protected override void Awake()
     {
         _audioSource = gameObject.AddComponent<AudioSource>();
-         
+
         _board = Instantiate(board);
         _board.Init(this, offset, levelData);
-         
-        _window = Instantiate(window);
+
+        _window = FindFirstObjectByType<ServingWindow>();
         _window.Init(this);
 
-        _client = Instantiate(client);
+        _client = Instantiate(service);
         _client.Init(this, _haseDish);
 
         _board.OnLose += Lose;

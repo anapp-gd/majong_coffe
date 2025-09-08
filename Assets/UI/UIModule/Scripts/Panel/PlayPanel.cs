@@ -4,18 +4,18 @@ using UnityEngine;
 
 public class PlayPanel : SourcePanel
 {
-    [SerializeField] FlyIcon _flyIcon;
+    /*[SerializeField] FlyIcon _flyIcon;
 
-    private float duration = 1f;
+    private float duration = 1f;*/
 
     public override void OnOpen(params Action[] onComplete)
     {
         base.OnOpen(onComplete);
 
-        OpenLayout<ServingLayout>(); 
+        //OpenLayout<ServingLayout>(); 
     }
 
-    public void RemoveTile(Dish dish)
+    /*public void RemoveTile(Dish dish)
     { 
         var layout = GetLayout<ServingLayout>();
 
@@ -70,5 +70,5 @@ public class PlayPanel : SourcePanel
             layout.AddDish(targetSlot); // добавляем блюдо
             flyIcon.Finish();           // добиваем punch-эффектом
         });
-    }
+    }*/
 }

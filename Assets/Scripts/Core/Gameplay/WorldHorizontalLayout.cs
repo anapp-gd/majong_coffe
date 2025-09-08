@@ -14,13 +14,13 @@ public class WorldHorizontalLayout : MonoBehaviour
     [SerializeField] private float edgeOffset = 0.5f;
     [SerializeField] private bool fitToParent = true;
 
-    private List<Transform> children = new List<Transform>();
+    private Dictionary<Dish, Transform> values = new Dictionary<Dish, Transform>();
 
     // --- Callbacks ---
-    public event Action<Transform> OnAddStart;
-    public event Action<Transform> OnAddComplete;
-    public event Action<Transform> OnRemoveStart;
-    public event Action<Transform> OnRemoveComplete;
+    public event Action<Dish, Transform> OnAddStart;
+    public event Action<Dish, Transform> OnAddComplete;
+    public event Action<Dish, Transform> OnRemoveStart;
+    public event Action<Dish, Transform> OnRemoveComplete;
     public event Action OnRearrangeComplete;
 
     private void Update()
@@ -29,12 +29,7 @@ public class WorldHorizontalLayout : MonoBehaviour
             UpdateLayoutEditor();
     }
 
-    private void GatherChildren()
-    {
-        children.Clear();
-        foreach (Transform t in transform)
-            children.Add(t);
-    }
+    public int GetSlotCount() => values.Count;
 
     private Bounds GetParentBounds()
     {
@@ -43,71 +38,49 @@ public class WorldHorizontalLayout : MonoBehaviour
     }
 
     // -------------------- ADD --------------------
-    public bool AddObject(Transform obj)
+    public bool AddObject(Dish dish, Transform obj)
     {
-        if (obj == null) return false;
-
-        GatherChildren();
-        if (children.Count >= maxCount)
-            return false; // очередь полная
+        if (dish == null || obj == null) return false;
+        if (values.Count >= maxCount) return false; // очередь полная
+        if (values.ContainsKey(dish)) return false; // уже добавлен
 
         obj.SetParent(transform);
         obj.localScale = Vector3.zero;
 
-        Bounds parentBounds = GetParentBounds();
+        values.Add(dish, obj);
+        OnAddStart?.Invoke(dish, obj);
 
-        // Начальная позиция для анимации (от края)
-        Vector3 startPos = Vector3.zero;
-        switch (startEdge)
-        {
-            case StartEdge.Left:
-                startPos = new Vector3(parentBounds.min.x - spacing, 0f, 0f);
-                break;
-            case StartEdge.Right:
-                startPos = new Vector3(parentBounds.max.x + spacing, 0f, 0f);
-                break;
-            case StartEdge.Center:
-                startPos = Vector3.zero;
-                break;
-        }
-        obj.localPosition = startPos;
-
-        OnAddStart?.Invoke(obj);
-
-        // Появление и перестановка очереди
+        // Анимация появления + перестройка
         Sequence seq = DOTween.Sequence();
         seq.Append(obj.DOScale(Vector3.one, 0.25f).SetEase(Ease.OutBack));
-        seq.AppendCallback(() => UpdateLayoutAnimated());
-        seq.OnComplete(() => OnAddComplete?.Invoke(obj));
+        seq.AppendCallback(UpdateLayoutAnimated);
+        seq.OnComplete(() => OnAddComplete?.Invoke(dish, obj));
 
         return true;
     }
 
     // -------------------- REMOVE --------------------
-    public void RemoveObject(Transform obj)
+    public void RemoveObject(Dish dish)
     {
-        if (obj == null) return;
+        if (dish == null || !values.ContainsKey(dish)) return;
 
-        GatherChildren();
-        if (!children.Contains(obj)) return;
-
-        OnRemoveStart?.Invoke(obj);
+        Transform obj = values[dish];
+        OnRemoveStart?.Invoke(dish, obj);
 
         // Анимация исчезновения
         obj.DOScale(Vector3.zero, 0.25f).SetEase(Ease.InBack).OnComplete(() =>
         {
-            children.Remove(obj);
+            values.Remove(dish);
             Destroy(obj.gameObject);
             UpdateLayoutAnimated();
-            OnRemoveComplete?.Invoke(obj);
+            OnRemoveComplete?.Invoke(dish, obj);
         });
     }
 
     // -------------------- UPDATE LAYOUT --------------------
     private void UpdateLayoutAnimated()
     {
-        GatherChildren();
-        if (children.Count == 0)
+        if (values.Count == 0)
         {
             OnRearrangeComplete?.Invoke();
             return;
@@ -115,14 +88,14 @@ public class WorldHorizontalLayout : MonoBehaviour
 
         Bounds parentBounds = GetParentBounds();
         float currentSpacing = spacing;
-        float totalWidth = (children.Count - 1) * currentSpacing;
+        float totalWidth = (values.Count - 1) * currentSpacing;
 
-        if (fitToParent && children.Count > 1)
+        if (fitToParent && values.Count > 1)
         {
             float parentWidth = parentBounds.size.x - 2 * edgeOffset;
             if (totalWidth > parentWidth)
             {
-                currentSpacing = parentWidth / (children.Count - 1);
+                currentSpacing = parentWidth / (values.Count - 1);
                 totalWidth = parentWidth;
             }
         }
@@ -142,10 +115,12 @@ public class WorldHorizontalLayout : MonoBehaviour
         }
 
         Sequence seq = DOTween.Sequence();
-        for (int i = 0; i < children.Count; i++)
+        int index = 0;
+        foreach (var kv in values)
         {
-            Vector3 target = startPos + Vector3.right * (i * currentSpacing);
-            seq.Join(children[i].DOLocalMove(target, 0.5f).SetEase(Ease.OutCubic));
+            Vector3 target = startPos + Vector3.right * (index * currentSpacing);
+            seq.Join(kv.Value.DOLocalMove(target, 0.5f).SetEase(Ease.OutCubic));
+            index++;
         }
         seq.OnComplete(() => OnRearrangeComplete?.Invoke());
     }
@@ -153,19 +128,18 @@ public class WorldHorizontalLayout : MonoBehaviour
     // -------------------- EDITOR --------------------
     private void UpdateLayoutEditor()
     {
-        GatherChildren();
-        if (children.Count == 0) return;
+        if (values.Count == 0) return;
 
         Bounds parentBounds = GetParentBounds();
         float currentSpacing = spacing;
-        float totalWidth = (children.Count - 1) * currentSpacing;
+        float totalWidth = (values.Count - 1) * currentSpacing;
 
-        if (fitToParent && children.Count > 1)
+        if (fitToParent && values.Count > 1)
         {
             float parentWidth = parentBounds.size.x - 2 * edgeOffset;
             if (totalWidth > parentWidth)
             {
-                currentSpacing = parentWidth / (children.Count - 1);
+                currentSpacing = parentWidth / (values.Count - 1);
                 totalWidth = parentWidth;
             }
         }
@@ -184,20 +158,101 @@ public class WorldHorizontalLayout : MonoBehaviour
                 break;
         }
 
-        for (int i = 0; i < children.Count; i++)
+        int index = 0;
+        foreach (var kv in values)
         {
-            children[i].localPosition = startPos + Vector3.right * (i * currentSpacing);
-            children[i].localScale = Vector3.one;
+            kv.Value.localPosition = startPos + Vector3.right * (index * currentSpacing);
+            kv.Value.localScale = Vector3.one;
+            index++;
         }
     }
 
     // -------------------- CLEAR --------------------
     public void ClearQueue()
     {
-        GatherChildren();
-        for (int i = children.Count - 1; i >= 0; i--)
+        foreach (var kv in new Dictionary<Dish, Transform>(values))
         {
-            RemoveObject(children[i]);
+            RemoveObject(kv.Key);
         }
+    }
+
+    // -------------------- NEXT SLOT --------------------
+    public Vector3 GetNextSlot(bool inWorldSpace = true)
+    {
+        int futureIndex = values.Count; // позиция нового элемента
+
+        Bounds parentBounds = GetParentBounds();
+        float currentSpacing = spacing;
+        float totalWidth = (futureIndex) * currentSpacing;
+
+        if (fitToParent && futureIndex > 1)
+        {
+            float parentWidth = parentBounds.size.x - 2 * edgeOffset;
+            if (totalWidth > parentWidth)
+            {
+                currentSpacing = parentWidth / (futureIndex);
+                totalWidth = parentWidth;
+            }
+        }
+
+        Vector3 startPos = Vector3.zero;
+        switch (startEdge)
+        {
+            case StartEdge.Left:
+                startPos = new Vector3(parentBounds.min.x + edgeOffset, 0f, 0f);
+                break;
+            case StartEdge.Center:
+                startPos = new Vector3(parentBounds.center.x - totalWidth / 2f, 0f, 0f);
+                break;
+            case StartEdge.Right:
+                startPos = new Vector3(parentBounds.max.x - totalWidth - edgeOffset, 0f, 0f);
+                break;
+        }
+
+        Vector3 localTarget = startPos + Vector3.right * (futureIndex * currentSpacing);
+        return inWorldSpace ? transform.TransformPoint(localTarget) : localTarget;
+    }
+
+    // -------------------- SLOT BY DISH --------------------
+    public Vector3 GetSlot(Dish dish, bool inWorldSpace = true)
+    {
+        if (!values.ContainsKey(dish))
+            return transform.position;
+
+        List<Dish> ordered = new List<Dish>(values.Keys);
+        int index = ordered.IndexOf(dish);
+
+        if (index < 0) return transform.position;
+
+        Bounds parentBounds = GetParentBounds();
+        float currentSpacing = spacing;
+        float totalWidth = (values.Count - 1) * currentSpacing;
+
+        if (fitToParent && values.Count > 1)
+        {
+            float parentWidth = parentBounds.size.x - 2 * edgeOffset;
+            if (totalWidth > parentWidth)
+            {
+                currentSpacing = parentWidth / (values.Count - 1);
+                totalWidth = parentWidth;
+            }
+        }
+
+        Vector3 startPos = Vector3.zero;
+        switch (startEdge)
+        {
+            case StartEdge.Left:
+                startPos = new Vector3(parentBounds.min.x + edgeOffset, 0f, 0f);
+                break;
+            case StartEdge.Center:
+                startPos = new Vector3(parentBounds.center.x - totalWidth / 2f, 0f, 0f);
+                break;
+            case StartEdge.Right:
+                startPos = new Vector3(parentBounds.max.x - totalWidth - edgeOffset, 0f, 0f);
+                break;
+        }
+
+        Vector3 localTarget = startPos + Vector3.right * (index * currentSpacing);
+        return inWorldSpace ? transform.TransformPoint(localTarget) : localTarget;
     }
 }

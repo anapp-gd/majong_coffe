@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Generic; 
 using UnityEngine;
 
 public class PlayState : State
@@ -20,18 +20,18 @@ public class PlayState : State
     }
 
     [SerializeField] protected Transform mergeEffect;
-    [SerializeField] protected Vector2 offset; 
+    [SerializeField] protected Vector2 offset;
+
     [SerializeField] protected Board board;
+    [SerializeField] protected ClientService service;
     public ServingWindow ServingWindow
     {
         get => _window; 
-    }
-    [SerializeField] protected ServingWindow window;
+    } 
     public ClientService ClientService
     {
         get => _client;
-    }
-    [SerializeField] protected ClientService client;
+    } 
 
     protected Board _board;
     protected ServingWindow _window;
@@ -60,15 +60,15 @@ public class PlayState : State
         int currentLevel = PlayerEntity.Instance.GetCurrentLevel;
 
         if (ConfigModule.GetConfig<LevelConfig>().TryGetLevelData(currentLevel, out var levelData))
-        {
+        { 
             _board = Instantiate(board);
             _board.Init(this, offset, levelData);
         }
 
-        _window = Instantiate(window);
+        _window = FindFirstObjectByType<ServingWindow>(); 
         _window.Init(this);
 
-        _client = Instantiate(client);
+        _client = Instantiate(service);
         _client.Init(this, _haseDish);
 
         _board.OnLose += Lose; 

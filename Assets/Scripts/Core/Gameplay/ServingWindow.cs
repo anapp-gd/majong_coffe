@@ -1,18 +1,22 @@
-﻿using System;
+﻿using DG.Tweening;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ServingWindow : MonoBehaviour
 {
+    [SerializeField] FlyIcon _flyIcon;
+
     private PlayState _state;
     public event Action<List<Dish>> OnServingUpdate;
     private List<Dish> _readyDishes = new();
     private PlayState.PlayStatus _status;
-
+    private WorldHorizontalLayout _layout;
     public void Init(PlayState state)
     {
         _state = state;
         _state.PlayStatusChanged += OnPlayStatusChange;
+        _layout = GetComponent<WorldHorizontalLayout>();
     }
 
     void OnPlayStatusChange(PlayState.PlayStatus playStatus)
@@ -25,17 +29,47 @@ public class ServingWindow : MonoBehaviour
     {
         if (_status != PlayState.PlayStatus.play) return;
 
-        if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
-        {
-            var playPanel = playCanvas.GetPanel<PlayPanel>();
-
-            playPanel.InvokeMoveTile(worldMergePos, dish);
-
-            Debug.Log($"{dish.Type} добавлено в окно выдачи");
-        }
+        InvokeMoveTile(worldMergePos, dish);
 
         _readyDishes.Add(dish); 
     }
+
+    void InvokeMoveTile(Vector3 mergeWorldPos, Dish dish)
+    {
+        if (_layout == null)
+        {
+            Debug.LogError("Layout не установлен!");
+            return;
+        }
+
+        // 1. Создаём иконку в мире
+        var flyIcon = Instantiate(_flyIcon);
+        flyIcon.InvokeFly(dish.Icon);
+        flyIcon.transform.position = mergeWorldPos;
+        flyIcon.transform.localScale = Vector3.zero;
+
+        // 2. Получаем целевой слот
+        Vector3 targetPos = _layout.GetNextSlot(); 
+
+        // 3. Настройки анимации
+        float duration = 0.3f;
+
+        // 4. Запускаем анимацию
+        flyIcon.PlayFlyWorld(targetPos, duration, () =>
+        {
+            // Проверяем, свободен ли слот к моменту завершения
+            if (_layout.AddObject(dish, flyIcon.transform))
+            { 
+                flyIcon.Finish(); // punch-эффект
+            }
+            else
+            {
+                // Слот занят — просто исчезаем
+                flyIcon.CancelFly();
+            }
+        });
+    }
+
 
     public bool TryTakeDish(Enums.DishType dishType, out Dish dish)
     {
@@ -57,12 +91,7 @@ public class ServingWindow : MonoBehaviour
         if (dish == null)
             return false;
 
-        if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
-        {
-            var playPanel = playCanvas.GetPanel<PlayPanel>();
-            playPanel.RemoveTile(dish);
-            Debug.Log($"{dish.Type} убрано из окна выдачи");
-        }
+        _layout.RemoveObject(dish);
 
         _readyDishes.Remove(dish);
 
