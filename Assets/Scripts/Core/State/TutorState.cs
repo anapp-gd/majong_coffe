@@ -122,7 +122,11 @@ public class TutorState : PlayState
 
         int indexScene = 0;
 
-        if (stage == 3) PlayerEntity.Instance.TutorDone = true;
+        if (stage == 3)
+        {
+            PlayerEntity.Instance.TutorDone = true;
+            AnalyticsHolder.TutorDone();
+        }
 
         PlayerEntity.Instance.TutorialStage = stage;
         PlayerEntity.Instance.Save(); 
@@ -131,6 +135,8 @@ public class TutorState : PlayState
         _status = PlayStatus.win;
 
         _audioSource.PlayOneShot(_audioWin);
+
+        AnalyticsHolder.Victory();
 
         if (stage == 1) indexScene = 4; 
 
@@ -157,15 +163,14 @@ public class TutorState : PlayState
 
     public override void Lose()
     {
-        if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
-        {
-            playCanvas.OpenPanel<LosePanel>(true).OpenWindow<LoseWindow>();
-        }
-
         InvokePlayStatusChanged(PlayStatus.lose);
         _status = PlayStatus.lose;
 
         _audioSource.PlayOneShot(_audioLose);
+
+        AnalyticsHolder.Defeat();
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     protected override void HandleTileClick(TileView clickedTile)

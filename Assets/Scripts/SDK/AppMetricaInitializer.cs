@@ -17,26 +17,18 @@ public static class AppMetricaInitializer
         _initialized = true;
 
 #if UNITY_EDITOR
-        // В редакторе просто сразу возвращаем Task
+        // В редакторе сразу возвращаем завершённый Task
         return Task.CompletedTask;
 #else
         var tcs = new TaskCompletionSource<bool>();
 
         try
         {
-#if UNITY_ANDROID || UNITY_IOS
-            // Создаем конфиг SDK
-            var config = new AppMetricaConfig("YOUR_API_KEY")
-            {
-                FirstActivationAsUpdate = !IsFirstLaunch()
-            };
-
-            AppMetrica.Activate(config);
-
-            // Можно добавить обработчики событий, если нужно
-            // Например, AppMetrica.OnRevenueEvent += ...
+#if UNITY_ANDROID
+            InitializeAndroid();
+#elif UNITY_IOS
+            InitializeiOS();
 #endif
-            // SDK активировался, считаем Task завершенным
             tcs.SetResult(true);
         }
         catch (System.Exception e)
@@ -49,9 +41,40 @@ public static class AppMetricaInitializer
 #endif
     }
 
+#if UNITY_ANDROID
+    private static void InitializeAndroid()
+    {
+        var androidApiKey = "4e6b8e7f-3e44-474f-b853-03a08334540d";
+
+        var config = new AppMetricaConfig(androidApiKey)
+        {
+            FirstActivationAsUpdate = !IsFirstLaunch()
+            // Можно добавить специфичные для Android настройки
+        };
+
+        AppMetrica.Activate(config);
+        Debug.Log("[AppMetrica] Android initialized");
+    }
+#endif
+
+#if UNITY_IOS
+    private static void InitializeiOS()
+    {
+        var iosApiKey = "c4c789a2-37ba-4970-a93d-1cab2f77c2a7";
+
+        var config = new AppMetricaConfig(iosApiKey)
+        {
+            FirstActivationAsUpdate = !IsFirstLaunch()
+            // Можно добавить специфичные для iOS настройки
+        };
+
+        AppMetrica.Activate(config);
+        Debug.Log("[AppMetrica] iOS initialized");
+    }
+#endif
+
     private static bool IsFirstLaunch()
     {
-        // Тут можно использовать PlayerPrefs или проверку файла
         const string key = "AppMetrica_FirstLaunch";
 
         if (PlayerPrefs.HasKey(key))

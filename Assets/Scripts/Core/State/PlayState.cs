@@ -163,6 +163,8 @@ public class PlayState : State
 
         InvokePlayStatusChanged(PlayStatus.win);
         _status = PlayStatus.win;
+
+        AnalyticsHolder.Victory();
     }
 
     public virtual void Lose()
@@ -174,7 +176,9 @@ public class PlayState : State
         }
 
         InvokePlayStatusChanged(PlayStatus.lose);
-       _status = PlayStatus.lose; 
+       _status = PlayStatus.lose;
+
+        AnalyticsHolder.Defeat();
     }
 
     protected virtual void HandleTileClick(TileView clickedTile)

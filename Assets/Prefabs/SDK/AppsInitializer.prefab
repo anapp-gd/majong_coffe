@@ -44,6 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60ee3c8311320e748b11a5fe2ceece49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  devKeyAndroid: FPvLwYMS72KXycgppD6iTm
+  devKey: FPvLwYMS72KXycgppD6iTm
   devKeyiOS: 
   appStoreAppID: 

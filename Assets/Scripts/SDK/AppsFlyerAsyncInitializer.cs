@@ -1,23 +1,13 @@
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-
-#if UNITY_IOS
 using AppsFlyerSDK;
-#endif
-
-#if UNITY_ANDROID
-using AppsFlyerSDK;
-#endif
+ 
 public class AppsFlyerInitializer : MonoBehaviour, IAppsFlyerConversionData
 {
     private TaskCompletionSource<bool> _tcs;
 
-    [SerializeField] private string devKeyAndroid;
-    [SerializeField] private string devKeyiOS;
-    [SerializeField] private string appStoreAppID;
-
+    string devKey = "FPvLwYMS72KXycgppD6iTm";
+    string appId = "6751897265";
     public async Task InitializeAsync()
     {
         _tcs = new TaskCompletionSource<bool>();
@@ -27,16 +17,15 @@ public class AppsFlyerInitializer : MonoBehaviour, IAppsFlyerConversionData
         await _tcs.Task;
         return;
 #endif
+        AppsFlyer.initSDK(devKey, appId, this);
+        AppsFlyer.startSDK();
 
 #if UNITY_ANDROID
-        AppsFlyer.initSDK(devKeyAndroid, Application.identifier, this);
-        AppsFlyer.startSDK();
-#elif UNITY_IOS
-        AppsFlyer.initSDK(devKeyiOS, appStoreAppID, this);
+#elif UNITY_IOS 
+        AppsFlyer.initSDK(devKey,appId, this);
         AppsFlyer.enableTCFDataCollection(true);
         AppsFlyer.startSDK();
-#endif
-
+#endif 
         await _tcs.Task; // ждём callback от AppsFlyer
     }
 
