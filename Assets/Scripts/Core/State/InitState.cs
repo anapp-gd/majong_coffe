@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class InitState : State
 {
+    [SerializeField] private AppsFlyerInitializer appsflyerRef;
     public static new InitState Instance => (InitState)State.Instance;
 
 #if UNITY_EDITOR
@@ -44,17 +45,15 @@ public class InitState : State
     private async Task InitializeSDKs()
     { 
         // 1. Запрашиваем трекинг (iOS ATT)
-        await iOSAdvertisementSupport.RequestTracking(); 
-        
-        // 2. AppsFlyer
-        var afInitializer = gameObject.AddComponent<AppsFlyerInitializer>();
-#if UNITY_ANDROID
-        afInitializer.devKeyAndroid = "YOUR_ANDROID_DEV_KEY";
-#elif UNITY_IOS
-    afInitializer.devKeyiOS = "YOUR_IOS_DEV_KEY";
-    afInitializer.appStoreAppID = "YOUR_APPSTORE_APP_ID";
-#endif
-        await afInitializer.InitializeAsync();
+        await iOSAdvertisementSupport.RequestTracking();
+
+        // 2. AppsFlyer  
+        await Instantiate(appsflyerRef).InitializeAsync();
+
+        // 3. AppMetrica
+        await AppMetricaInitializer.InitializeAsync();
+
+        await GameAnalyticsInitializer.InitializeAsync();
     }
 
     private void LoadTargetScene()
