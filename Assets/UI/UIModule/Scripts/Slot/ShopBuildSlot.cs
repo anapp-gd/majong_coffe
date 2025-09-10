@@ -29,14 +29,13 @@ public class ShopBuildSlot : SourceSlot
     }
 
     public override void UpdateView()
-    { 
+    {
         if (Data)
         {
             var interfaceConfig = ConfigModule.GetConfig<InterfaceConfig>();
-
             var list = PlayerEntity.Instance.Data;
 
-            isBuyed = list.Exists(_ => _.Type == Data.ItemData.Type);
+            isBuyed = list.Exists(_ => _.Level == Data.ItemData.Level);
 
             gameObject.SetActive(true);
 
@@ -44,7 +43,13 @@ public class ShopBuildSlot : SourceSlot
             _titleCost.text = $"{Data.ItemData.Cost}";
             _titleName.text = $"{Data.ItemData.Name}";
             _titleLevel.text = $"LEVEL {Data.ItemData.Level}";
-              
+
+            bool hasPrevious = true;
+            if (Data.ItemData.Level > 1) // если не первый уровень
+            {
+                hasPrevious = list.Exists(_ => _.Level == Data.ItemData.Level - 1);
+            }
+
             if (isBuyed)
             {
                 _listner.SetInteractable(false);
@@ -53,16 +58,21 @@ public class ShopBuildSlot : SourceSlot
             }
             else
             {
-                _listner.SetInteractable(true);
-                _buyBtn.interactable = true;
-                _buyImage.sprite = interfaceConfig.BuyButton;
+                // можно покупать только если предыдущий уровень куплен
+                bool canBuy = hasPrevious && PlayerEntity.Instance.GetResource >= Data.ItemData.Cost;
 
-                if (PlayerEntity.Instance.GetResource < Data.ItemData.Cost)
+                _listner.SetInteractable(canBuy);
+                _buyBtn.interactable = canBuy;
+
+                if (!hasPrevious || PlayerEntity.Instance.GetResource < Data.ItemData.Cost)
                 {
-                    _buyBtn.image.sprite = interfaceConfig.CantBuyButton;
+                    _buyImage.sprite = interfaceConfig.CantBuyButton;
+                }
+                else
+                {
+                    _buyImage.sprite = interfaceConfig.BuyButton;
                 }
             }
-
         }
         else
         {

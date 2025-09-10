@@ -35,7 +35,7 @@ public class FlyIcon : MonoBehaviour
         _flySequence = DOTween.Sequence();
 
         // Этап 1: поп-ап
-        _flySequence.Append(transform.DOScale(1.2f, 0.25f).SetEase(Ease.OutBack));
+        _flySequence.Append(transform.DOScale(1.1f, 0.25f).SetEase(Ease.OutBack));
 
         // Этап 2: полёт
         _flySequence.Append(transform.DOMove(endWorldPos, duration).SetEase(Ease.InOutCubic));

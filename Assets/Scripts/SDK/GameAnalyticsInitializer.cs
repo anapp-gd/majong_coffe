@@ -31,7 +31,8 @@ public static class GameAnalyticsInitializer
             Debug.LogError($"[GameAnalytics] Initialization error: {e}");
             tcs.SetResult(true);
         }
-
+        
+        AnalyticsHolder.Register(new GameAnalyticsProvider());
         return tcs.Task;
 #endif
     }

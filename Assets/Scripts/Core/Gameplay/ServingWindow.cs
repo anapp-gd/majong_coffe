@@ -57,7 +57,7 @@ public class ServingWindow : MonoBehaviour
         Vector3 targetPos = _layout.GetNextSlot(); 
 
         // 3. Настройки анимации
-        float duration = 0.3f;
+        float duration = 0.2f;
 
         _currentIconsFly.Add(flyIcon);
 
@@ -79,10 +79,7 @@ public class ServingWindow : MonoBehaviour
         _readyDishes.Add(dish);
         _currentIconsFly.Remove(icon);
 
-        if (_currentInGameCountDishes >= 5)
-        {
-            _state.ForceTakeDish();
-        }
+        if (_currentInGameCountDishes >= 5) _state.ForceTakeDish(); 
     }
 
     public void Finish()

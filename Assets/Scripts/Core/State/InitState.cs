@@ -57,10 +57,6 @@ public class InitState : State
 
         await FacebookInitializer.InitializeAsync();
          
-        AnalyticsHolder.Register(new AppsFlyerProvider());
-        AnalyticsHolder.Register(new AppMetricaProvider());
-        AnalyticsHolder.Register(new GameAnalyticsProvider());
-        AnalyticsHolder.Register(new FacebookProvider());
     }
 
     private void LoadTargetScene()

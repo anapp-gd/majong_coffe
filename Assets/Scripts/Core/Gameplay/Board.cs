@@ -34,41 +34,44 @@ public class Board : MonoBehaviour
         _layersCount = data.layersCount;
         CurrentLayer = _layersCount - 1;
         _state.SetHashDishes = data.dishes;
-         
-        int maxX = 0, maxY = 0;
+
+        // --- Находим границы сетки
+        int minX = int.MaxValue, maxX = int.MinValue;
+        int minY = int.MaxValue, maxY = int.MinValue;
+
         foreach (var t in data.tiles)
         {
-            if (t.WorldPos.x > maxX) maxX = t.GridPos.x;
-            if (t.WorldPos.y > maxY) maxY = t.GridPos.y;
+            if (t.GridPos.x < minX) minX = t.GridPos.x;
+            if (t.GridPos.x > maxX) maxX = t.GridPos.x;
+            if (t.GridPos.y < minY) minY = t.GridPos.y;
+            if (t.GridPos.y > maxY) maxY = t.GridPos.y;
         }
 
-        float offsetX = -(maxX * tileSizeX) / 2f + customOffset.x;
-        float offsetY = -(maxY * tileSizeY) / 2f + customOffset.y;
+        // Центрирование по X, с учётом размера тайла
+        float centerX = ((minX + maxX) / 2f) * tileSizeX;
+        // Центрирование по Y (но можно смещать только customOffset.y)
+        float centerY = ((minY + maxY) / 2f) * tileSizeY;
 
         foreach (var tileData in data.tiles)
         {
             Vector3 worldPos = new Vector3
             (
-                tileData.WorldPos.x * tileSizeX + offsetX,
-                tileData.WorldPos.y * tileSizeY + offsetY,
+                tileData.WorldPos.x * tileSizeX - centerX,
+                tileData.WorldPos.y * tileSizeY - centerY + customOffset.y,
                 0f
             );
-             
-            var tile = Instantiate(tileViewPrefab, worldPos, Quaternion.identity, transform); 
+
+            var tile = Instantiate(tileViewPrefab, worldPos, Quaternion.identity, transform);
             tile.Init(state, tileData, tileData.TileType, tileData.Layer);
 
             _allTiles.Add(tile);
 
             if (tile.IsAvailable())
-            {
                 tile.Enable();
-            }
             else
-            { 
                 tile.Disable();
-            } 
         }
-    } 
+    }
 
     void OnStatusChange(PlayState.PlayStatus playStatus)
     {

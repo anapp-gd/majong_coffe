@@ -72,7 +72,7 @@ public static class MadjongGenerator
 
     // событие, чтобы UI мог подписаться и обновиться
     public static event Action OnTilesUpdated;
-     
+
     // --- Генерация ---
     public static (List<TileData> tiles, HashSet<Enums.DishType> dishes, int layersCount) Generate(LevelData data)
     {
@@ -83,7 +83,10 @@ public static class MadjongGenerator
         int pairsLeft = data.pairsCount;
         int actualLayers = 0;
 
-        var baseCells = new List<(Vector2 pos, Enums.TileType tile)>();
+        var fixedCells = new List<(Vector2 pos, Enums.TileType tile)>();
+        var randomCells = new List<(Vector2 pos, Enums.TileType tile)>();
+
+        // --- Разбираем базовый слой
         for (int y = 0; y < data.height; y++)
         {
             for (int x = 0; x < data.width; x++)
@@ -91,33 +94,35 @@ public static class MadjongGenerator
                 int index = y * data.width + x;
                 int cellValue = data.baseLayer[index];
 
-                if (cellValue == 0) continue; // пусто, пропускаем
+                if (cellValue == 0) continue; // пусто
 
-                Enums.TileType tile;
                 if (cellValue == 1) // Random
                 {
                     if (data.availableTileTypes.Count == 0) continue;
-                    tile = data.availableTileTypes[UnityEngine.Random.Range(0, data.availableTileTypes.Count)];
+                    var tile = data.availableTileTypes[UnityEngine.Random.Range(0, data.availableTileTypes.Count)];
+                    randomCells.Add((new Vector2(x, y), tile));
                 }
-                else // Конкретный тайл (Enum)
+                else // Конкретный тайл
                 {
-                    tile = (Enums.TileType)(cellValue - 2);
+                    var tile = (Enums.TileType)(cellValue - 2);
+                    fixedCells.Add((new Vector2(x, y), tile));
                 }
-
-                baseCells.Add((new Vector2(x, y), tile));
             }
         }
 
-        PlacePairsOnLayer(baseCells, 0, data, result, availableDishes, ref pairsLeft);
+        // --- Сначала фиксированные тайлы
+        PlaceFixedPairs(fixedCells, 0, result, availableDishes, ref pairsLeft);
+        // --- Потом случайные тайлы
+        PlacePairsOnLayer(randomCells, 0, data, result, availableDishes, ref pairsLeft);
+
         actualLayers++;
 
-        // остальные слои (пирамида)
+        // --- Остальные слои пирамиды (только рандом)
         for (int layer = 1; layer < data.layersCount; layer++)
         {
             var positions = GeneratePyramidLayerMask(layer);
             if (positions.Count == 0) break;
 
-            // для пирамиды используем Random тайлы
             var positionsWithTile = new List<(Vector2, Enums.TileType)>();
             foreach (var pos in positions)
             {
@@ -131,6 +136,44 @@ public static class MadjongGenerator
 
         OnTilesUpdated?.Invoke();
         return (result, availableDishes, actualLayers);
+    }
+
+    /// <summary>
+    /// Создаём пары из фиксированных тайлов — без подмены типов
+    /// </summary>
+    private static void PlaceFixedPairs(
+        List<(Vector2 pos, Enums.TileType tile)> positions,
+        int layer,
+        List<TileData> result,
+        HashSet<Enums.DishType> availableDishes,
+        ref int pairsLeft)
+    {
+        if (positions.Count % 2 != 0)
+            positions.RemoveAt(positions.Count - 1);
+
+        positions.Sort((a, b) => a.pos.x.CompareTo(b.pos.x));
+
+        while (pairsLeft > 0 && positions.Count >= 2)
+        {
+            var (wp1, t1) = positions[0];
+            var (wp2, t2) = positions[1];
+            positions.RemoveRange(0, 2);
+
+            // Оба тайла сохраняем строго как есть
+            if (DishMapping.TryGetDish(t1, out var dish1)) availableDishes.Add(dish1);
+            if (DishMapping.TryGetDish(t2, out var dish2)) availableDishes.Add(dish2);
+
+            var td1 = new TileData(wp1, Vector2Int.RoundToInt(wp1), layer, t1);
+            var td2 = new TileData(wp2, Vector2Int.RoundToInt(wp2), layer, t2);
+
+            result.Add(td1);
+            result.Add(td2);
+
+            gridAll[new GridPos3(wp1, layer)] = td1;
+            gridAll[new GridPos3(wp2, layer)] = td2;
+
+            pairsLeft--;
+        }
     }
     private static void PlacePairsOnLayer(
     List<(Vector2 pos, Enums.TileType tile)> positions,

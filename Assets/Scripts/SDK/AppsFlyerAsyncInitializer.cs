@@ -18,14 +18,14 @@ public class AppsFlyerInitializer : MonoBehaviour, IAppsFlyerConversionData
         return;
 #endif
         AppsFlyer.initSDK(devKey, appId, this);
-        AppsFlyer.startSDK();
-
+        AppsFlyer.startSDK(); 
 #if UNITY_ANDROID
-#elif UNITY_IOS 
+#elif UNITY_IOS
         AppsFlyer.initSDK(devKey,appId, this);
         AppsFlyer.enableTCFDataCollection(true);
         AppsFlyer.startSDK();
-#endif 
+#endif
+        AnalyticsHolder.Register(new AppsFlyerProvider());
         await _tcs.Task; // ждём callback от AppsFlyer
     }
 

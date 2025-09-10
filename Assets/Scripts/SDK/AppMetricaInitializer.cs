@@ -36,7 +36,8 @@ public static class AppMetricaInitializer
             Debug.LogError($"[AppMetrica] Initialization error: {e}");
             tcs.SetResult(true); // даже при ошибке продолжаем пайплайн
         }
-
+        
+        AnalyticsHolder.Register(new AppMetricaProvider());
         return tcs.Task;
 #endif
     }

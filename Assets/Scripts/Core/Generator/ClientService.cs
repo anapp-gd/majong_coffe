@@ -67,13 +67,17 @@ public class ClientService : MonoBehaviour
 
     public void ForceTakeDish()
     { 
-        var firstClient = _clients[0];
+        /*var firstClient = _clients[0];
 
         if (firstClient != null)
         {
             firstClient.TryTakeDish();
-        }
+        }*/
 
+        foreach (var client in _clients)
+        { 
+            client.TryTakeDish();
+        }
         _takeTimer = _clientDelayTake;
     }
 

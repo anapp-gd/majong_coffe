@@ -45,5 +45,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileViewPrefab: {fileID: 4882771979855935371, guid: f5cb1e2d20bbb4c4f92ed6b6f02a0019, type: 3}
-  tileSizeX: 1.51
-  tileSizeY: 1.7
+  tileSizeX: 2.1
+  tileSizeY: 2.7

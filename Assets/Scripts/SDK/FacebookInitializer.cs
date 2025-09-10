@@ -37,6 +37,7 @@ public static class FacebookInitializer
         if (FB.IsInitialized)
         {
             FB.ActivateApp();
+            AnalyticsHolder.Register(new FacebookProvider());
             _tcs.TrySetResult(true);
         }
         else

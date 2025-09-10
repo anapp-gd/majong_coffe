@@ -14,7 +14,7 @@ public class WorldHorizontalLayout : MonoBehaviour
     [SerializeField] private float edgeOffset = 0.5f;
     [SerializeField] private bool fitToParent = true;
 
-    private Dictionary<Dish, Transform> values = new Dictionary<Dish, Transform>();
+    private Dictionary<Dish, Transform> _values = new Dictionary<Dish, Transform>();
 
     // --- Callbacks ---
     public event Action<Dish, Transform> OnAddStart;
@@ -29,7 +29,7 @@ public class WorldHorizontalLayout : MonoBehaviour
             UpdateLayoutEditor();
     }
 
-    public int GetSlotCount() => values.Count;
+    public int GetSlotCount() => _values.Count;
 
     private Bounds GetParentBounds()
     {
@@ -41,13 +41,13 @@ public class WorldHorizontalLayout : MonoBehaviour
     public bool AddObject(Dish dish, Transform obj, Action addCallback)
     {
         if (dish == null || obj == null) return false;
-        if (values.Count >= maxCount) return false; // очередь полная
-        if (values.ContainsKey(dish)) return false; // уже добавлен
+        if (_values.Count >= maxCount) return false; // очередь полная
+        if (_values.ContainsKey(dish)) return false; // уже добавлен
 
         obj.SetParent(transform);
         obj.localScale = Vector3.zero;
 
-        values.Add(dish, obj);
+        _values.Add(dish, obj);
         OnAddStart?.Invoke(dish, obj);
 
         // Анимация появления + перестройка
@@ -62,15 +62,15 @@ public class WorldHorizontalLayout : MonoBehaviour
     // -------------------- REMOVE --------------------
     public void RemoveObject(Dish dish)
     {
-        if (dish == null || !values.ContainsKey(dish)) return;
+        if (dish == null || !_values.ContainsKey(dish)) return;
 
-        Transform obj = values[dish];
+        Transform obj = _values[dish];
         OnRemoveStart?.Invoke(dish, obj);
 
         // Анимация исчезновения
         obj.DOScale(Vector3.zero, 0.25f).SetEase(Ease.InBack).OnComplete(() =>
         {
-            values.Remove(dish);
+            _values.Remove(dish);
             Destroy(obj.gameObject);
             UpdateLayoutAnimated();
             OnRemoveComplete?.Invoke(dish, obj);
@@ -80,7 +80,7 @@ public class WorldHorizontalLayout : MonoBehaviour
     // -------------------- UPDATE LAYOUT --------------------
     private void UpdateLayoutAnimated()
     {
-        if (values.Count == 0)
+        if (_values.Count == 0)
         {
             OnRearrangeComplete?.Invoke();
             return;
@@ -88,14 +88,14 @@ public class WorldHorizontalLayout : MonoBehaviour
 
         Bounds parentBounds = GetParentBounds();
         float currentSpacing = spacing;
-        float totalWidth = (values.Count - 1) * currentSpacing;
+        float totalWidth = (_values.Count - 1) * currentSpacing;
 
-        if (fitToParent && values.Count > 1)
+        if (fitToParent && _values.Count > 1)
         {
             float parentWidth = parentBounds.size.x - 2 * edgeOffset;
             if (totalWidth > parentWidth)
             {
-                currentSpacing = parentWidth / (values.Count - 1);
+                currentSpacing = parentWidth / (_values.Count - 1);
                 totalWidth = parentWidth;
             }
         }
@@ -116,7 +116,7 @@ public class WorldHorizontalLayout : MonoBehaviour
 
         Sequence seq = DOTween.Sequence();
         int index = 0;
-        foreach (var kv in values)
+        foreach (var kv in _values)
         {
             Vector3 target = startPos + Vector3.right * (index * currentSpacing);
             seq.Join(kv.Value.DOLocalMove(target, 0.5f).SetEase(Ease.OutCubic));
@@ -128,18 +128,19 @@ public class WorldHorizontalLayout : MonoBehaviour
     // -------------------- EDITOR --------------------
     private void UpdateLayoutEditor()
     {
-        if (values.Count == 0) return;
+        int childCount = transform.childCount;
+        if (childCount == 0) return;
 
         Bounds parentBounds = GetParentBounds();
         float currentSpacing = spacing;
-        float totalWidth = (values.Count - 1) * currentSpacing;
+        float totalWidth = (childCount - 1) * currentSpacing;
 
-        if (fitToParent && values.Count > 1)
+        if (fitToParent && childCount > 1)
         {
             float parentWidth = parentBounds.size.x - 2 * edgeOffset;
             if (totalWidth > parentWidth)
             {
-                currentSpacing = parentWidth / (values.Count - 1);
+                currentSpacing = parentWidth / (childCount - 1);
                 totalWidth = parentWidth;
             }
         }
@@ -158,19 +159,17 @@ public class WorldHorizontalLayout : MonoBehaviour
                 break;
         }
 
-        int index = 0;
-        foreach (var kv in values)
+        for (int i = 0; i < childCount; i++)
         {
-            kv.Value.localPosition = startPos + Vector3.right * (index * currentSpacing);
-            kv.Value.localScale = Vector3.one;
-            index++;
+            Transform child = transform.GetChild(i);
+            child.localPosition = startPos + Vector3.right * (i * currentSpacing);
+            child.localScale = Vector3.one;
         }
     }
-
     // -------------------- CLEAR --------------------
     public void ClearQueue()
     {
-        foreach (var kv in new Dictionary<Dish, Transform>(values))
+        foreach (var kv in new Dictionary<Dish, Transform>(_values))
         {
             RemoveObject(kv.Key);
         }
@@ -179,7 +178,7 @@ public class WorldHorizontalLayout : MonoBehaviour
     // -------------------- NEXT SLOT --------------------
     public Vector3 GetNextSlot(bool inWorldSpace = true)
     {
-        int futureIndex = values.Count; // позиция нового элемента
+        int futureIndex = _values.Count; // позиция нового элемента
 
         Bounds parentBounds = GetParentBounds();
         float currentSpacing = spacing;
@@ -216,24 +215,24 @@ public class WorldHorizontalLayout : MonoBehaviour
     // -------------------- SLOT BY DISH --------------------
     public Vector3 GetSlot(Dish dish, bool inWorldSpace = true)
     {
-        if (!values.ContainsKey(dish))
+        if (!_values.ContainsKey(dish))
             return transform.position;
 
-        List<Dish> ordered = new List<Dish>(values.Keys);
+        List<Dish> ordered = new List<Dish>(_values.Keys);
         int index = ordered.IndexOf(dish);
 
         if (index < 0) return transform.position;
 
         Bounds parentBounds = GetParentBounds();
         float currentSpacing = spacing;
-        float totalWidth = (values.Count - 1) * currentSpacing;
+        float totalWidth = (_values.Count - 1) * currentSpacing;
 
-        if (fitToParent && values.Count > 1)
+        if (fitToParent && _values.Count > 1)
         {
             float parentWidth = parentBounds.size.x - 2 * edgeOffset;
             if (totalWidth > parentWidth)
             {
-                currentSpacing = parentWidth / (values.Count - 1);
+                currentSpacing = parentWidth / (_values.Count - 1);
                 totalWidth = parentWidth;
             }
         }

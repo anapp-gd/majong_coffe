@@ -35,21 +35,6 @@ public class Client : MonoBehaviour
         if (_window.TryTakeDish(_wantedDish, out Dish dish))
         {
             if (_wantedDish == dish.Type)
-                Leave(dish, success: true);
-            else
-                Leave(dish, success: false);
-        }
-        else
-        {
-            Leave(null, success: false);
-        }
-    }
-
-    public void TryTakeDish()
-    {
-        if (_window.TryTakeDish(_wantedDish, out Dish dish))
-        {
-            if (_wantedDish == dish.Type)
                 FinalyLeave(dish, success: true);
             else
                 FinalyLeave(dish, success: false);
@@ -60,17 +45,29 @@ public class Client : MonoBehaviour
         }
     }
 
+    public void TryTakeDish()
+    {
+        if (_window.TryTakeDish(_wantedDish, out Dish dish))
+        {
+            if (_wantedDish == dish.Type)
+                Leave(dish, success: true);
+            else
+                Leave(dish, success: false);
+        }
+        else
+        {
+            Leave(null, success: false);
+        }
+    }
+
     void FinalyLeave(Dish dish, bool success)
     {
-        int value = 0;
-        Transform reaction = null;
-
+        int value = 0; 
         if (!success)
         {
             if (dish == null)
             {
-                Debug.Log("Клиент ушёл недовольным! (не осталось блюд)");
-                reaction = _angryReaction;
+                Debug.Log("Клиент ушёл недовольным! (не осталось блюд)"); 
             }
             else
             {
@@ -78,8 +75,7 @@ public class Client : MonoBehaviour
                 {
                     value = 5;
                     Debug.Log($"Клиент ушёл недовольным! Хотел {_wantedDish}, а получил {dish.Type}");
-                }
-                reaction = _sadReaction;
+                } 
             }
         }
         else
@@ -88,8 +84,7 @@ public class Client : MonoBehaviour
             {
                 value = 10;
                 Debug.Log($"Клиент ушёл довольный! Получил {_wantedDish}");
-            }
-            reaction = _happyReaction;
+            } 
         }
 
         PlayState.Instance.AddValue(value);
