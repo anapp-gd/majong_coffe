@@ -17,5 +17,5 @@ MonoBehaviour:
     Level: 6
     Icon: {fileID: 21300000, guid: 94cd6b33b31d59a4db9cc7d269421546, type: 3}
     Type: 5
-    Cost: 95
+    Cost: 160
     Name: Table
