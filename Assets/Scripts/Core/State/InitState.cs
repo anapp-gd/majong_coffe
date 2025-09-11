@@ -12,11 +12,10 @@ public class InitState : State
 #endif
     [SerializeField] private string targetSceneName;
 
+
     protected override void Awake()
-    { 
-
+    {
     }
-
     protected override void Start()
     {
         // «апускаем централизованную инициализацию
@@ -75,6 +74,7 @@ public class InitState : State
         if (TargetScene)
             targetSceneName = TargetScene.name;
     }
+
 #endif
 }
 

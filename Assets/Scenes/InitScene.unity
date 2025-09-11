@@ -683,6 +683,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
     - target: {fileID: 7365618771064245615, guid: fd98ee1c8d28f464aad91bcb00df3e38, type: 3}
+      propertyPath: worldHeight
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 7365618771064245615, guid: fd98ee1c8d28f464aad91bcb00df3e38, type: 3}
       propertyPath: appsflyerRef
       value: 
       objectReference: {fileID: 2814685975503801642, guid: 9d210cbf05e9ddd42b0f526118250e16, type: 3}

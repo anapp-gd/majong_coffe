@@ -44,3 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0d26d44d5f0d32468477c6a22f56e4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  referenceWidth: 720
+  referenceHeight: 1280
+  worldHeight: 100
+  _particleBuild: {fileID: 0}

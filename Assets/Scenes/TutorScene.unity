@@ -3608,7 +3608,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 166634846}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c88f5cead0c0b2a4eb05b5900433f8d1, type: 3}
   m_Name: 
@@ -3660,7 +3660,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 17.8125
+  orthographic size: 15
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -43737,6 +43737,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9384f850244e79448f4e6972bded73b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  referenceWidth: 720
+  referenceHeight: 1280
+  referenceOrthoSize: 9
+  matchWidthOrHeight: 0.5
   _audioWin: {fileID: 8300000, guid: 7853087ec8d5efe41acb54de3bcb9aff, type: 3}
   _audioLose: {fileID: 8300000, guid: aa292f7353d9ada4c97bc145878af245, type: 3}
   mergeEffect: {fileID: 4375348493407302, guid: 2939296a1af999d4e97dc4981f9093a2, type: 3}

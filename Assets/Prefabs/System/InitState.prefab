@@ -44,5 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6f182cecfb5ba345a818286a6398c95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  referenceWidth: 720
+  referenceHeight: 1280
+  worldHeight: 100
+  appsflyerRef: {fileID: 0}
   TargetScene: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
   targetSceneName: MenuScene

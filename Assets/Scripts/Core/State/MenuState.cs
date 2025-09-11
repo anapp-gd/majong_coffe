@@ -106,5 +106,6 @@ public class MenuState : State
     public void Play()
     {
         SceneManager.LoadScene(2);
-    } 
+    }
+
 }

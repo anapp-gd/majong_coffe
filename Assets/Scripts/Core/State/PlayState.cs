@@ -54,7 +54,7 @@ public class PlayState : State
     protected WinConditions _winConditions; 
 
     protected override void Awake()
-    {
+    { 
         _audioSource = gameObject.AddComponent<AudioSource>();
 
         int currentLevel = PlayerEntity.Instance.GetCurrentLevel;
