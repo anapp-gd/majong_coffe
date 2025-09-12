@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ClientService : MonoBehaviour
@@ -14,7 +15,8 @@ public class ClientService : MonoBehaviour
 
     private PlayState _state;
     private float _spawnTimer = 1f;
-    private List<Client> _clients = new List<Client>();
+    private List<Client> _clients = new();
+    private List<Enums.DishType> _orders = new();
     private PlayState.PlayStatus _status;
     private HashSet<Enums.DishType> _availableDishes;
 
@@ -25,20 +27,25 @@ public class ClientService : MonoBehaviour
         _availableDishes = availableDishes;
         _spawnPoint = GameObject.FindWithTag("SpawnPoint").transform;
 
-        var gameConfig = ConfigModule.GetConfig<GameConfig>();
+        var gameConfig = ConfigModule.GetConfig<GameConfig>(); 
 
         _spawnInterval = gameConfig.ClientSpawnDelay;
         _maxClients = gameConfig.MaxClientCount;
-        _clientDelayTake = gameConfig.ClientTakeDelay; 
-    }
+        _clientDelayTake = gameConfig.ClientTakeDelay;
 
-    public void Finish()
-    {
-        foreach (var client in _clients)
-        {
-            client.FinishTakeDish();
+        var orders = _state.GetTilesInOrder();
+
+        orders.Reverse();
+
+        foreach (var order in orders)
+        { 
+            if (DishMapping.TryGetDish(order.First.TileType, out var dish))
+            {
+                _orders.Add(dish);
+            }
         }
     }
+
     void OnPlayStatusChange(PlayState.PlayStatus status)
     {
         _status = status;
@@ -64,55 +71,73 @@ public class ClientService : MonoBehaviour
             _spawnTimer = _spawnInterval;
         }
     }
+    public void Finish()
+    {
+        int index = 0;
 
-    public void ForceTakeDish()
-    { 
-        /*var firstClient = _clients[0];
-
-        if (firstClient != null)
+        while (index < _clients.Count && _orders.Count > 0)
         {
-            firstClient.TryTakeDish();
-        }*/
+            var client = _clients[index];
 
-        foreach (var client in _clients)
-        { 
-            client.TryTakeDish();
+            if (client.FinishTakeDish(_orders[0]))
+            {
+                _orders.RemoveAt(0); // заказ убираем
+            }
+
+            index++; // двигаемся к следующему клиенту, чтобы не застрять
         }
-        _takeTimer = _clientDelayTake;
+
+        UpdateUI();
     }
 
+    public void ForceTakeDish()
+    {
+        int index = 0;
+
+        while (index < _clients.Count && _orders.Count > 0)
+        {
+            var client = _clients[index];
+
+            if (client.TryTakeDish(_orders[0]))
+            {
+                _orders.RemoveAt(0);
+                index++;
+            }
+        }
+
+        _takeTimer = _clientDelayTake;
+        UpdateUI();
+    }
     private void HandleTaking()
     {
-        if (_clients.Count == 0) return;
+        if (_clients.Count == 0 || _orders.Count == 0) return;
 
         _takeTimer -= Time.deltaTime;
         if (_takeTimer <= 0f)
         {
-            // всегда первый в очереди пытается взять
             var firstClient = _clients[0];
             if (firstClient != null)
             {
-                firstClient.TryTakeDish(); // у клиента метод, который решает "получилось/нет"
+                if (firstClient.TryTakeDish(_orders[0]))
+                { 
+                    _orders.RemoveAt(0);                 // удаляем заказ 
+                    UpdateUI();                          // обновляем UI
+                }
             }
 
             _takeTimer = _clientDelayTake;
         }
     }
-
     private void SpawnClient()
-    {
-        var dish = GetRandomDish();
-
-        // позиция в очереди: SpawnPoint - первый, дальше с отступами
+    { 
         Vector3 spawnPos = _spawnPoint.position + Vector3.right * (_clients.Count * _queueSpacing);
 
         var client = Instantiate(clientPrefab, spawnPos, Quaternion.identity);
-        client.Init(dish, _state.ServingWindow, OnClientLeft); // убираем локальный таймер
+        client.Init(_state.ServingWindow, OnClientLeft);
 
         _clients.Add(client);
 
-        UpdateUI();
-        Debug.Log($"Новый клиент заказал: {dish}");
+        UpdateUI(); 
     }
 
     private Enums.DishType GetRandomDish()
@@ -163,9 +188,10 @@ public class ClientService : MonoBehaviour
         {
             if (playCanvas.TryGetPanel<PlayPanel>(out var panel))
             {
-                var dishes = new List<Enums.DishType>();
-                foreach (var c in _clients)
-                    dishes.Add(c.WantedType);
+                // Берём первые 3 заказа из _orders
+                var dishes = _orders
+                    .Take(3)
+                    .ToList();
 
                 panel.GetWindow<TipWindow>().UpdateSlots(dishes);
             }

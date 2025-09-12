@@ -111,6 +111,11 @@ public class PlayState : State
         _resultValue += value;
     }
 
+    public List<MadjongGenerator.TilePair> GetTilesInOrder()
+    {
+        return _board.GetTilesInOrder();
+    }
+
     public List<Enums.TileType> GetAvaiablesTiles()
     {
         return _board.GetAvaiableTiles();

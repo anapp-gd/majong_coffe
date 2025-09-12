@@ -98,27 +98,20 @@ public class ServingWindow : MonoBehaviour
             return false;
 
         if (_readyDishes == null || _readyDishes.Count == 0)
-            return false; // нет блюд вообще
+            return false; // нет блюд вообще    
 
-        // пробуем найти нужное
-        dish = _readyDishes.Find(d => d.Type == dishType);
-
-        // если нужного нет → берём первый
-        if (dish == null)
-            dish = _readyDishes[0];
-
-        if (dish == null)
-            return false;
+        // всегда берём первый добавленный (FIFO)
+        dish = _readyDishes[0];
 
         _layout.RemoveObject(dish);
-
-        _readyDishes.Remove(dish);
+        _readyDishes.RemoveAt(0);
 
         _currentInGameCountDishes--;
 
         if (_readyDishes.Count == 0)
             _state.SetTableClear();
 
+        // возвращаем true — клиент сам решает, совпал ли тип
         return true;
     } 
 }

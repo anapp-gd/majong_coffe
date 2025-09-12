@@ -6,16 +6,12 @@ public class Client : MonoBehaviour
     [SerializeField] private Sprite[] _views;
     [SerializeField] private Transform _happyReaction;
     [SerializeField] private Transform _angryReaction;
-    [SerializeField] private Transform _sadReaction;
-    public Enums.DishType WantedType => _wantedDish;
-
-    private Enums.DishType _wantedDish;
+    [SerializeField] private Transform _sadReaction; 
     private ServingWindow _window;
     private System.Action<Client> _onLeave;
 
-    public void Init(Enums.DishType dish, ServingWindow window, System.Action<Client> onLeave)
-    {
-        _wantedDish = dish;
+    public void Init(ServingWindow window, System.Action<Client> onLeave)
+    { 
         _window = window;
         _onLeave = onLeave;
 
@@ -30,33 +26,37 @@ public class Client : MonoBehaviour
         _sadReaction?.gameObject.SetActive(false);
     }
 
-    public void FinishTakeDish()
+    public bool FinishTakeDish(Enums.DishType targetDish)
     {
-        if (_window.TryTakeDish(_wantedDish, out Dish dish))
+        if (_window.TryTakeDish(targetDish, out Dish dish))
         {
-            if (_wantedDish == dish.Type)
+            if (targetDish == dish.Type)
                 FinalyLeave(dish, success: true);
             else
                 FinalyLeave(dish, success: false);
+            return true;
         }
         else
         {
             FinalyLeave(null, success: false);
+            return false;
         }
     }
 
-    public void TryTakeDish()
+    public bool TryTakeDish(Enums.DishType targetDish)
     {
-        if (_window.TryTakeDish(_wantedDish, out Dish dish))
+        if (_window.TryTakeDish(targetDish, out Dish dish))
         {
-            if (_wantedDish == dish.Type)
+            if (targetDish == dish.Type)
                 Leave(dish, success: true);
             else
-                Leave(dish, success: false);
+                Leave(dish, success: false); 
+            return true;
         }
         else
         {
-            Leave(null, success: false);
+            Leave(null, success: false); 
+            return false;
         }
     }
 
@@ -74,7 +74,7 @@ public class Client : MonoBehaviour
                 if (PlayerEntity.Instance.TryAddResourceValue(5))
                 {
                     value = 5;
-                    Debug.Log($"Клиент ушёл недовольным! Хотел {_wantedDish}, а получил {dish.Type}");
+                    Debug.Log($"Клиент ушёл недовольным!");
                 } 
             }
         }
@@ -83,7 +83,7 @@ public class Client : MonoBehaviour
             if (PlayerEntity.Instance.TryAddResourceValue(10))
             {
                 value = 10;
-                Debug.Log($"Клиент ушёл довольный! Получил {_wantedDish}");
+                Debug.Log($"Клиент ушёл довольный!");
             } 
         }
 
@@ -116,7 +116,7 @@ public class Client : MonoBehaviour
                 if (PlayerEntity.Instance.TryAddResourceValue(5))
                 {
                     value = 5;
-                    Debug.Log($"Клиент ушёл недовольным! Хотел {_wantedDish}, а получил {dish.Type}");
+                    Debug.Log($"Клиент ушёл недовольным!");
                 }
                 reaction = _sadReaction;
             }
@@ -126,7 +126,7 @@ public class Client : MonoBehaviour
             if (PlayerEntity.Instance.TryAddResourceValue(10))
             {
                 value = 10;
-                Debug.Log($"Клиент ушёл довольный! Получил {_wantedDish}");
+                Debug.Log($"Клиент ушёл довольный!");
             }
             reaction = _happyReaction;
         }

@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class Board : MonoBehaviour
 {
-    public event Action OnLose; 
+    public event Action OnLose;
 
     [SerializeField] private TileView tileViewPrefab;
     [SerializeField] private float tileSizeX = 1f;
@@ -16,6 +16,7 @@ public class Board : MonoBehaviour
     private PlayState _state;
 
     private readonly List<TileView> _allTiles = new List<TileView>();
+    private readonly List<MadjongGenerator.TilePair> _pairs = new List<MadjongGenerator.TilePair>();
     public int CurrentLayer { get; private set; }
     private int _layersCount = 3;
     private PlayState.PlayStatus _status;
@@ -24,12 +25,18 @@ public class Board : MonoBehaviour
     {
         _state = state;
         _allTiles.Clear();
+        _pairs.Clear();
 
         _state.PlayStatusChanged += OnStatusChange;
 
         _levelData = levelData;
 
         var data = MadjongGenerator.Generate(_levelData);
+
+        foreach (var pair in data.orderedPairs)
+        {
+            _pairs.Add(pair); 
+        }
 
         _layersCount = data.layersCount;
         CurrentLayer = _layersCount - 1;
@@ -150,6 +157,11 @@ public class Board : MonoBehaviour
         } 
 
         return false;
+    }
+
+    public List<MadjongGenerator.TilePair> GetTilesInOrder()
+    {
+        return _pairs;
     }
 
     public List<Enums.TileType> GetAvaiableTiles()
