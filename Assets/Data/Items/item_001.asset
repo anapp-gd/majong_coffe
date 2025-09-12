@@ -17,5 +17,5 @@ MonoBehaviour:
     Level: 9
     Icon: {fileID: 21300000, guid: 77768e7af13794c40a148f64e1aa0288, type: 3}
     Type: 0
-    Cost: 205
+    Cost: 445
     Name: Plant

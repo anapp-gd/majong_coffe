@@ -17,5 +17,5 @@ MonoBehaviour:
     Level: 10
     Icon: {fileID: 21300000, guid: 7a59b5c0115c7224bbac789ebfe407e3, type: 3}
     Type: 9
-    Cost: 265
+    Cost: 620
     Name: Diner board
