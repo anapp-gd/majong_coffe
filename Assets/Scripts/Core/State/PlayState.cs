@@ -8,6 +8,7 @@ public class PlayState : State
     [SerializeField] protected AudioClip _audioWin;
     [SerializeField] protected AudioClip _audioLose;
 
+    public bool InProgress;
     public event Action<PlayStatus> PlayStatusChanged;
     protected PlayStatus _status;
     protected AudioSource _audioSource;
@@ -196,6 +197,8 @@ public class PlayState : State
     {
         if (_status != PlayStatus.play) return;
 
+        if (InProgress) return;
+
         if (!clickedTile.IsAvailable())
             return;
 
@@ -225,6 +228,8 @@ public class PlayState : State
 
         if (_firstTile.CompareType(clickedTile.TileType))
         {
+            InProgress = true;
+
             Vector3 joinPoint = (_firstTile.transform.position + clickedTile.transform.position) / 2f;
 
             _board.RemoveTiles(_firstTile, clickedTile, InvokeMergeEffect, x =>
@@ -239,6 +244,7 @@ public class PlayState : State
                         _window.AddDish(x, dish);
                     }
 
+                    InProgress = false;
                     _firstTile = null;
                 }
             }); 

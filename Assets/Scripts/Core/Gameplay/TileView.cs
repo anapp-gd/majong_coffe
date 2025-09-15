@@ -16,7 +16,7 @@ public class TileView : MonoBehaviour
     [SerializeField, ReadOnlyInspector] private int _layer;
     [SerializeField] private SpriteRenderer _renderer;
     [SerializeField] private Transform _selected;
-    private SpriteRenderer _view;
+    private SpriteRenderer _viewBack;
     private PlayState _state;
     private BoxCollider2D _collider;
     private MadjongGenerator.TileData _data;
@@ -24,25 +24,29 @@ public class TileView : MonoBehaviour
     private Color _enableColor; 
     private Vector3 _baseScale;
     private AudioSource _audioSource;
+    private int _sortingView;
+    private int _sortingBack;
     public void Init(PlayState state, MadjongGenerator.TileData data, Enums.TileType type, int layer)
     {
         _state = state;
         _tileType = type;
         _layer = layer;
         _data = data;
-        _view = GetComponent<SpriteRenderer>();
+        _viewBack = GetComponent<SpriteRenderer>();
         _audioSource = gameObject.AddComponent<AudioSource>();
         GridPos = data.GridPos;
         WorldPos = data.WorldPos;
-
         //_view.color = Color.HSVToRGB(((int)data.TileType % 12) / 12f, 0.8f, 1f);
-        _view.sortingOrder = data.Layer * 10;
-        _renderer.sortingOrder = _view.sortingOrder + 1;
+        _viewBack.sortingOrder = data.Layer * 10;
+        _renderer.sortingOrder = _viewBack.sortingOrder + 1;
+
+        _sortingView = _renderer.sortingOrder;
+        _sortingBack = _viewBack.sortingOrder;
 
         _collider = GetComponent<BoxCollider2D>();
         _collider.isTrigger = true;
 
-        Color color = _view.color;
+        Color color = _viewBack.color;
 
         _enableColor = color; 
         _disableColor = new Color
@@ -68,7 +72,7 @@ public class TileView : MonoBehaviour
     public void Disable()
     {
         Debug.Log($"Disable {_tileType}, {GridPos}, layer {_layer}");
-        _view.color = _disableColor;
+        _viewBack.color = _disableColor;
         _renderer.color = _disableColor;
         _collider.enabled = false;
         if (_selected) _selected.gameObject.SetActive(false);
@@ -77,7 +81,7 @@ public class TileView : MonoBehaviour
     public void Enable()
     {
         Debug.Log($"Enable {_tileType}, {GridPos}, layer {_layer}");
-        _view.color = _enableColor;
+        _viewBack.color = _enableColor;
         _renderer.color = _enableColor;
         _collider.enabled = true;
     }
@@ -94,7 +98,7 @@ public class TileView : MonoBehaviour
      
     public void SetColor(Color color)
     { 
-        _view.color = color;
+        _viewBack.color = color;
     }
     public void Select()
     {
@@ -102,21 +106,41 @@ public class TileView : MonoBehaviour
 
         if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioTap);
 
+        SetOverlay(true);
+
         transform.DOScale(_baseScale * 1.08f, 0.15f)
                  .SetLoops(2, LoopType.Yoyo);
     }
      
+    void SetOverlay(bool value)
+    {
+        if (value)
+        {
+            _viewBack.sortingOrder = 98;
+            _renderer.sortingOrder = 99;
+        }
+        else
+        {
+            _viewBack.sortingOrder = _sortingBack;
+            _renderer.sortingOrder = _sortingView;
+        }
+    }
+
     public void Deselect()
     {
         if (_selected) _selected.gameObject.SetActive(false);
 
         if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioTap);
 
+        SetOverlay(false);
+
         transform.DOScale(_baseScale, 0.1f);
     }
 
     public Tween RemoveWithJoin(Vector3 to, Action<Vector3> spawnMergeEffect)
     {
+        SetOverlay(true); 
+
         Sequence seq = DOTween.Sequence();
 
         // 1. Двигаем
