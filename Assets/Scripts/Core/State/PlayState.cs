@@ -54,7 +54,9 @@ public class PlayState : State
     protected WinConditions _winConditions; 
 
     protected override void Awake()
-    { 
+    {
+        AnalyticsHolder.LevelStart(PlayerEntity.Instance.GetCurrentLevel);
+
         _audioSource = gameObject.AddComponent<AudioSource>();
 
         int currentLevel = PlayerEntity.Instance.GetCurrentLevel;
@@ -157,6 +159,8 @@ public class PlayState : State
 
     public virtual void Win()
     {
+        AnalyticsHolder.LevelFinish(PlayerEntity.Instance.GetCurrentLevel);
+
         if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioWin);
 
         PlayerEntity.Instance.SetNextLevel();
@@ -174,6 +178,8 @@ public class PlayState : State
 
     public virtual void Lose()
     {
+        AnalyticsHolder.LevelFinish(PlayerEntity.Instance.GetCurrentLevel);
+
         if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioLose);
         if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
         {

@@ -102,6 +102,8 @@ public class PlayerEntity : SourceEntity
         Data.Add(item);
          
         Save();
+
+        AnalyticsHolder.ShopEvent(item.Type.ToString());
     } 
 
     public void SetNextLevel()

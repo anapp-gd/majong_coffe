@@ -722,7 +722,7 @@ Transform:
   m_GameObject: {fileID: 16715499}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -9.9, z: 0}
+  m_LocalPosition: {x: 0, y: -8, z: 0}
   m_LocalScale: {x: 20, y: 20, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -24655,7 +24655,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3321085850642118258, guid: 21e96f5eb93540144a929a8705876aa4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.5
+      value: 5.5
       objectReference: {fileID: 0}
     - target: {fileID: 3321085850642118258, guid: 21e96f5eb93540144a929a8705876aa4, type: 3}
       propertyPath: m_LocalPosition.z
@@ -39760,7 +39760,7 @@ Transform:
   m_GameObject: {fileID: 1956933750}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.0189, y: 2.84, z: 0}
+  m_LocalPosition: {x: 0, y: 5, z: 0}
   m_LocalScale: {x: 80, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -41531,7 +41531,7 @@ Transform:
   m_GameObject: {fileID: 2048707049}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 6, z: 0}
+  m_LocalPosition: {x: 0, y: 8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -43669,14 +43669,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9384f850244e79448f4e6972bded73b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  referenceWidth: 720
-  referenceHeight: 1280
-  referenceOrthoSize: 9
-  matchWidthOrHeight: 0.5
   _audioWin: {fileID: 8300000, guid: 7853087ec8d5efe41acb54de3bcb9aff, type: 3}
   _audioLose: {fileID: 8300000, guid: aa292f7353d9ada4c97bc145878af245, type: 3}
   mergeEffect: {fileID: 4375348493407302, guid: 2939296a1af999d4e97dc4981f9093a2, type: 3}
-  offset: {x: 0, y: -4}
+  offset: {x: 0, y: -5}
   board: {fileID: 8249881955901418612, guid: 6d61e17bddc10514ebc258120a197a00, type: 3}
   service: {fileID: 8974939872978371098, guid: ebde44104808ff849ba83aade7ff1bfc, type: 3}
   levelData: {fileID: 11400000, guid: f063c9a6fb26a9f419885db0883343ce, type: 2}

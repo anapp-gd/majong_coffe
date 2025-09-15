@@ -44,12 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f2f24b37ba0de94da7e03f405f24958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  referenceWidth: 720
-  referenceHeight: 1280
-  worldHeight: 100
   _audioWin: {fileID: 8300000, guid: 7853087ec8d5efe41acb54de3bcb9aff, type: 3}
   _audioLose: {fileID: 8300000, guid: aa292f7353d9ada4c97bc145878af245, type: 3}
   mergeEffect: {fileID: 4375348493407302, guid: 2939296a1af999d4e97dc4981f9093a2, type: 3}
-  offset: {x: 0, y: -4}
+  offset: {x: 0, y: -5}
   board: {fileID: 8249881955901418612, guid: 6d61e17bddc10514ebc258120a197a00, type: 3}
   service: {fileID: 8974939872978371098, guid: ebde44104808ff849ba83aade7ff1bfc, type: 3}

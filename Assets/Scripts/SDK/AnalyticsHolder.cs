@@ -34,6 +34,21 @@ public class AnalyticsHolder
         LogEvent("game_start");
     }
     
+    public static void LevelStart(int level)
+    {
+        LogEvent($"level_start_{level}");
+    }
+
+    public static void LevelFinish(int level)
+    { 
+        LogEvent($"level_finish_{level}");
+    }
+
+    public static void ShopEvent(string key)
+    {
+        LogEvent($"shop_buy_{key}");
+    }
+
     public static void TutorDone()
     {
         LogEvent("tutor_done");
