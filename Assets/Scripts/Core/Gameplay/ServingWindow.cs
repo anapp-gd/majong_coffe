@@ -1,32 +1,117 @@
-﻿using System.Collections.Generic;
+﻿using DG.Tweening;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ServingWindow : MonoBehaviour
 {
+    [SerializeField] FlyIcon _flyIcon;
+
     private PlayState _state;
-    private List<Dish> readyDishes = new();
+    public event Action<List<Dish>> OnServingUpdate;
+    private List<Dish> _readyDishes = new();
+    private PlayState.PlayStatus _status;
+    private WorldHorizontalLayout _layout;
+
+    public bool IsFree => _currentInGameCountDishes < 5;
+
+    private int _currentInGameCountDishes;
+    private List<FlyIcon> _currentIconsFly;
 
     public void Init(PlayState state)
     {
         _state = state;
+        _state.PlayStatusChanged += OnPlayStatusChange;
+        _layout = GetComponent<WorldHorizontalLayout>();
+        _currentIconsFly = new List<FlyIcon>();
     }
 
-    public void AddDish(Dish dish)
+    void OnPlayStatusChange(PlayState.PlayStatus playStatus)
     {
-        readyDishes.Add(dish);
-        Debug.Log($"{dish.Type} добавлено в окно выдачи");
+        _status = playStatus;
+    }
+
+
+    public void AddDish(Vector3 worldMergePos, Dish dish)
+    {
+        if (_status != PlayState.PlayStatus.play) return;
+
+        InvokeMoveTile(worldMergePos, dish);
+    }
+
+    void InvokeMoveTile(Vector3 mergeWorldPos, Dish dish)
+    {
+        if (_layout == null)
+        {
+            Debug.LogError("Layout не установлен!");
+            return;
+        }
+
+        // 1. Создаём иконку в мире
+        var flyIcon = Instantiate(_flyIcon);
+        flyIcon.InvokeFly(dish.Icon);
+        flyIcon.transform.position = mergeWorldPos;
+        flyIcon.transform.localScale = Vector3.zero;
+
+        // 2. Получаем целевой слот
+        Vector3 targetPos = _layout.GetNextSlot(); 
+
+        // 3. Настройки анимации
+        float duration = 0.2f;
+
+        _currentIconsFly.Add(flyIcon);
+
+        _currentInGameCountDishes++;
+
+        // 4. Запускаем анимацию
+        flyIcon.PlayFlyWorld(targetPos, duration, () =>
+        {
+            // Проверяем, свободен ли слот к моменту завершения
+            if (!_layout.AddObject(dish, flyIcon.transform, () =>  OnFlyComplete(dish, flyIcon)))
+            {
+                flyIcon.CancelFly();
+            } 
+        });
+    }
+
+    void OnFlyComplete(Dish dish, FlyIcon icon)
+    {
+        _readyDishes.Add(dish);
+        _currentIconsFly.Remove(icon);
+
+        if (_currentInGameCountDishes >= 5) _state.ForceTakeDish(); 
+    }
+
+    public void Finish()
+    {
+        foreach (var icon in _currentIconsFly)
+        {
+            icon.CancelFly();
+        }
     }
 
     public bool TryTakeDish(Enums.DishType dishType, out Dish dish)
     {
-        dish = readyDishes.Find(d => d.Type == dishType);
+        dish = null;
 
-        if (dish != null)
-        {
-            readyDishes.Remove(dish);
-            Debug.Log($"{dish.Type} забрано из окна выдачи");
-            return true;
-        }
-        return false;
-    }
+        if (_status != PlayState.PlayStatus.play)
+            return false;
+
+        if (_readyDishes == null || _readyDishes.Count == 0)
+            return false; // нет блюд вообще    
+
+        // всегда берём первый добавленный (FIFO)
+        dish = _readyDishes[0];
+
+        _layout.RemoveObject(dish);
+        _readyDishes.RemoveAt(0);
+
+        _currentInGameCountDishes--;
+
+        if (_readyDishes.Count == 0)
+            _state.SetTableClear();
+
+        // возвращаем true — клиент сам решает, совпал ли тип
+        return true;
+    } 
 }

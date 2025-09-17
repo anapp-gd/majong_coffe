@@ -12,112 +12,223 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef32745e024e4c348b1975ce666c6054, type: 3}
   m_Name: TextureConfig
   m_EditorClassIdentifier: 
-  TextureData:
+  TileFolder: "Assets/Import/UI \u044D\u043B\u0435\u043C\u0435\u043D\u0442\u044B/\u0411\u043B\u044E\u0434\u043E/Ingredients"
+  DishFolder: "Assets/Import/UI \u044D\u043B\u0435\u043C\u0435\u043D\u0442\u044B/\u0411\u043B\u044E\u0434\u043E/Dishes"
+  TileTextures:
   - TileType: 0
     Name: Eggs
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: d88be61d3eecf004e83dc9446540f191, type: 3}
   - TileType: 1
     Name: CoffeeBeans
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: baa55656890e86e4e89b69102bbda6d4, type: 3}
   - TileType: 2
     Name: Bread
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: f9e499f2ca361274282fa519e8f56300, type: 3}
   - TileType: 3
     Name: Potato
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: ece3b17528d5e8b41b62665846fe0f21, type: 3}
   - TileType: 4
     Name: Milk
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 6030276f1d778264dbee7cf8e91485cb, type: 3}
   - TileType: 5
     Name: Dough
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 68ab56bd4980ef3428f29868b4ee7f95, type: 3}
   - TileType: 6
     Name: Pita
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: c192b1459d3a6a24aa52a84aedffeb67, type: 3}
   - TileType: 7
     Name: BurgerBuns
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 2123066e576a43544b770f733c3813df, type: 3}
   - TileType: 8
     Name: Salmon
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 703eac256b5a1b44daeb4972725b1a3d, type: 3}
   - TileType: 9
     Name: Chiken
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 1af0deb06fc70734ea47f7d798baaa0c, type: 3}
   - TileType: 10
     Name: Limon
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 187b9c7cfc8754741a48796c0f4b02be, type: 3}
   - TileType: 11
     Name: Cheese
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 17c9004990001e24495224bd584c0119, type: 3}
   - TileType: 12
     Name: Blueberries
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: ac46765615430774f8b83f5c8c14c3ed, type: 3}
   - TileType: 13
     Name: TeaLeaves
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: fc8bd24fb1376d04a97ae131aa245832, type: 3}
   - TileType: 14
     Name: Tomato
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: eee3759636c416b448a7e502aaa55b25, type: 3}
   - TileType: 15
     Name: Cream
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 5262d21d618a38340bc0b815d69031fa, type: 3}
   - TileType: 16
     Name: Pasta
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 821d6c91a9fa1514184ff0617010d213, type: 3}
   - TileType: 17
     Name: Onion
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 7db356e172e467645bf873403bd2decd, type: 3}
   - TileType: 18
     Name: Olive
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 7972769ecd790764181cf05edcce66e8, type: 3}
   - TileType: 19
     Name: Sausages
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: a149e93c6d450b0419c89867252caed9, type: 3}
   - TileType: 20
     Name: Beef
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: e42f9b8fe64157e4fb27dd255b0c1530, type: 3}
   - TileType: 21
     Name: Apple
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 749d7c883c47d304ab572b3c031ade94, type: 3}
   - TileType: 22
     Name: Kvass
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: c17eef6c6c40794448222948a612fbaf, type: 3}
   - TileType: 23
     Name: Pumpkin
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: fc1f6f05067c0c848ab2242bad500c54, type: 3}
   - TileType: 24
     Name: Beet
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: a288e27f172d8ac4d9aef60167f0fbf2, type: 3}
   - TileType: 25
     Name: MincedMeat
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 95ac89bcb91e3d74da596248734ff78b, type: 3}
   - TileType: 26
     Name: Cabbage
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 0a08577d6b6da4140b8f3b70765b00b1, type: 3}
   - TileType: 27
     Name: Cucumbers
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 17356ef54554d5749992f036c10c5435, type: 3}
   - TileType: 28
     Name: Jam
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: d420f7378bf24494fa02bfad2622bcaf, type: 3}
   - TileType: 29
     Name: Mushrooms
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: dc7c59e34579e234a98ceffcce5b2c5c, type: 3}
   - TileType: 30
     Name: Rice
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: b5b00951c9f99d14c948bde372e1c5e0, type: 3}
   - TileType: 31
     Name: Caviar
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 11a61e6ca07fac7419761ef35f06d91d, type: 3}
   - TileType: 32
     Name: CottageCheese
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: db5cf07067a3eb6459b69f6c1d40c90a, type: 3}
   - TileType: 33
     Name: Garlic
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 88a7228ba4ef33c4ab6688277d4d26a4, type: 3}
   - TileType: 34
     Name: Shrimp
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: 4853e61f86a70a841ae27b9f3e33c449, type: 3}
   - TileType: 35
     Name: LettuceLeaf
-    Texture: {fileID: 0}
+    TextureTile: {fileID: 21300000, guid: e901bbd110f201248a808a8e8136a6a8, type: 3}
+  DishTextures:
+  - DishType: 0
+    Name: FriedEgg
+    TextureDish: {fileID: 21300000, guid: 2af9fb6777b64d548bb9219dcda4eef8, type: 3}
+  - DishType: 1
+    Name: CoffeeCup
+    TextureDish: {fileID: 21300000, guid: fad5440e7a6ac1e44b26b4d81d7d9d0d, type: 3}
+  - DishType: 2
+    Name: Toast
+    TextureDish: {fileID: 21300000, guid: 4ec9b29a22bc7944996cad6fe2727db6, type: 3}
+  - DishType: 3
+    Name: FrenchFries
+    TextureDish: {fileID: 21300000, guid: 74cb35ca4aad19c4e9833f858e60aa68, type: 3}
+  - DishType: 4
+    Name: MilkShake
+    TextureDish: {fileID: 21300000, guid: 4309bcd6a4c8b444e9102aaed4616e5e, type: 3}
+  - DishType: 5
+    Name: Pizza
+    TextureDish: {fileID: 21300000, guid: 75ee99f543ba4964d901f1f91ebcd68c, type: 3}
+  - DishType: 6
+    Name: Shawarma
+    TextureDish: {fileID: 21300000, guid: da3ed546eda756a47a0b07d00df4b86d, type: 3}
+  - DishType: 7
+    Name: Burger
+    TextureDish: {fileID: 21300000, guid: 551705ae50b71a147b2f7d6d3c236ee0, type: 3}
+  - DishType: 8
+    Name: FishSteak
+    TextureDish: {fileID: 21300000, guid: 229b4896b2a187e469c52699f97a32c3, type: 3}
+  - DishType: 9
+    Name: Nuggets
+    TextureDish: {fileID: 21300000, guid: 78ccd8fddba94f54ea03e23900f66919, type: 3}
+  - DishType: 10
+    Name: Lemonade
+    TextureDish: {fileID: 21300000, guid: 24d7c481168cd9b4c9d94cfe7685eb27, type: 3}
+  - DishType: 11
+    Name: CheeseStick
+    TextureDish: {fileID: 21300000, guid: d888c399e41fedf4194334565d172053, type: 3}
+  - DishType: 12
+    Name: BlueberriesCheesecake
+    TextureDish: {fileID: 21300000, guid: baaf194e64be4ca49878bfb926e9c3b9, type: 3}
+  - DishType: 13
+    Name: Tea
+    TextureDish: {fileID: 21300000, guid: eb715101cad4a2a4cb9e8b219b1c3cfb, type: 3}
+  - DishType: 14
+    Name: Bruschetta
+    TextureDish: {fileID: 21300000, guid: 296eb4f3c76853949999114b9fdaa465, type: 3}
+  - DishType: 15
+    Name: IceCream
+    TextureDish: {fileID: 21300000, guid: d5260052e7a10b34eaea7dd66e348746, type: 3}
+  - DishType: 16
+    Name: WOK
+    TextureDish: {fileID: 21300000, guid: b0326701abc79db488c6c0cd6630496a, type: 3}
+  - DishType: 17
+    Name: OnionRing
+    TextureDish: {fileID: 21300000, guid: 31449b418a1ddf047b4541e6902e2490, type: 3}
+  - DishType: 18
+    Name: GreekSalad
+    TextureDish: {fileID: 21300000, guid: 086fa87278cb9a042b7f0858362ea84e, type: 3}
+  - DishType: 19
+    Name: Hotdog
+    TextureDish: {fileID: 21300000, guid: a09294a6dce112145bd302641f49171a, type: 3}
+  - DishType: 20
+    Name: Steak
+    TextureDish: {fileID: 21300000, guid: c121f8bc38f3b90459b2f8a441e4f502, type: 3}
+  - DishType: 21
+    Name: ApplePie
+    TextureDish: {fileID: 21300000, guid: fd754e3ee0f845349b805f6ac21298f0, type: 3}
+  - DishType: 22
+    Name: Okroshka
+    TextureDish: {fileID: 21300000, guid: e00e77f3745433e47a0b8af713203de9, type: 3}
+  - DishType: 23
+    Name: CreamSoup
+    TextureDish: {fileID: 21300000, guid: 03c631c2541518347b815ccb6a72ca0a, type: 3}
+  - DishType: 24
+    Name: Borsch
+    TextureDish: {fileID: 21300000, guid: e907ee659fb366240b6515c9b6809ce6, type: 3}
+  - DishType: 25
+    Name: Khinkali
+    TextureDish: {fileID: 21300000, guid: a671276ec37edc84aa29651b0001f2ee, type: 3}
+  - DishType: 26
+    Name: Sauerkraut
+    TextureDish: {fileID: 21300000, guid: 0f64c8a7293fb9d428fe4400a6c72d58, type: 3}
+  - DishType: 27
+    Name: SaltedCucumbers
+    TextureDish: {fileID: 21300000, guid: f02052f3c8c38b74498232a1d2608f6b, type: 3}
+  - DishType: 28
+    Name: PancakeJam
+    TextureDish: {fileID: 21300000, guid: c5179900254d5d34b8d24b1e2f214620, type: 3}
+  - DishType: 29
+    Name: Julien
+    TextureDish: {fileID: 21300000, guid: fc3aa7f3c4bb49b4fba3df1e594c9583, type: 3}
+  - DishType: 30
+    Name: Pilaf
+    TextureDish: {fileID: 21300000, guid: f87b0cf0371b3354d9ca6ba55031a35d, type: 3}
+  - DishType: 31
+    Name: CaviarSandwich
+    TextureDish: {fileID: 21300000, guid: dbace141efdaae046a46a7126fbead28, type: 3}
+  - DishType: 32
+    Name: Cheesecakes
+    TextureDish: {fileID: 21300000, guid: 058fdb1b14ea1654b9e65270f759f45f, type: 3}
+  - DishType: 33
+    Name: Croutons
+    TextureDish: {fileID: 21300000, guid: 7d7dcf435f5f4f340b9751c3552c78ff, type: 3}
+  - DishType: 34
+    Name: GrilledShrimp
+    TextureDish: {fileID: 21300000, guid: 31a47bf5a744b9e4d9515c8c2542a0dd, type: 3}
+  - DishType: 35
+    Name: Sandwich
+    TextureDish: {fileID: 21300000, guid: dbace141efdaae046a46a7126fbead28, type: 3}

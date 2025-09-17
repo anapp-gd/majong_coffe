@@ -7,15 +7,29 @@ using System.Collections.Generic;
 public class LevelDataEditor : Editor
 {
     private LevelData data;
+    private string[] tileOptions;
 
     private void OnEnable()
     {
         data = (LevelData)target;
+        BuildTileOptions();
+    }
+
+    // Построение списка для Popup:
+    // 0 = пусто, 1 = Random, 2..N = тайлы
+    private void BuildTileOptions()
+    {
+        var enums = Enum.GetNames(typeof(Enums.TileType));
+        tileOptions = new string[enums.Length + 2];
+        tileOptions[0] = "Empty";   // 0
+        tileOptions[1] = "Random";  // 1
+
+        for (int i = 0; i < enums.Length; i++)
+            tileOptions[i + 2] = enums[i]; // 2..N
     }
 
     public override void OnInspectorGUI()
     {
-        // Стандартные поля
         DrawDefaultInspector();
 
         GUILayout.Space(10);
@@ -43,6 +57,7 @@ public class LevelDataEditor : Editor
             {
                 data.availableTileTypes.RemoveAt(i);
                 EditorUtility.SetDirty(data);
+                BuildTileOptions();
                 break;
             }
 
@@ -62,6 +77,7 @@ public class LevelDataEditor : Editor
         {
             data.availableTileTypes.Clear();
             EditorUtility.SetDirty(data);
+            BuildTileOptions();
         }
 
         EditorGUILayout.EndHorizontal();
@@ -87,6 +103,7 @@ public class LevelDataEditor : Editor
     {
         data.availableTileTypes.Add((Enums.TileType)tile);
         EditorUtility.SetDirty(data);
+        BuildTileOptions();
     }
 
     void SelectAllTiles()
@@ -96,6 +113,7 @@ public class LevelDataEditor : Editor
             data.availableTileTypes.Add(val);
 
         EditorUtility.SetDirty(data);
+        BuildTileOptions();
     }
 
     void DrawBaseLayerEditor()
@@ -103,10 +121,9 @@ public class LevelDataEditor : Editor
         int width = data.width;
         int height = data.height;
 
-        // Синхронизируем размер списка с width*height
         int targetSize = width * height;
         while (data.baseLayer.Count < targetSize)
-            data.baseLayer.Add(0);
+            data.baseLayer.Add(0); // пусто
         while (data.baseLayer.Count > targetSize)
             data.baseLayer.RemoveAt(data.baseLayer.Count - 1);
 
@@ -116,18 +133,18 @@ public class LevelDataEditor : Editor
             for (int x = 0; x < width; x++)
             {
                 int index = y * width + x;
-                int value = data.baseLayer[index];
+                int current = data.baseLayer[index];
 
-                Color prevColor = GUI.backgroundColor;
-                GUI.backgroundColor = value == 0 ? Color.gray : Color.green;
+                // Защита от выхода за пределы массива
+                if (current < 0 || current >= tileOptions.Length)
+                    current = 0;
 
-                if (GUILayout.Button("", GUILayout.Width(30), GUILayout.Height(30)))
+                int newValue = EditorGUILayout.Popup(current, tileOptions, GUILayout.Width(80));
+                if (newValue != current)
                 {
-                    data.baseLayer[index] = (value + 1) % 2;
+                    data.baseLayer[index] = newValue;
                     EditorUtility.SetDirty(data);
                 }
-
-                GUI.backgroundColor = prevColor;
             }
             EditorGUILayout.EndHorizontal();
         }

@@ -5,8 +5,8 @@ using UnityEngine;
 public class LevelData : ScriptableObject
 {
     [Header("Размер слоя")]
-    public int width = 5;
-    public int height = 5;
+    [Range(1, 10)] public int width = 5;
+    [Range(1, 10)] public int height = 5;
 
     [Header("Параметры генерации")]
     public int layersCount = 3;
@@ -27,4 +27,4 @@ public class LevelData : ScriptableObject
             baseLayer.RemoveAt(baseLayer.Count - 1);
         
     }
-} 
+}  

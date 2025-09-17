@@ -2,6 +2,8 @@ using UnityEngine;
 
 public abstract class SourceLayout : MonoBehaviour
 {
+    public bool IsOpenInit;
+    public bool IsAlwaysOpen;
     protected SourcePanel _panel;
     protected SourceSlot[] _slots; 
 
@@ -14,7 +16,14 @@ public abstract class SourceLayout : MonoBehaviour
 
         for (int i = 0; i < slots.Length; i++) _slots[i] = slots[i].Init(this);
 
-        gameObject.SetActive(false);
+        if (IsOpenInit)
+        {
+            OnOpen();
+        }
+        else
+        { 
+            gameObject.SetActive(false);
+        }
 
         return this;
     } 
@@ -46,7 +55,7 @@ public abstract class SourceLayout : MonoBehaviour
 
     public virtual void OnClose()
     {
-        gameObject.SetActive(false);
+        if(!IsAlwaysOpen) gameObject.SetActive(false);
     }
 
     public virtual void Dispose()

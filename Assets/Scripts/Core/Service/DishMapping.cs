@@ -8,7 +8,10 @@ public static class DishMapping
         { Enums.TileType.Eggs, Enums.DishType.FriedEgg },
         { Enums.TileType.CoffeeBeans, Enums.DishType.CoffeeCup },
         { Enums.TileType.Bread, Enums.DishType.Toast },
+        { Enums.TileType.BurgerBuns, Enums.DishType.Burger },
+        { Enums.TileType.Pita, Enums.DishType.Shawarma },
         { Enums.TileType.Potato, Enums.DishType.FrenchFries },
+        { Enums.TileType.Milk, Enums.DishType.MilkShake },
         { Enums.TileType.Dough, Enums.DishType.Pizza },
         { Enums.TileType.Salmon, Enums.DishType.FishSteak },
         { Enums.TileType.Chiken, Enums.DishType.Nuggets },
@@ -39,9 +42,23 @@ public static class DishMapping
         { Enums.TileType.Shrimp, Enums.DishType.GrilledShrimp }, 
         { Enums.TileType.LettuceLeaf, Enums.DishType.Sandwich }, 
     };
+     
+    private static readonly Dictionary<Enums.DishType, Enums.TileType> reverseMap; 
+
+    static DishMapping()
+    {
+        reverseMap = new Dictionary<Enums.DishType, Enums.TileType>();
+        foreach (var kvp in map)
+            reverseMap[kvp.Value] = kvp.Key;
+    }
 
     public static bool TryGetDish(Enums.TileType tile, out Enums.DishType dish)
     {
         return map.TryGetValue(tile, out dish);
+    }
+
+    public static bool TryGetTile(Enums.DishType dish, out Enums.TileType tile)
+    {
+        return reverseMap.TryGetValue(dish, out tile);
     }
 }

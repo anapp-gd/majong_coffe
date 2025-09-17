@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic; 
 using UnityEngine;
 
@@ -9,7 +10,7 @@ public abstract class SourceCanvas : MonoBehaviour
     public bool isInited { get; protected set; }
 
     public bool IsOpenOnStart;
-
+    public RenderMode renderMode => _canvas.renderMode;
     public virtual void Init()
     {
         _canvas = GetComponent<Canvas>();
@@ -22,8 +23,6 @@ public abstract class SourceCanvas : MonoBehaviour
 
         _panels.ForEach(panel => panel.Init(this));
 
-        _canvas.enabled = IsOpenOnStart;
-
         foreach (var panel in _panels)
         {
             if (panel.isOpenOnInit) panel.OnOpen();
@@ -33,6 +32,11 @@ public abstract class SourceCanvas : MonoBehaviour
         isInited = true;
 
         gameObject.SetActive(true);
+
+        if (IsOpenOnStart)
+        {
+            InvokeCanvas();
+        }
     } 
 
     public virtual void OnInject()
@@ -52,7 +56,7 @@ public abstract class SourceCanvas : MonoBehaviour
     }
     public virtual void Dispose()
     {
-        _panels.ForEach(panel => panel.OnDipose()); 
+        _panels.ForEach(panel => panel.OnDispose()); 
     }
 
     public virtual T ClosePanel<T>() where T : SourcePanel
@@ -78,7 +82,7 @@ public abstract class SourceCanvas : MonoBehaviour
         return returnedPanel as T;
     }
 
-    public virtual T OpenPanel<T>() where T : SourcePanel
+    public virtual T OpenPanel<T>(bool isAbove = false, params Action[] actions) where T : SourcePanel
     {
         SourcePanel returnedPanel = null;
 
@@ -86,7 +90,7 @@ public abstract class SourceCanvas : MonoBehaviour
         {
             if (sourcePanel.isAlwaysOpen)
             {
-                sourcePanel.OnOpen();
+                sourcePanel.OnOpen(actions);
                 continue;
             }
 
@@ -96,11 +100,11 @@ public abstract class SourceCanvas : MonoBehaviour
             }
             else
             {
-                sourcePanel.OnCLose();
+                if(!isAbove) sourcePanel.OnCLose();
             }
         }
 
-        if(!returnedPanel.isOpen) returnedPanel.OnOpen();
+        if(!returnedPanel.isOpen) returnedPanel.OnOpen(actions);
 
         return returnedPanel as T;
     }

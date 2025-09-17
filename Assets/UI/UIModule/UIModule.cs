@@ -45,7 +45,10 @@ public static class UIModule
     {
         Handler?.Inject(data); 
     }
-
+    public static void Play()
+    {
+        Handler.Play();
+    } 
     public static bool OpenCanvas<T>(out T canvas) where T : SourceCanvas
     {
         canvas = null;

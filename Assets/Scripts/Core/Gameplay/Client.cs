@@ -1,51 +1,162 @@
-using UnityEngine;
+﻿using UnityEngine;
+using DG.Tweening;
 
 public class Client : MonoBehaviour
 {
-    public Enums.DishType WantedDish { get; private set; }
-
-    [SerializeField] private float waitTime = 10f; // ������� ��� ������
-
-    private float _timer;
+    [SerializeField] private Sprite[] _views;
+    [SerializeField] private Transform _happyReaction;
+    [SerializeField] private Transform _angryReaction;
+    [SerializeField] private Transform _sadReaction; 
+    private ServingWindow _window;
     private System.Action<Client> _onLeave;
 
-    public void Init(Enums.DishType dish, System.Action<Client> onLeave)
-    {
-        WantedDish = dish;
-        _timer = waitTime;
+    public void Init(ServingWindow window, System.Action<Client> onLeave)
+    { 
+        _window = window;
         _onLeave = onLeave;
-    }
 
-    private void Update()
-    {
-        _timer -= Time.deltaTime;
-        if (_timer <= 0f)
+        if (_views != null && TryGetComponent<SpriteRenderer>(out var renderer) && _views.Length > 0)
         {
-            Leave(false);
+            renderer.sprite = _views[Random.Range(0, _views.Length)];
         }
+
+        // сразу выключаем все реакции
+        _happyReaction?.gameObject.SetActive(false);
+        _angryReaction?.gameObject.SetActive(false);
+        _sadReaction?.gameObject.SetActive(false);
     }
 
-    public void TakeDish(Enums.DishType dish)
+    public bool FinishTakeDish(Enums.DishType targetDish)
     {
-        if (dish == WantedDish)
+        if (_window.TryTakeDish(targetDish, out Dish dish))
         {
-            Debug.Log($"������ �������, ������� {dish}!");
-            Leave(true);
+            if (targetDish == dish.Type)
+                FinalyLeave(dish, success: true);
+            else
+                FinalyLeave(dish, success: false);
+            return true;
         }
         else
         {
-            Debug.Log($"������ ���������, ������ {WantedDish}, � ������� {dish}");
-            Leave(false);
+            FinalyLeave(null, success: false);
+            return false;
         }
     }
 
-    private void Leave(bool success)
+    public bool TryTakeDish(Enums.DishType targetDish)
     {
-        // ��� ����� ���������� �������� �����, ���������� ����� � �.�.
-        if (!success)
-            Debug.Log("������ ���� �����������!");
+        if (_window.TryTakeDish(targetDish, out Dish dish))
+        {
+            if (targetDish == dish.Type)
+                Leave(dish, success: true);
+            else
+                Leave(dish, success: false); 
+            return true;
+        }
+        else
+        {
+            Leave(null, success: false); 
+            return false;
+        }
+    }
 
-        _onLeave?.Invoke(this);
-        Destroy(gameObject);
+    void FinalyLeave(Dish dish, bool success)
+    {
+        int value = 0; 
+        if (!success)
+        {
+            if (dish == null)
+            {
+                Debug.Log("Клиент ушёл недовольным! (не осталось блюд)"); 
+            }
+            else
+            {
+                if (PlayerEntity.Instance.TryAddResourceValue(5))
+                {
+                    value = 5;
+                    Debug.Log($"Клиент ушёл недовольным!");
+                } 
+            }
+        }
+        else
+        {
+            if (PlayerEntity.Instance.TryAddResourceValue(10))
+            {
+                value = 10;
+                Debug.Log($"Клиент ушёл довольный!");
+            } 
+        }
+
+        PlayState.Instance.AddValue(value);
+    }
+
+    public void MoveToQueuePosition(Vector3 target, float duration = 0.4f, System.Action onArrived = null)
+    {
+        DOTween.Kill(transform);
+
+        transform.DOMove(target, duration)
+            .SetEase(Ease.OutCubic)
+            .OnComplete(() => onArrived?.Invoke());
+    }
+
+    private void Leave(Dish dish, bool success)
+    {
+        int value = 0;
+        Transform reaction = null;
+
+        if (!success)
+        {
+            if (dish == null)
+            {
+                Debug.Log("Клиент ушёл недовольным! (не осталось блюд)");
+                reaction = _angryReaction;
+            }
+            else
+            {
+                if (PlayerEntity.Instance.TryAddResourceValue(5))
+                {
+                    value = 5;
+                    Debug.Log($"Клиент ушёл недовольным!");
+                }
+                reaction = _sadReaction;
+            }
+        }
+        else
+        {
+            if (PlayerEntity.Instance.TryAddResourceValue(10))
+            {
+                value = 10;
+                Debug.Log($"Клиент ушёл довольный!");
+            }
+            reaction = _happyReaction;
+        }
+
+        PlayState.Instance.AddValue(value);
+
+        // --- Анимация реакции перед уходом ---
+        if (reaction != null)
+        {
+            reaction.gameObject.SetActive(true);
+            reaction.localPosition = Vector3.zero;
+            reaction.localScale = Vector3.zero;
+
+            Sequence seq = DOTween.Sequence();
+            seq.Append(reaction.DOScale(1f, 0.2f).SetEase(Ease.OutBack));
+            seq.Join(reaction.DOLocalMoveY(1.5f, 0.6f).SetEase(Ease.OutCubic));
+            seq.AppendInterval(0.2f); 
+            seq.OnComplete(() =>
+            {
+                DOTween.Kill(transform); // убиваем твины объекта
+                _onLeave?.Invoke(this);  // теперь сигналим сервису → очередь сдвинется
+                Destroy(gameObject);
+            });
+        }
+        else
+        {
+            // fallback: если реакции нет
+            DOTween.Kill(transform);
+            _onLeave?.Invoke(this);
+            Destroy(gameObject);
+        }
     }
 }

@@ -1,206 +1,191 @@
-﻿using System;
-using System.Collections;
+﻿using DG.Tweening;
+using System;
 using System.Collections.Generic;
+using System.Linq; 
 using UnityEngine;
 
 public class Board : MonoBehaviour
-{ 
-    public event Action OnLose; 
-    public event Action OnWin;
+{
+    public event Action OnLose;
 
-    [SerializeField] TileView tileView;
-    [SerializeField] int layersCount = 3;          // Кол-во слоёв
-    [SerializeField] int pairsCount = 10;          // Кол-во пар плиток
-    [SerializeField] int tileTypesCount = 5;       // Кол-во типов плиток
-    [SerializeField] float tileSize = 1f;          // Размер одной плитки
-    [SerializeField, Range(0f, 1f)] float lowerLayerDarken = 0.5f; // Затемнение нижних слоёв
+    [SerializeField] private TileView tileViewPrefab;
+    [SerializeField] private float tileSizeX = 1f;
+    [SerializeField] private float tileSizeY = 1f;
 
     private LevelData _levelData;
+    private PlayState _state;
+
+    private readonly List<TileView> _allTiles = new List<TileView>();
+    private readonly List<MadjongGenerator.TilePair> _pairs = new List<MadjongGenerator.TilePair>();
     public int CurrentLayer { get; private set; }
+    private int _layersCount = 3;
+    private PlayState.PlayStatus _status;
 
-    // Храним все тайлы по слоям
-    private Dictionary<int, TileView[,]> _layers = new Dictionary<int, TileView[,]>(); 
-    private PlayState _state; 
-
-    public void Init(PlayState state)
+    public void Init(PlayState state, Vector2 customOffset, LevelData levelData)
     {
         _state = state;
-        CurrentLayer = layersCount - 1; // Начинаем с верхнего слоя
-        _layers.Clear();
+        _allTiles.Clear();
+        _pairs.Clear();
 
-        if (ConfigModule.GetConfig<LevelConfig>().TryGetLevelData(0, out var levelData))
-        {
-            _levelData = levelData;
-        }
+        _state.PlayStatusChanged += OnStatusChange;
+
+        _levelData = levelData;
 
         var data = MadjongGenerator.Generate(_levelData);
 
+        foreach (var pair in data.orderedPairs)
+        {
+            _pairs.Add(pair); 
+        }
+
+        _layersCount = data.layersCount;
+        CurrentLayer = _layersCount - 1;
         _state.SetHashDishes = data.dishes;
 
-        // Чтобы всё было по центру
-        int maxX = 0, maxY = 0;
+        // --- Находим границы сетки
+        int minX = int.MaxValue, maxX = int.MinValue;
+        int minY = int.MaxValue, maxY = int.MinValue;
+
         foreach (var t in data.tiles)
         {
-            if (t.position.x > maxX) maxX = t.position.x;
-            if (t.position.y > maxY) maxY = t.position.y;
+            if (t.GridPos.x < minX) minX = t.GridPos.x;
+            if (t.GridPos.x > maxX) maxX = t.GridPos.x;
+            if (t.GridPos.y < minY) minY = t.GridPos.y;
+            if (t.GridPos.y > maxY) maxY = t.GridPos.y;
         }
 
-        float offsetX = -(maxX * tileSize) / 2f;
-        float offsetY = -(maxY * tileSize) / 2f;
+        // Центрирование по X, с учётом размера тайла
+        float centerX = ((minX + maxX) / 2f) * tileSizeX;
+        // Центрирование по Y (но можно смещать только customOffset.y)
+        float centerY = ((minY + maxY) / 2f) * tileSizeY;
 
-        // Создаём массивы для каждого слоя
-        for (int l = 0; l < layersCount; l++)
-        {
-            _layers[l] = new TileView[maxX + 1, maxY + 1];
-        }
-
-        // Создаём тайлы
         foreach (var tileData in data.tiles)
         {
-            Vector3 worldPos = new Vector3(
-                tileData.position.x * tileSize + offsetX,
-                tileData.position.y * tileSize + offsetY,
+            Vector3 worldPos = new Vector3
+            (
+                tileData.WorldPos.x * tileSizeX - centerX,
+                tileData.WorldPos.y * tileSizeY - centerY + customOffset.y,
                 0f
             );
 
-            var tile = Instantiate(tileView, worldPos, Quaternion.identity, transform);
-            tile.GridPos = tileData.position;
-            tile.Init(state, tileData.TileType, tileData.layer);
+            var tile = Instantiate(tileViewPrefab, worldPos, Quaternion.identity, transform);
+            tile.Init(state, tileData, tileData.TileType, tileData.Layer);
 
-            _layers[tileData.layer][tileData.position.x, tileData.position.y] = tile;
+            _allTiles.Add(tile);
 
-            var spriteRenderer = tile.GetComponent<SpriteRenderer>();
-            if (spriteRenderer != null)
-            {
-                spriteRenderer.sortingOrder = tileData.layer;
-
-                spriteRenderer.color = Color.HSVToRGB(((int)tile.TileType % 12) / 12f, 0.8f, 1f);
-
-                if (tileData.layer < CurrentLayer)
-                {
-                    spriteRenderer.color *= lowerLayerDarken;
-                    tile.Disable();
-                }
-            }
+            if (tile.IsAvailable())
+                tile.Enable();
+            else
+                tile.Disable();
         }
-    } 
-    public void RemoveTiles(TileView a, TileView b)
+    }
+
+    void OnStatusChange(PlayState.PlayStatus playStatus)
     {
+        _status = playStatus;
+    }
+
+    public void RemoveTiles(TileView a, TileView b, Action<Vector3> spawn, Action<Vector3> callback)
+    {
+        if (_status != PlayState.PlayStatus.play) return;
+
         Vector3 joinPoint = (a.transform.position + b.transform.position) / 2f;
 
-        _layers[a.LayerIndex][a.GridPos.x, a.GridPos.y] = null;
-        _layers[b.LayerIndex][b.GridPos.x, b.GridPos.y] = null;
+        _allTiles.Remove(a);
+        _allTiles.Remove(b);
+         
+        Sequence seq = DOTween.Sequence();
 
-        a.RemoveWithJoin(joinPoint);
-        b.RemoveWithJoin(joinPoint);
+        seq.Join(a.RemoveWithJoin(joinPoint, spawn));
+        seq.Join(b.RemoveWithJoin(joinPoint, spawn));
 
-        StartCoroutine(WaitAndCheckLayer(a.LayerIndex));
-    } 
-    private IEnumerator WaitAndCheckLayer(int layer)
-    {
-        yield return new WaitForSeconds(0.3f); // ждём завершения анимации
-
-        if (IsLayerCleared(layer))
+        // Когда обе анимации завершены
+        seq.OnComplete(() =>
         {
-            int nextLayer = layer - 1;
-            CurrentLayer = nextLayer;
+            callback?.Invoke(joinPoint);
+            CheckLayerAfterRemove();
+        });
+    }
 
-            Debug.Log($"Слой {layer} очищен! Теперь активен слой {CurrentLayer}");
-
-            // Если открылся новый слой, восстановим нормальный цвет для него
-            if (CurrentLayer >= 0)
+    private void UpdateAllTiles()
+    {
+        foreach (var tile in _allTiles)
+        {
+            if (tile.IsAvailable())
             {
-                ApplyNormalColorToLayer(CurrentLayer);
-
-                // Проверяем доступные ходы
-                if (!HasAvailableMoves(CurrentLayer))
-                {
-                    Debug.Log("Нет доступных ходов — GAME OVER");
-                    OnLose?.Invoke();
-                }
+                tile.Enable();
             }
             else
             {
-                // Все слои очищены — игрок победил
-                Debug.Log("Все слои очищены — WIN");
-                OnWin?.Invoke();
+                tile.Disable();
             }
         }
-    } 
-    private bool IsLayerCleared(int layer)
-    {
-        var layerTiles = GetTilesOnLayer(layer);
-        if (layerTiles == null) return true;
-
-        for (int x = 0; x < layerTiles.GetLength(0); x++)
-        {
-            for (int y = 0; y < layerTiles.GetLength(1); y++)
-            {
-                if (layerTiles[x, y] != null)
-                    return false;
-            }
-        }
-        return true;
     }
-    public TileView[,] GetTilesOnLayer(int layer)
-    {
-        return _layers.ContainsKey(layer) ? _layers[layer] : null;
-    } 
-    // Проверяет: есть ли на слое хотя бы одна пара плиток, которые можно выбрать (оба кликабельны и одного типа)
-    public bool HasAvailableMoves(int layer)
-    {
-        var layerTiles = GetTilesOnLayer(layer);
-        if (layerTiles == null) return false;
 
-        // Собираем все кликабельные плитки на слое
-        List<TileView> clickable = new List<TileView>();
-        for (int x = 0; x < layerTiles.GetLength(0); x++)
+    private void CheckLayerAfterRemove()
+    { 
+        UpdateAllTiles();
+
+        if (IsBoardClear())
         {
-            for (int y = 0; y < layerTiles.GetLength(1); y++)
-            {
-                var tile = layerTiles[x, y];
-                if (tile == null) continue;
+            _state.SetRemoveAllTiles();
+        }
+        else if(!HasAvailableMoves()) 
+        {
+            OnLose?.Invoke();
+        }
+    }
 
-                // Используем существующий метод IsClickable
-                if (tile.IsAvailable(layerTiles, CurrentLayer))
+    public bool IsBoardClear()
+    {
+        return _allTiles.Count == 0;
+    }
+     
+    public bool HasAvailableMoves()
+    {
+        var availables = MadjongGenerator.GetFreeTiles();
+
+        for (int i = 0; i < availables.Count; i++)
+        {
+            for (int j = i + 1; j < availables.Count; j++)
+            {
+                if (availables[i].TileType == availables[j].TileType)
                 {
-                    clickable.Add(tile);
+                    return true;
                 }
             }
-        }
-
-        // Группируем по типу — если у какого-то типа >=2 => есть ход
-        Dictionary<Enums.TileType, int> counts = new Dictionary<Enums.TileType, int>();
-        foreach (var t in clickable)
-        {
-            if (!counts.ContainsKey(t.TileType)) counts[t.TileType] = 0;
-            counts[t.TileType]++;
-            if (counts[t.TileType] >= 2) return true;
-        }
+        } 
 
         return false;
-    } 
-    // Восстанавливаем "нормальный" цвет для слоя (ту же формулу, что использовалась при создании)
-    private void ApplyNormalColorToLayer(int layer)
+    }
+
+    public List<MadjongGenerator.TilePair> GetTilesInOrder()
     {
-        var layerTiles = GetTilesOnLayer(layer);
-        if (layerTiles == null) return;
+        return _pairs;
+    }
 
-        for (int x = 0; x < layerTiles.GetLength(0); x++)
+    public List<Enums.TileType> GetAvaiableTiles()
+    { 
+        var list = new List<Enums.TileType>();
+
+        var availables = MadjongGenerator.GetFreeTiles();
+
+        for (int i = 0; i < availables.Count; i++)
         {
-            for (int y = 0; y < layerTiles.GetLength(1); y++)
+            for (int j = i + 1; j < availables.Count; j++)
             {
-                var tile = layerTiles[x, y];
-
-                if (tile == null) continue;
-                tile.Enable();
-
-                var spriteRenderer = tile.GetComponent<SpriteRenderer>();
-                if (spriteRenderer != null)
+                if (availables[i].TileType == availables[j].TileType)
                 {
-                    spriteRenderer.color = Color.HSVToRGB(((int)tile.TileType % 12) / 12f, 0.8f, 1f);
+                    list.Add(availables[i].TileType);
                 }
             }
         }
+
+        return list;
     }
+
+    public IEnumerable<TileView> GetTilesOnLayer(int layer)
+    {
+        return _allTiles.Where(t => t.LayerIndex == layer);
+    }  
 }

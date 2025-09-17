@@ -1,9 +1,12 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Button))]
+
 public abstract class SourceSlot : MonoBehaviour
 {
+    public bool IsButton;
+    public bool EnableIcon = true;
     protected Image _icon;
     protected Image _background;
     protected SourceLayout _layout;
@@ -14,19 +17,22 @@ public abstract class SourceSlot : MonoBehaviour
     {
         _layout = layout;
 
-        if (TryGetComponent<Button>(out var button))
+        if (IsButton)
         {
-            _btnClick = button;
-        }
-        else
-        {
-            _btnClick = gameObject.AddComponent<Button>();
-        }
+            if (TryGetComponent<Button>(out var button))
+            {
+                _btnClick = button;
+            }
+            else
+            {
+                _btnClick = gameObject.AddComponent<Button>();
+            }
 
-        _btnClick.onClick.AddListener(OnClick);
+            _btnClick.onClick.AddListener(OnClick);
+        }
 
         _icon = transform.GetChild(0).GetComponent<Image>();
-        _icon.enabled = false;
+        if(_icon && !EnableIcon) _icon.enabled = false;
 
         _loading = GetComponentInChildren<Animation>();
 
@@ -48,5 +54,5 @@ public abstract class SourceSlot : MonoBehaviour
     public virtual void Dispose()
     {
         _btnClick?.onClick.RemoveListener(OnClick);
-    }
+    } 
 }

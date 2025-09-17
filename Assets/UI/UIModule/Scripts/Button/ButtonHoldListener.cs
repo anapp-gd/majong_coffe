@@ -24,12 +24,21 @@ public class ButtonHoldListener : MonoBehaviour, IPointerDownHandler, IPointerUp
     [Tooltip("Срабатывает один раз, когда удержание превысит holdThreshold")]
     public UnityEvent OnHoldComplete;
 
+    private bool isInteractable;
+
     private bool isPressed;
     private bool thresholdTriggered;
     private float holdTime;
 
+    public void SetInteractable(bool value)
+    {
+        isInteractable = value;
+    }
+
     public void OnPointerDown(PointerEventData eventData)
     {
+        if (!isInteractable) return;
+
         if (!isPressed)
         {
             isPressed = true;
@@ -41,6 +50,8 @@ public class ButtonHoldListener : MonoBehaviour, IPointerDownHandler, IPointerUp
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        if (!isInteractable) return;
+
         Release();
     }
 
@@ -64,7 +75,7 @@ public class ButtonHoldListener : MonoBehaviour, IPointerDownHandler, IPointerUp
 
     private void Update()
     {
-        if (isPressed)
+        if (isPressed && isInteractable)
         {
             holdTime += Time.unscaledDeltaTime; // без влияния Time.timeScale
             OnHold?.Invoke(holdTime);
