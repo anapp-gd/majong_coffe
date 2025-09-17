@@ -109,12 +109,6 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.unity.ads.ios-support": {
-      "version": "file:D:/SDK/com.unity.ads.ios-support-master/com.unity.ads.ios-support-master/com.unity.ads.ios-support",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {}
-    },
     "com.unity.ai.navigation": {
       "version": "2.0.8",
       "depth": 0,
@@ -368,14 +362,6 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
-    },
-    "io.appmetrica.analytics": {
-      "version": "file:D:/SDK/appmetrica-unity-plugin-main/appmetrica-unity-plugin-main",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {
-        "com.google.external-dependency-manager": "1.2.183"
-      }
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
