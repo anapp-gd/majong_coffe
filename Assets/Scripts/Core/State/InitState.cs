@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.SceneManagement;  
 
 public class InitState : State
 {
@@ -24,6 +24,8 @@ public class InitState : State
 
     private async Task InitializeAsync()
     {
+        Vibration.Init();
+
         // 1. Локальные модули
         EntityModule.Initialize();
 

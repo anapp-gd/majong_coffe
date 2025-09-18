@@ -86,6 +86,7 @@ public class WinWindow : SourceWindow
 
     void OnNext()
     {
+        if (PlayerEntity.Instance.IsVibro) Vibration.VibratePop();
         if (PlayerEntity.Instance.IsSound)
         {
             _audioSource.PlayOneShot(_audioClick);

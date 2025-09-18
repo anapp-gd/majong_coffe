@@ -25,6 +25,8 @@ public class BuildMenuPanel : SourcePanel
      
     void OnClose()
     {
+        if(PlayerEntity.Instance.IsVibro) Vibration.VibratePop();
+
         PlaySound();
 
         if (UIModule.TryGetCanvas<MainMenuCanvas>(out var mainMenuCanvas))

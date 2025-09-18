@@ -20,6 +20,7 @@ public class LoseWindow : SourceWindow
 
     void OnRestart()
     {
+        if (PlayerEntity.Instance.IsVibro) Vibration.VibratePop();
         if (PlayerEntity.Instance.IsSound)
         {
             _audioSource.PlayOneShot(_audioClick);

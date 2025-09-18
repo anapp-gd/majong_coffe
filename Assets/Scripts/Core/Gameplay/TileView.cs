@@ -105,6 +105,7 @@ public class TileView : MonoBehaviour
         if (_selected) _selected.gameObject.SetActive(true);
 
         if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioTap);
+        if (PlayerEntity.Instance.IsVibro) Vibration.VibratePop();
 
         SetOverlay(true);
 
@@ -131,6 +132,7 @@ public class TileView : MonoBehaviour
         if (_selected) _selected.gameObject.SetActive(false);
 
         if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioTap);
+        if (PlayerEntity.Instance.IsVibro) Vibration.VibratePop();
 
         SetOverlay(false);
 
@@ -153,6 +155,7 @@ public class TileView : MonoBehaviour
         seq.AppendCallback(() =>
         {
             if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioMerge);
+            if (PlayerEntity.Instance.IsVibro) Vibration.VibratePeek();
         });
 
         // 3. Скалируем

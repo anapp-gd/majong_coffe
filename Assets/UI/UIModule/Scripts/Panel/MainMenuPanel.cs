@@ -71,6 +71,7 @@ public class MainMenuPanel : SourcePanel
 
     void OnPlay()
     {
+        if (PlayerEntity.Instance.IsVibro) Vibration.VibratePop();
         if (PlayerEntity.Instance.IsSound)
         {
             _audioSource.PlayOneShot(_audioClick);
@@ -80,6 +81,7 @@ public class MainMenuPanel : SourcePanel
 
     void OnUpgrade()
     {
+        if (PlayerEntity.Instance.IsVibro) Vibration.VibratePop();
         if (PlayerEntity.Instance.IsSound)
         {
             _audioSource.PlayOneShot(_audioClick);

@@ -35,7 +35,8 @@ public class SettingsPanel : SourcePanel
 
     void OnClose()
     {
-        if(PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioClick);
+        if (PlayerEntity.Instance.IsVibro) Vibration.VibratePop();
+        if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioClick);
 
         PlayerEntity.Instance.Save();
 
@@ -44,6 +45,7 @@ public class SettingsPanel : SourcePanel
 
     void OnSoundChange()
     {
+        if (PlayerEntity.Instance.IsVibro) Vibration.VibratePop();
         if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioClick);
 
         bool result = !PlayerEntity.Instance.IsSound;
@@ -55,6 +57,7 @@ public class SettingsPanel : SourcePanel
 
     void OnMusicChange()
     {
+        if (PlayerEntity.Instance.IsVibro) Vibration.VibratePop();
         if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioClick);
 
         bool result = !PlayerEntity.Instance.IsMusic;
@@ -68,6 +71,7 @@ public class SettingsPanel : SourcePanel
 
     void OnVibroChange()
     {
+        if (PlayerEntity.Instance.IsVibro) Vibration.VibratePop();
         if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioClick);
 
         bool result = !PlayerEntity.Instance.IsVibro;
