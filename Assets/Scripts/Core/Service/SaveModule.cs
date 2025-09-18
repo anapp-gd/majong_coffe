@@ -72,9 +72,9 @@ public class SaveData
     public int MetaResources;
     public bool TutorDone;
     public int TutorialStage;
-    public bool IsSound;
-    public bool IsMusic;
-    public bool IsVibro;
+    public bool IsSound = true;
+    public bool IsMusic = true;
+    public bool IsVibro = true;
     public List<ItemSaveData> itemsData;
     public SaveData()
     {
