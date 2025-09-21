@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using UnityEngine;
+using AppsFlyerSDK;
 
 public static class iOSAdvertisementSupport
 {

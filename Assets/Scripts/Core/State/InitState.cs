@@ -15,10 +15,11 @@ public class InitState : State
 
     protected override void Awake()
     {
+        Application.targetFrameRate = 60;
     }
     protected override void Start()
     {
-        // Запускаем централизованную инициализацию
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         _ = InitializeAsync();
     }
 
@@ -26,26 +27,26 @@ public class InitState : State
     {
         Vibration.Init();
 
-        // 1. Локальные модули
+        // 1. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         EntityModule.Initialize();
 
         UIModule.Initialize();
 
-        // 2. Конфиг (ждём завершения)
+        // 2. пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
         var configLoaded = new TaskCompletionSource<bool>();
         ConfigModule.Initialize(this, () => configLoaded.SetResult(true));
         await configLoaded.Task;
 
-        // 3. SDK (по порядку)
+        // 3. SDK (пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
         await InitializeSDKs();
 
-        // 4. После полной инициализации грузим сцену
+        // 4. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
         LoadTargetScene();
     }
 
     private async Task InitializeSDKs()
     { 
-        // 1. Запрашиваем трекинг (iOS ATT)
+        // 1. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (iOS ATT)
         await iOSAdvertisementSupport.RequestTracking();
 
         // 2. AppsFlyer  
