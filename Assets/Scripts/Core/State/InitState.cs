@@ -15,6 +15,7 @@ public class InitState : State
 
     protected override void Awake()
     {
+        Application.targetFrameRate = 60;
     }
     protected override void Start()
     {
