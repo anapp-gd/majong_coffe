@@ -214,7 +214,7 @@ public class TutorState : PlayState
         {
             Vector3 joinPoint = (_firstTile.transform.position + clickedTile.transform.position) / 2f;
 
-            _board.RemoveTiles(_firstTile, clickedTile, InvokeMergeEffect, x =>
+            _board.InvokeMergeEvent(_firstTile, clickedTile, InvokeMergeEffect, x =>
             {
                 if (DishMapping.TryGetDish(clickedTile.TileType, out Enums.DishType type))
                 {

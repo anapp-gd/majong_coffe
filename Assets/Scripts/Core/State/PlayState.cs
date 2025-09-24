@@ -199,8 +199,7 @@ public class PlayState : State
 
         if (InProgress) return;
 
-        if (!clickedTile.IsAvailable())
-            return;
+        if (!clickedTile.IsAvailable()) return;
 
         if (!_window.IsFree)
         {
@@ -232,7 +231,7 @@ public class PlayState : State
 
             Vector3 joinPoint = (_firstTile.transform.position + clickedTile.transform.position) / 2f;
 
-            _board.RemoveTiles(_firstTile, clickedTile, InvokeMergeEffect, x =>
+            _board.InvokeMergeEvent(_firstTile, clickedTile, InvokeMergeEffect, x =>
             {  
                 if (DishMapping.TryGetDish(clickedTile.TileType, out Enums.DishType type))
                 {
@@ -241,10 +240,9 @@ public class PlayState : State
                     if (textureConfig.TryGetTextureData(type, out DishTextureData data))
                     {
                         var dish = new Dish(type, data.TextureDish);
-                        _window.AddDish(x, dish);
+                        _window.AddDish(x, dish, () => InProgress = false);
                     }
 
-                    InProgress = false;
                     _firstTile = null;
                 }
             }); 

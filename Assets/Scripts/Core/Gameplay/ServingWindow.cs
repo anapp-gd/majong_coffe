@@ -32,14 +32,14 @@ public class ServingWindow : MonoBehaviour
     }
 
 
-    public void AddDish(Vector3 worldMergePos, Dish dish)
+    public void AddDish(Vector3 worldMergePos, Dish dish, Action onComplete = null)
     {
         if (_status != PlayState.PlayStatus.play) return;
 
-        InvokeMoveTile(worldMergePos, dish);
+        InvokeMoveTile(worldMergePos, dish, onComplete);
     }
 
-    void InvokeMoveTile(Vector3 mergeWorldPos, Dish dish)
+    void InvokeMoveTile(Vector3 mergeWorldPos, Dish dish, Action onComplete)
     {
         if (_layout == null)
         {
@@ -67,19 +67,21 @@ public class ServingWindow : MonoBehaviour
         flyIcon.PlayFlyWorld(targetPos, duration, () =>
         {
             // Проверяем, свободен ли слот к моменту завершения
-            if (!_layout.AddObject(dish, flyIcon.transform, () =>  OnFlyComplete(dish, flyIcon)))
+            if (!_layout.AddObject(dish, flyIcon.transform, () =>  OnFlyComplete(dish, flyIcon, onComplete)))
             {
                 flyIcon.CancelFly();
             } 
         });
     }
 
-    void OnFlyComplete(Dish dish, FlyIcon icon)
+    void OnFlyComplete(Dish dish, FlyIcon icon, Action onComplete)
     {
         _readyDishes.Add(dish);
         _currentIconsFly.Remove(icon);
 
         if (_currentInGameCountDishes >= 5) _state.ForceTakeDish(); 
+
+        onComplete?.Invoke();
     }
 
     public void Finish()
