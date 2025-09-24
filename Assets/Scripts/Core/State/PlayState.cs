@@ -37,8 +37,7 @@ public class PlayState : State
     protected Board _board;
     protected ServingWindow _window;
     protected ClientService _client;
-    protected Camera _camera;
-
+    protected Camera _camera; 
     protected TileView _firstTile;
 
     protected HashSet<Enums.DishType> _haseDish;
@@ -226,26 +225,14 @@ public class PlayState : State
         }
 
         if (_firstTile.CompareType(clickedTile.TileType))
-        {
+        { 
             InProgress = true;
 
             Vector3 joinPoint = (_firstTile.transform.position + clickedTile.transform.position) / 2f;
 
-            _board.InvokeMergeEvent(_firstTile, clickedTile, InvokeMergeEffect, x =>
-            {  
-                if (DishMapping.TryGetDish(clickedTile.TileType, out Enums.DishType type))
-                {
-                    var textureConfig = ConfigModule.GetConfig<TextureConfig>();
+            _board.InvokeMergeEvent(_firstTile, clickedTile, InvokeMergeEffect, InvokeDish);
 
-                    if (textureConfig.TryGetTextureData(type, out DishTextureData data))
-                    {
-                        var dish = new Dish(type, data.TextureDish);
-                        _window.AddDish(x, dish, () => InProgress = false);
-                    }
-
-                    _firstTile = null;
-                }
-            }); 
+            _firstTile = null;
         }
         else
         {
@@ -253,6 +240,22 @@ public class PlayState : State
             _firstTile = clickedTile;
             _firstTile.Select();
         }
+    }
+
+    void InvokeDish(Enums.TileType tileType, Vector3 mergePos)
+    {
+        if (DishMapping.TryGetDish(tileType, out Enums.DishType type))
+        {
+            var textureConfig = ConfigModule.GetConfig<TextureConfig>();
+
+            if (textureConfig.TryGetTextureData(type, out DishTextureData data))
+            {
+                var dish = new Dish(type, data.TextureDish);
+                _window.AddDish(mergePos, dish);
+            } 
+        }
+
+        InProgress = false;
     }
     
     protected void InvokePlayStatusChanged(PlayStatus status)

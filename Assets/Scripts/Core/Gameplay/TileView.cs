@@ -164,10 +164,11 @@ public class TileView : MonoBehaviour
         return seq;
     }
 
+    public void RemoveInGenerator() => MadjongGenerator.RemoveTile(_data); 
+
     void onComplete()
     {
         if (_selected) _selected.gameObject.SetActive(false);
-        MadjongGenerator.RemoveTile(_data);
         Destroy(gameObject);
     }
 }

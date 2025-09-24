@@ -212,23 +212,14 @@ public class TutorState : PlayState
 
         if (_firstTile.CompareType(clickedTile.TileType))
         {
+            InProgress = true;
+
             Vector3 joinPoint = (_firstTile.transform.position + clickedTile.transform.position) / 2f;
 
-            _board.InvokeMergeEvent(_firstTile, clickedTile, InvokeMergeEffect, x =>
-            {
-                if (DishMapping.TryGetDish(clickedTile.TileType, out Enums.DishType type))
-                {
-                    var textureConfig = ConfigModule.GetConfig<TextureConfig>();
+            _board.InvokeMergeEvent(_firstTile, clickedTile, InvokeMergeEffect, InvokeDish);
 
-                    if (textureConfig.TryGetTextureData(type, out DishTextureData data))
-                    {
-                        var dish = new Dish(type, data.TextureDish);
-                        _window.AddDish(x, dish);
-                    }
-
-                    _firstTile = null;
-                }
-            });
+            _firstTile?.Deselect();
+            _firstTile = null;
         }
         else
         {
@@ -236,5 +227,21 @@ public class TutorState : PlayState
             _firstTile = clickedTile;
             _firstTile.Select();
         }
-    } 
+    }
+
+    void InvokeDish(Enums.TileType tileType, Vector3 mergePos)
+    {
+        if (DishMapping.TryGetDish(tileType, out Enums.DishType type))
+        {
+            var textureConfig = ConfigModule.GetConfig<TextureConfig>();
+
+            if (textureConfig.TryGetTextureData(type, out DishTextureData data))
+            {
+                var dish = new Dish(type, data.TextureDish);
+                _window.AddDish(mergePos, dish);
+            }
+        }
+
+        InProgress = false;
+    }
 }
