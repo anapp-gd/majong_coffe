@@ -109,12 +109,12 @@ public class TileView : MonoBehaviour
 
         SetOverlay(true);
 
-        transform.DOScale(_baseScale * 1.08f, 0.15f)
+        transform.DOScale(_baseScale * 1.12f, 0.12f)
                  .SetLoops(2, LoopType.Yoyo);
     }
      
     void SetOverlay(bool value)
-    {
+    { 
         if (value)
         {
             _viewBack.sortingOrder = 98;
@@ -136,17 +136,19 @@ public class TileView : MonoBehaviour
 
         SetOverlay(false);
 
-        transform.DOScale(_baseScale, 0.1f);
+        transform.DOScale(_baseScale, 0.12f);
     }
 
     public Tween RemoveWithJoin(Vector3 to, Action<Vector3> spawnMergeEffect)
     {
+        _collider.enabled = false;
+
         SetOverlay(true); 
 
         Sequence seq = DOTween.Sequence();
 
         // 1. Двигаем
-        seq.Append(transform.DOMove(to, 0.15f));
+        seq.Append(transform.DOMove(to, 0.12f));
 
         // 2. Колбэк между движением и скейлом
         if (spawnMergeEffect != null)
@@ -159,7 +161,7 @@ public class TileView : MonoBehaviour
         });
 
         // 3. Скалируем
-        seq.Append(transform.DOScale(0f, 0.15f).OnComplete(onComplete));
+        seq.Append(transform.DOScale(0f, 0.12f).OnComplete(onComplete));
 
         return seq;
     }

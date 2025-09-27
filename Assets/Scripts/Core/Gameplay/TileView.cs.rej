@@ -1,0 +1,10 @@
+diff a/Assets/Scripts/Core/Gameplay/TileView.cs b/Assets/Scripts/Core/Gameplay/TileView.cs	(rejected hunks)
+@@ -161,7 +161,7 @@
+         });
+ 
+         // 3. ���������
+-        seq.Append(transform.DOScale(0f, 0.15f).OnComplete(onComplete));
++        seq.Append(transform.DOScale(0f, 1f).OnComplete(onComplete));
+ 
+         return seq;
+     }

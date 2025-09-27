@@ -1,6 +1,7 @@
 ﻿using DG.Tweening;
 using System;
-using System.Collections.Generic;
+using System.Collections;
+using System.Collections.Generic; 
 using UnityEngine;
 
 public class ServingWindow : MonoBehaviour
@@ -12,11 +13,15 @@ public class ServingWindow : MonoBehaviour
     private List<Dish> _readyDishes = new();
     private PlayState.PlayStatus _status;
     private WorldHorizontalLayout _layout;
+    private bool _isForceTaken;
 
     public bool IsFree => _currentInGameCountDishes < 5;
 
-    private int _currentInGameCountDishes;
+    private int _currentInGameCountDishes => _readyDishes.Count + _currentIconsFly.Count;
     private List<FlyIcon> _currentIconsFly;
+
+    private Queue<(Dish dish, Vector3 pos, Action onComplete)> _dishQueue = new();
+    private bool _processingQueue = false;
 
     public void Init(PlayState state)
     {
@@ -26,63 +31,104 @@ public class ServingWindow : MonoBehaviour
         _currentIconsFly = new List<FlyIcon>();
     }
 
-    void OnPlayStatusChange(PlayState.PlayStatus playStatus)
+    private void OnPlayStatusChange(PlayState.PlayStatus status)
     {
-        _status = playStatus;
+        _status = status;
     }
 
-
-    public void AddDish(Vector3 worldMergePos, Dish dish, Action onComplete = null)
+    public void EnqueueDish(Dish dish, Vector3 mergePos, Action onComplete = null)
     {
-        if (_status != PlayState.PlayStatus.play) return;
+        _dishQueue.Enqueue((dish, mergePos, onComplete));
 
-        InvokeMoveTile(worldMergePos, dish, onComplete);
-    }
-
-    void InvokeMoveTile(Vector3 mergeWorldPos, Dish dish, Action onComplete)
-    {
-        if (_layout == null)
+        if (!_processingQueue)
         {
-            Debug.LogError("Layout не установлен!");
-            return;
+            StartCoroutine(ProcessQueue());
+        }
+    }
+
+    private IEnumerator ProcessQueue()
+    {
+        _processingQueue = true;
+
+        _isForceTaken = false;
+
+        while (_dishQueue.Count > 0)
+        {
+            var (dish, spawnPos, onComplete) = _dishQueue.Peek();
+
+            // Ждём, пока появится свободный слот
+            DishSlot slot = null;
+            yield return new WaitUntil(() =>
+            { 
+                return !_isForceTaken && !_layout.IsBusy;
+            });
+
+            yield return new WaitUntil(() =>
+            {
+                slot = _layout.GetNextSlot();
+                return slot != null;
+            }); 
+
+            // Создаём FlyIcon
+            var flyIcon = Instantiate(_flyIcon);
+            flyIcon.InvokeFly(dish.Icon);
+            flyIcon.transform.position = spawnPos;
+            flyIcon.transform.localScale = Vector3.zero;
+            _currentIconsFly.Add(flyIcon);
+
+            // Ждём завершения полёта
+            yield return flyIcon.PlayFlyWorld(slot.transform.position, 0.15f).WaitForCompletion();
+
+            // Добавляем в layout → ждём анимацию scale + перестройку
+            yield return StartCoroutine(_layout.AddObjectRoutine(dish, flyIcon.transform, () =>
+            {
+                OnFlyComplete(dish, flyIcon, onComplete);
+            }));
+
+            // Убираем из очереди
+            _dishQueue.Dequeue();
         }
 
-        // 1. Создаём иконку в мире
-        var flyIcon = Instantiate(_flyIcon);
-        flyIcon.InvokeFly(dish.Icon);
-        flyIcon.transform.position = mergeWorldPos;
-        flyIcon.transform.localScale = Vector3.zero;
-
-        // 2. Получаем целевой слот
-        Vector3 targetPos = _layout.GetNextSlot(); 
-
-        // 3. Настройки анимации
-        float duration = 0.2f;
-
-        _currentIconsFly.Add(flyIcon);
-
-        _currentInGameCountDishes++;
-
-        // 4. Запускаем анимацию
-        flyIcon.PlayFlyWorld(targetPos, duration, () =>
-        {
-            // Проверяем, свободен ли слот к моменту завершения
-            if (!_layout.AddObject(dish, flyIcon.transform, () =>  OnFlyComplete(dish, flyIcon, onComplete)))
-            {
-                flyIcon.CancelFly();
-            } 
-        });
+        _processingQueue = false;
     }
-
-    void OnFlyComplete(Dish dish, FlyIcon icon, Action onComplete)
+     
+    private void OnFlyComplete(Dish dish, FlyIcon icon, Action onComplete)
     {
         _readyDishes.Add(dish);
         _currentIconsFly.Remove(icon);
-
-        if (_currentInGameCountDishes >= 5) _state.ForceTakeDish(); 
-
         onComplete?.Invoke();
+
+        // Если превысили лимит, можно форсировать сброс
+        if (_currentInGameCountDishes >= 5)
+        {
+            _isForceTaken = true;
+
+            _state.ForceTakeDish(CompleteForceTake);
+        }
     }
+
+    void CompleteForceTake() => _isForceTaken = false; 
+
+    public IEnumerator TryTakeDish(Enums.DishType dishType, Action<Enums.DishType, Dish> onComplete)
+    {
+        if (_status != PlayState.PlayStatus.play || _readyDishes.Count == 0)
+        {
+            onComplete?.Invoke(dishType, null);
+            yield break;
+        }
+
+        // FIFO
+        var dish = _readyDishes[0];
+        _readyDishes.RemoveAt(0);
+
+        yield return _layout.RemoveObjectRoutine(dish);
+
+        if (_readyDishes.Count == 0)
+            _state.SetTableValue(true);
+
+        onComplete?.Invoke(dishType, dish);
+    }
+
 
     public void Finish()
     {
@@ -92,28 +138,4 @@ public class ServingWindow : MonoBehaviour
         }
     }
 
-    public bool TryTakeDish(Enums.DishType dishType, out Dish dish)
-    {
-        dish = null;
-
-        if (_status != PlayState.PlayStatus.play)
-            return false;
-
-        if (_readyDishes == null || _readyDishes.Count == 0)
-            return false; // нет блюд вообще    
-
-        // всегда берём первый добавленный (FIFO)
-        dish = _readyDishes[0];
-
-        _layout.RemoveObject(dish);
-        _readyDishes.RemoveAt(0);
-
-        _currentInGameCountDishes--;
-
-        if (_readyDishes.Count == 0)
-            _state.SetTableClear();
-
-        // возвращаем true — клиент сам решает, совпал ли тип
-        return true;
-    } 
 }

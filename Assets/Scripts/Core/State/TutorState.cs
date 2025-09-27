@@ -1,3 +1,5 @@
+using DG.Tweening;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -52,24 +54,14 @@ public class TutorState : PlayState
 
     public override void SetRemoveAllTiles()
     {
-        switch (stage)
+        _window.Finish();
+
+        _client.Finish(() =>
         {
-            case 0:
-                _client.Finish();
-                _window.Finish();
-                Win();
-                break;
-            case 1:
-                _client.Finish();
-                _window.Finish();
-                Win();
-                break;
-            case 2:
-                _client.Finish();
-                _window.Finish();
-                Win();
-                break;
-            default:
+            _winConditions.SetCompleted(WinCondition.RemoveAllTiles, true);
+
+            if (stage >= 3)
+            {
                 PlayerEntity.Instance.TutorialStage = 3;
                 PlayerEntity.Instance.TutorDone = true;
                 PlayerEntity.Instance.Save();
@@ -80,8 +72,10 @@ public class TutorState : PlayState
                         SceneManager.LoadScene(1);
                     });
                 }
-                break;
-        }
+            }
+        });
+
+        
     }
 
     public override void AddValue(int value)
@@ -209,39 +203,52 @@ public class TutorState : PlayState
             _firstTile = null;
             return;
         }
-
         if (_firstTile.CompareType(clickedTile.TileType))
-        {
-            InProgress = true;
-
-            Vector3 joinPoint = (_firstTile.transform.position + clickedTile.transform.position) / 2f;
-
-            _board.InvokeMergeEvent(_firstTile, clickedTile, InvokeMergeEffect, InvokeDish);
+        { 
+            StartCoroutine(MergeAndCreateDish(_firstTile, clickedTile));
 
             _firstTile?.Deselect();
             _firstTile = null;
         }
         else
         {
-            _firstTile.Deselect();
+            _firstTile?.Deselect();
             _firstTile = clickedTile;
-            _firstTile.Select();
+            _firstTile?.Select();
         }
-    }
+    } 
 
-    void InvokeDish(Enums.TileType tileType, Vector3 mergePos)
+    private IEnumerator MergeAndCreateDish(TileView a, TileView b)
     {
-        if (DishMapping.TryGetDish(tileType, out Enums.DishType type))
+        SwitchProgress();
+
+        // Точка объединения
+        Vector3 joinPoint = (a.transform.position + b.transform.position) / 2f;
+
+        // Запускаем анимацию слияния плиток
+        var seq = _board.InvokeMergeEvent(a, b, InvokeMergeEffect);
+        if (seq != null)
+            yield return seq.WaitForCompletion();
+
+        SwitchProgress();
+
+        // Создаём блюдо после завершения анимации
+        if (DishMapping.TryGetDish(a.TileType, out Enums.DishType type))
         {
             var textureConfig = ConfigModule.GetConfig<TextureConfig>();
-
             if (textureConfig.TryGetTextureData(type, out DishTextureData data))
             {
                 var dish = new Dish(type, data.TextureDish);
-                _window.AddDish(mergePos, dish);
+
+                // Ставим блюдо в очередь и ждём, пока оно будет добавлено на стол
+                bool completed = false;
+                _window.EnqueueDish(dish, joinPoint, () => completed = true);
+
+                yield return new WaitUntil(() => completed);
             }
         }
-
-        InProgress = false;
     }
+
+    void SwitchProgress() => InProgress = !InProgress;
+
 }

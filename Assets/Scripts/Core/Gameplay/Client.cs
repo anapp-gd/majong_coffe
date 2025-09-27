@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using DG.Tweening;
+using System.Collections;
 
 public class Client : MonoBehaviour
 {
@@ -26,37 +27,32 @@ public class Client : MonoBehaviour
         _sadReaction?.gameObject.SetActive(false);
     }
 
-    public bool FinishTakeDish(Enums.DishType targetDish)
+    public IEnumerator FinishTakeDish(Enums.DishType targetDish)
     {
-        if (_window.TryTakeDish(targetDish, out Dish dish))
-        {
-            if (targetDish == dish.Type)
-                FinalyLeave(dish, success: true);
-            else
-                FinalyLeave(dish, success: false);
-            return true;
-        }
-        else
-        {
-            FinalyLeave(null, success: false);
-            return false;
-        }
+        yield return _window.TryTakeDish(targetDish, takeDish); 
     }
 
-    public bool TryTakeDish(Enums.DishType targetDish)
+    public IEnumerator TryTakeDish(Enums.DishType targetDish)
     {
-        if (_window.TryTakeDish(targetDish, out Dish dish))
+        yield return _window.TryTakeDish(targetDish, takeDish); 
+    }
+
+    void takeDish(Enums.DishType targetDish, Dish dish)
+    {
+        if (dish == null)
         {
-            if (targetDish == dish.Type)
-                Leave(dish, success: true);
-            else
-                Leave(dish, success: false); 
-            return true;
+            Leave(null, false); 
         }
         else
         {
-            Leave(null, success: false); 
-            return false;
+            if (targetDish == dish.Type)
+            {
+                Leave(dish, success: true);
+            }
+            else
+            {
+                Leave(dish, success: false);
+            }
         }
     }
 

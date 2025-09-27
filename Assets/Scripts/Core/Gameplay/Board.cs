@@ -85,11 +85,9 @@ public class Board : MonoBehaviour
         _status = playStatus;
     }
 
-    public void InvokeMergeEvent(TileView a, TileView b, Action<Vector3> spawn, Action<Enums.TileType, Vector3> callback)
+    public Sequence InvokeMergeEvent(TileView a, TileView b, Action<Vector3> spawn)
     {
-        if (_status != PlayState.PlayStatus.play) return;
-
-        var type = a.TileType;
+        if (_status != PlayState.PlayStatus.play) return null;
 
         Vector3 joinPoint = (a.transform.position + b.transform.position) / 2f;
 
@@ -104,12 +102,12 @@ public class Board : MonoBehaviour
         seq.Join(a.RemoveWithJoin(joinPoint, spawn));
         seq.Join(b.RemoveWithJoin(joinPoint, spawn));
 
-        // Когда обе анимации завершены
         seq.OnComplete(() =>
-        { 
-            CheckLayerAfterRemove(); 
-            callback?.Invoke(type, joinPoint);
+        {
+            CheckLayerAfterRemove();
         });
+
+        return seq;
     }
 
     private void UpdateAllTiles()

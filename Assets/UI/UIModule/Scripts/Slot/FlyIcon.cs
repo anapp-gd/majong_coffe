@@ -25,9 +25,10 @@ public class FlyIcon : MonoBehaviour
     }
 
     /// <summary>
-    /// Запуск анимации полёта (в мировых координатах)
+    /// Запуск анимации полёта (в мировых координатах).
+    /// Возвращает Tween, который можно await/yield return.
     /// </summary>
-    public void PlayFlyWorld(Vector3 endWorldPos, float duration, System.Action onArrive)
+    public Tween PlayFlyWorld(Vector3 endWorldPos, float duration)
     {
         // если уже что-то летит → убиваем
         _flySequence?.Kill();
@@ -40,14 +41,15 @@ public class FlyIcon : MonoBehaviour
         // Этап 2: полёт
         _flySequence.Append(transform.DOMove(endWorldPos, duration).SetEase(Ease.InOutCubic));
 
-        // Этап 3: прибытие
+        // Этап 3: сброс состояния
         _flySequence.OnComplete(() =>
         {
             _flySequence = null;
-            onArrive?.Invoke();
         });
+
+        return _flySequence;
     }
-     
+
 
     /// <summary>
     /// Прервать полёт (например, слот занят)

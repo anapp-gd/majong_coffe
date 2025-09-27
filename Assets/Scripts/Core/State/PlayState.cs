@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic; 
 using UnityEngine;
@@ -8,7 +9,7 @@ public class PlayState : State
     [SerializeField] protected AudioClip _audioWin;
     [SerializeField] protected AudioClip _audioLose;
 
-    public bool InProgress;
+    public bool InProgress = false;
     public event Action<PlayStatus> PlayStatusChanged;
     protected PlayStatus _status;
     protected AudioSource _audioSource;
@@ -93,19 +94,22 @@ public class PlayState : State
 
     public virtual void SetRemoveAllTiles()
     {
-        _client.Finish();
         _window.Finish();
-        _winConditions.SetCompleted(WinCondition.RemoveAllTiles, true);
+
+        _client.Finish(()=>
+        {
+            _winConditions.SetCompleted(WinCondition.RemoveAllTiles, true);
+        });
     }
 
-    public virtual void ForceTakeDish()
+    public virtual void ForceTakeDish(Action callback)
     {
-        _client.ForceTakeDish();
+        _client.ForceTakeDish(callback);
     }
 
-    public virtual void SetTableClear()
+    public virtual void SetTableValue(bool value)
     {
-        _winConditions.SetCompleted(WinCondition.TableClear, true);
+        _winConditions.SetCompleted(WinCondition.TableClear, value);
     } 
 
     public virtual void AddValue(int value)
@@ -195,69 +199,81 @@ public class PlayState : State
     protected virtual void HandleTileClick(TileView clickedTile)
     {
         if (_status != PlayStatus.play) return;
-
         if (InProgress) return;
-
         if (!clickedTile.IsAvailable()) return;
 
         if (!_window.IsFree)
         {
             if (_firstTile != null)
             {
-                _firstTile.Deselect();
+                _firstTile?.Deselect();
                 _firstTile = null;
-            } 
+            }
             return;
         }
 
         if (_firstTile == null)
         {
             _firstTile = clickedTile;
-            _firstTile.Select();
+            _firstTile?.Select();
             return;
         }
 
         if (_firstTile == clickedTile)
         {
-            _firstTile.Deselect();
+            _firstTile?.Deselect();
             _firstTile = null;
             return;
         }
 
         if (_firstTile.CompareType(clickedTile.TileType))
         { 
-            InProgress = true;
+            StartCoroutine(MergeAndCreateDish(_firstTile, clickedTile));
 
-            Vector3 joinPoint = (_firstTile.transform.position + clickedTile.transform.position) / 2f;
-
-            _board.InvokeMergeEvent(_firstTile, clickedTile, InvokeMergeEffect, InvokeDish);
-
+            _firstTile?.Deselect();
             _firstTile = null;
         }
         else
         {
-            _firstTile.Deselect();
+            _firstTile?.Deselect();
             _firstTile = clickedTile;
-            _firstTile.Select();
+            _firstTile?.Select();
         }
     }
 
-    void InvokeDish(Enums.TileType tileType, Vector3 mergePos)
+    private IEnumerator MergeAndCreateDish(TileView a, TileView b)
     {
-        if (DishMapping.TryGetDish(tileType, out Enums.DishType type))
+        SwitchProgress();
+
+        // Точка объединения
+        Vector3 joinPoint = (a.transform.position + b.transform.position) / 2f;
+
+        // Запускаем анимацию слияния плиток
+        var seq = _board.InvokeMergeEvent(a, b, InvokeMergeEffect);
+
+        if (seq != null) yield return seq.WaitForCompletion();
+
+        SwitchProgress();
+
+        // Создаём блюдо после завершения анимации
+        if (DishMapping.TryGetDish(a.TileType, out Enums.DishType type))
         {
             var textureConfig = ConfigModule.GetConfig<TextureConfig>();
-
             if (textureConfig.TryGetTextureData(type, out DishTextureData data))
             {
                 var dish = new Dish(type, data.TextureDish);
-                _window.AddDish(mergePos, dish);
-            } 
-        }
 
-        InProgress = false;
+                // Ставим блюдо в очередь и ждём, пока оно будет добавлено на стол
+                bool completed = false;
+                _window.EnqueueDish(dish, joinPoint, () => completed = true);
+
+                yield return new WaitUntil(() => completed);
+            }
+        }
     }
-    
+
+    void SwitchProgress() => InProgress = !InProgress;
+
     protected void InvokePlayStatusChanged(PlayStatus status)
     {
         PlayStatusChanged?.Invoke(status);
