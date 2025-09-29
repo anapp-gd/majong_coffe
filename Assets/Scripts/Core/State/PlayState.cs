@@ -51,8 +51,7 @@ public class PlayState : State
     } 
 
     public int GetResaultValue => _resultValue;
-    protected int _resultValue;
-    protected WinConditions _winConditions; 
+    protected int _resultValue; 
 
     protected override void Awake()
     {
@@ -74,14 +73,10 @@ public class PlayState : State
         _client = Instantiate(service);
         _client.Init(this, _haseDish);
 
-        _board.OnLose += Lose; 
+        _board.OnLose += Lose;
+        _board.OnWin += Win;
 
-        UIModule.Inject(this, _board, _window, _client);
-
-        _winConditions = new WinConditions(new[] 
-        {
-            WinCondition.TableClear, WinCondition.RemoveAllTiles
-        });
+        UIModule.Inject(this, _board, _window, _client); 
     }
 
     public override void Close()
@@ -92,26 +87,38 @@ public class PlayState : State
         }
     }
 
-    public virtual void SetRemoveAllTiles()
+    public virtual void Win()
+    {
+        StartCoroutine(WinRoutine());
+    } 
+    protected virtual IEnumerator WinRoutine()
     {
         _window.Finish();
 
-        _client.Finish(()=>
+        yield return _client.Finish();
+
+        InvokePlayStatusChanged(PlayStatus.win);
+        _status = PlayStatus.win;
+
+        AnalyticsHolder.LevelFinish(PlayerEntity.Instance.GetCurrentLevel);
+
+        if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioWin);
+
+        PlayerEntity.Instance.SetNextLevel();
+
+        if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
         {
-            _winConditions.SetCompleted(WinCondition.RemoveAllTiles, true);
-        });
-    }
+            playCanvas.OpenPanel<WinPanel>(true).OpenWindow<WinWindow>();
+        }
+
+        AnalyticsHolder.Victory();
+    } 
 
     public virtual void ForceTakeDish(Action callback)
     {
         _client.ForceTakeDish(callback);
     }
-
-    public virtual void SetTableValue(bool value)
-    {
-        _winConditions.SetCompleted(WinCondition.TableClear, value);
-    } 
-
+     
     public virtual void AddValue(int value)
     {
         _resultValue += value;
@@ -157,29 +164,10 @@ public class PlayState : State
 
     protected virtual void OnDestroy()
     {
-        _board.OnLose -= Lose; 
+        _board.OnLose -= Lose;
+        _board.OnWin -= Win;
     }
-     
-
-    public virtual void Win()
-    {
-        AnalyticsHolder.LevelFinish(PlayerEntity.Instance.GetCurrentLevel);
-
-        if (PlayerEntity.Instance.IsSound) _audioSource.PlayOneShot(_audioWin);
-
-        PlayerEntity.Instance.SetNextLevel();
-
-        if (UIModule.TryGetCanvas<PlayCanvas>(out var playCanvas))
-        {
-            playCanvas.OpenPanel<WinPanel>(true).OpenWindow<WinWindow>();
-        }
-
-        InvokePlayStatusChanged(PlayStatus.win);
-        _status = PlayStatus.win;
-
-        AnalyticsHolder.Victory();
-    }
-
+      
     public virtual void Lose()
     {
         AnalyticsHolder.LevelFinish(PlayerEntity.Instance.GetCurrentLevel);
@@ -199,7 +187,9 @@ public class PlayState : State
     protected virtual void HandleTileClick(TileView clickedTile)
     {
         if (_status != PlayStatus.play) return;
+
         if (InProgress) return;
+
         if (!clickedTile.IsAvailable()) return;
 
         if (!_window.IsFree)

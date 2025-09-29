@@ -156,11 +156,8 @@ public class WorldHorizontalLayout : MonoBehaviour
         OnAddStart?.Invoke(dish, freeSlot);
          
         // масштабируем объект
-        yield return obj.DOScale(Vector3.one, 0.12f).SetEase(Ease.OutBack).WaitForCompletion();
-
-        /*// запускаем перестройку с ожиданием
-        yield return StartCoroutine(UpdateLayoutAnimated());
-        // всё закончилось — вызываем коллбэки*/
+        yield return obj.DOScale(Vector3.one, 0.1f).SetEase(Ease.OutBack).WaitForCompletion();
+         
         addCallback?.Invoke();
 
         IsBusy = false;
@@ -204,11 +201,10 @@ public class WorldHorizontalLayout : MonoBehaviour
         OnRemoveStart?.Invoke(dish, slot);
 
         IsBusy = false;
-
-        // Шаг 1: анимация уменьшения объекта
+         
         if (obj != null)
         {
-            yield return obj.DOScale(Vector3.zero, 0.12f).SetEase(Ease.InBack).WaitForCompletion();
+            yield return obj.DOScale(Vector3.zero, 0.1f).SetEase(Ease.InBack).WaitForCompletion();
 
             Destroy(obj.gameObject);
         }
@@ -273,7 +269,7 @@ public class WorldHorizontalLayout : MonoBehaviour
         foreach (var slot in orderedSlots)
         {
             Vector3 target = startPos + Vector3.right * (orderedSlots.IndexOf(slot) * currentSpacing);
-            seq.Join(slot.transform.DOLocalMove(target, 0.12f).SetEase(Ease.OutCubic));
+            seq.Join(slot.transform.DOLocalMove(target, 0.08f).SetEase(Ease.OutCubic));
         }
          
         // Ждём завершения Sequence в корутине

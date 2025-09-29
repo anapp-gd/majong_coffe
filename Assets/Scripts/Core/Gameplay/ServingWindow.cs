@@ -122,20 +122,15 @@ public class ServingWindow : MonoBehaviour
         _readyDishes.RemoveAt(0);
 
         yield return _layout.RemoveObjectRoutine(dish);
-
-        if (_readyDishes.Count == 0)
-            _state.SetTableValue(true);
-
+         
         onComplete?.Invoke(dishType, dish);
     }
-
-
+     
     public void Finish()
     {
         foreach (var icon in _currentIconsFly)
         {
             icon.CancelFly();
         }
-    }
-
+    } 
 }

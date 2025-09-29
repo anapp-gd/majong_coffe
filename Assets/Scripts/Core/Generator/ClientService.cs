@@ -67,36 +67,38 @@ public class ClientService : MonoBehaviour
             _spawnTimer = _spawnInterval;
         }
     }
-    public void Finish(Action callback)
-    {
-        StartCoroutine(FinishRoutine(callback));
-    }
 
-    IEnumerator FinishRoutine(Action callback)
+    public IEnumerator Finish()
     {
+        yield return StartCoroutine(FinishRoutine());
+    }
+    IEnumerator FinishRoutine()
+    {
+        // ждём пока клиентов будет хотя бы столько же, сколько заказов
+        yield return new WaitUntil(() => _clients.Count >= _orders.Count);
+
         int index = 0;
 
         while (index < _clients.Count && _orders.Count > 0)
         {
             var client = _clients[index];
 
-            if (client != null)
+            if (client != null && _orders.Count > 0)
             {
-                // Ждём завершения анимации забора блюда
-                yield return client.FinishTakeDish(_orders[0]);
+                var dish = _orders[0];
 
-                // После завершения убираем заказ из очереди
-                _orders.RemoveAt(0);
+                yield return client.FinishTakeDish(dish);
+
+                if (_orders.Count > 0) _orders.RemoveAt(0);
             }
 
-            index++; // Переходим к следующему клиенту
+            index++;
         }
 
         UpdateUI();
 
-        callback?.Invoke();
+        yield return new WaitForSeconds(0.1f);
     }
-
 
     private void Update()
     {
@@ -193,37 +195,10 @@ public class ClientService : MonoBehaviour
 
         UpdateUI(); 
     }
-
-    private Enums.DishType GetRandomDish()
-    {
-        var tiles = _state.GetAvaiablesTiles();
-         
-        int index = UnityEngine.Random.Range(0, tiles.Count);
-        int i = 0;
-
-        Enums.DishType dish = Enums.DishType.FriedEgg;
-
-        foreach (var tile in tiles)
-        {
-            if (i == index)
-            {
-                if (DishMapping.TryGetDish(tile, out dish))
-                {
-                    break;
-                } 
-            }
-
-            i++;
-        }
-
-
-        return dish;
-    }
-
+     
     private void OnClientLeft(Client client)
     {
-        if (_clients.Contains(client))
-            _clients.Remove(client);
+        if (_clients.Contains(client)) _clients.Remove(client);
 
         // после ухода смещаем всех вперёд
         for (int i = 0; i < _clients.Count; i++)

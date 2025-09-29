@@ -14,10 +14,7 @@ public class WinConditions
 
     public void SetCompleted(WinCondition condition, bool value = true)
     {
-        if (conditions.ContainsKey(condition))
-            conditions[condition] = value;
-
-        if (IsVictory()) PlayState.Instance.Win(); 
+        
     }
 
     bool IsVictory()

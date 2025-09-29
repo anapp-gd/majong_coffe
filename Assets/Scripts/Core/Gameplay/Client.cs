@@ -53,46 +53,19 @@ public class Client : MonoBehaviour
             {
                 Leave(dish, success: false);
             }
-        }
+        } 
     }
-
-    void FinalyLeave(Dish dish, bool success)
-    {
-        int value = 0; 
-        if (!success)
-        {
-            if (dish == null)
-            {
-                Debug.Log("Клиент ушёл недовольным! (не осталось блюд)"); 
-            }
-            else
-            {
-                if (PlayerEntity.Instance.TryAddResourceValue(5))
-                {
-                    value = 5;
-                    Debug.Log($"Клиент ушёл недовольным!");
-                } 
-            }
-        }
-        else
-        {
-            if (PlayerEntity.Instance.TryAddResourceValue(10))
-            {
-                value = 10;
-                Debug.Log($"Клиент ушёл довольный!");
-            } 
-        }
-
-        PlayState.Instance.AddValue(value);
-    }
-
+     
     public void MoveToQueuePosition(Vector3 target, float duration = 0.4f, System.Action onArrived = null)
     {
         DOTween.Kill(transform);
 
         transform.DOMove(target, duration)
             .SetEase(Ease.OutCubic)
-            .OnComplete(() => onArrived?.Invoke());
+            .OnComplete(() =>
+            {
+                onArrived?.Invoke();
+            });
     }
 
     private void Leave(Dish dish, bool success)
@@ -127,9 +100,8 @@ public class Client : MonoBehaviour
             reaction = _happyReaction;
         }
 
-        PlayState.Instance.AddValue(value);
+        PlayState.Instance.AddValue(value); 
 
-        // --- Анимация реакции перед уходом ---
         if (reaction != null)
         {
             reaction.gameObject.SetActive(true);
@@ -139,20 +111,19 @@ public class Client : MonoBehaviour
             Sequence seq = DOTween.Sequence();
             seq.Append(reaction.DOScale(1f, 0.2f).SetEase(Ease.OutBack));
             seq.Join(reaction.DOLocalMoveY(1.5f, 0.6f).SetEase(Ease.OutCubic));
-            seq.AppendInterval(0.2f); 
-            seq.OnComplete(() =>
-            {
-                DOTween.Kill(transform); // убиваем твины объекта
-                _onLeave?.Invoke(this);  // теперь сигналим сервису → очередь сдвинется
-                Destroy(gameObject);
-            });
+            seq.AppendInterval(0.2f);
+            seq.OnComplete(Cleanup);
         }
         else
         {
-            // fallback: если реакции нет
-            DOTween.Kill(transform);
-            _onLeave?.Invoke(this);
-            Destroy(gameObject);
+            Cleanup();
         }
-    }
+
+        void Cleanup()
+        {
+            if (this != null && transform != null) DOTween.Kill(transform); 
+            gameObject.SetActive(false);
+            _onLeave?.Invoke(this);  
+        }
+    } 
 }

@@ -7,6 +7,7 @@ using UnityEngine;
 public class Board : MonoBehaviour
 {
     public event Action OnLose;
+    public event Action OnWin;
 
     [SerializeField] private TileView tileViewPrefab;
     [SerializeField] private float tileSizeX = 1f;
@@ -131,12 +132,13 @@ public class Board : MonoBehaviour
 
         if (IsBoardClear())
         {
-            _state.SetRemoveAllTiles();
+            OnWin?.Invoke();
+            return;
         }
-        else if(!HasAvailableMoves()) 
-        {
-            OnLose?.Invoke();
-        }
+
+        if (HasAvailableMoves()) return;
+        
+        OnLose?.Invoke();
     }
 
     public bool IsBoardClear()
@@ -147,17 +149,17 @@ public class Board : MonoBehaviour
     public bool HasAvailableMoves()
     {
         var availables = MadjongGenerator.GetFreeTiles();
-
+         
         for (int i = 0; i < availables.Count; i++)
         {
             for (int j = i + 1; j < availables.Count; j++)
             {
                 if (availables[i].TileType == availables[j].TileType)
                 {
-                    return true;
+                    return true;  
                 }
             }
-        } 
+        }
 
         return false;
     }

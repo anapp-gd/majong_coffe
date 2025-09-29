@@ -35,13 +35,9 @@ public class TutorState : PlayState
         _client.Init(this, _haseDish);
 
         _board.OnLose += Lose;
+        _board.OnWin += Win;
 
-        UIModule.Inject(this, _board, _window, _client);
-
-        _winConditions = new WinConditions(new[]
-        {
-            WinCondition.TableClear, WinCondition.RemoveAllTiles
-        });
+        UIModule.Inject(this, _board, _window, _client); 
     }
 
     public override void Close()
@@ -50,34 +46,57 @@ public class TutorState : PlayState
         {
             playCanvas.OpenPanel<PlayPanel>();
         }
-    }
+    } 
 
-    public override void SetRemoveAllTiles()
+    protected override IEnumerator WinRoutine()
     {
         _window.Finish();
 
-        _client.Finish(() =>
+        yield return _client.Finish();
+
+        stage++;
+
+        int indexScene = 0;
+
+        if (stage == 3)
         {
-            _winConditions.SetCompleted(WinCondition.RemoveAllTiles, true);
+            PlayerEntity.Instance.TutorDone = true;
+            AnalyticsHolder.TutorDone();
+        }
 
-            if (stage >= 3)
+        PlayerEntity.Instance.TutorialStage = stage;
+        PlayerEntity.Instance.Save();
+
+        InvokePlayStatusChanged(PlayStatus.win);
+        _status = PlayStatus.win;
+
+        _audioSource.PlayOneShot(_audioWin);
+
+        AnalyticsHolder.Victory();
+        AnalyticsHolder.LevelFinish(PlayerEntity.Instance.GetCurrentLevel);
+
+        if (stage == 1) indexScene = 4;
+
+        if (stage == 2) indexScene = 5;
+
+        if (stage == 3)
+        {
+            if (UIModule.OpenCanvas<LoadingCanvas>(out var loadingCanvas))
             {
-                PlayerEntity.Instance.TutorialStage = 3;
-                PlayerEntity.Instance.TutorDone = true;
-                PlayerEntity.Instance.Save();
-                if (UIModule.OpenCanvas<LoadingCanvas>(out var loadingCanvas))
+                loadingCanvas.OpenPanel<LoadingPanel>(false, () =>
                 {
-                    loadingCanvas.OpenPanel<LoadingPanel>(false, () =>
-                    {
-                        SceneManager.LoadScene(1);
-                    });
-                }
+                    SceneManager.LoadScene(2);
+                });
             }
-        });
-
-        
-    }
-
+        }
+        else if (UIModule.OpenCanvas<LoadingCanvas>(out var loadingCanvas))
+        {
+            loadingCanvas.OpenPanel<LoadingPanel>(false, () =>
+            {
+                SceneManager.LoadScene(indexScene);
+            });
+        }
+    } 
     public override void AddValue(int value)
     {
         _resultValue += value;
@@ -109,52 +128,7 @@ public class TutorState : PlayState
             }
         }
     } 
-
-    public override void Win()
-    {
-        stage++;
-
-        int indexScene = 0;
-
-        if (stage == 3)
-        {
-            PlayerEntity.Instance.TutorDone = true;
-            AnalyticsHolder.TutorDone();
-        }
-
-        PlayerEntity.Instance.TutorialStage = stage;
-        PlayerEntity.Instance.Save(); 
-
-        InvokePlayStatusChanged(PlayStatus.win);
-        _status = PlayStatus.win;
-
-        _audioSource.PlayOneShot(_audioWin);
-
-        AnalyticsHolder.Victory();
-
-        if (stage == 1) indexScene = 4; 
-
-        if (stage == 2) indexScene = 5;
-
-        if (stage == 3)
-        {
-            if (UIModule.OpenCanvas<LoadingCanvas>(out var loadingCanvas))
-            {
-                loadingCanvas.OpenPanel<LoadingPanel>(false, () =>
-                {
-                    SceneManager.LoadScene(2);
-                });
-            }
-        }
-        else if (UIModule.OpenCanvas<LoadingCanvas>(out var loadingCanvas))
-        {
-            loadingCanvas.OpenPanel<LoadingPanel>(false, () =>
-            {
-                SceneManager.LoadScene(indexScene);
-            });
-        }
-    }
-
+     
     public override void Lose()
     {
         InvokePlayStatusChanged(PlayStatus.lose);
